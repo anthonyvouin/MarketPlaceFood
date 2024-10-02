@@ -60,3 +60,8 @@ model VerificationToken {
   @@unique([identifier, token])
   @@map("verification_tokens")
 }
+
+model Category {
+  id   String @id @default(cuid())
+  name String @unique
+}

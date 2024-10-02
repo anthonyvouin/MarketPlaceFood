@@ -1,4 +1,4 @@
-import ButtonsProvider from "./../components/auth/ButtonsProvider";
+import ButtonsProvider from "../components/auth/ButtonsProvider";
 
 
 
