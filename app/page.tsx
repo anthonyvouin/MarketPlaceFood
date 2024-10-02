@@ -1,6 +1,5 @@
 "use client"
 import { useSession } from "next-auth/react";
-import ButtonsProvider from "./components/auth/ButtonsProvider";
 
 export default function Home() {
 
@@ -8,7 +7,6 @@ export default function Home() {
   console.log(session);
   return (
     
-      <ButtonsProvider />
-      
+      <h1>Page d'accueil</h1>
   );
 }
