@@ -5,7 +5,7 @@
 git clone
 ```
 
-## run server
+## Run server
 
 ```bash
 npm run dev
@@ -16,4 +16,11 @@ npm run dev
 
 ```bash
 npx  prisma migrate dev
+```
+
+
+## Créer une nouvelle migration
+
+```bash
+npx prisma migrate dev --name nom de la migration
 ```
