@@ -1,5 +1,5 @@
 
-## Getting Started
+## Recuperation du projet
 
 ```bash
 git clone
