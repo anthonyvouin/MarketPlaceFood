@@ -32,7 +32,7 @@ export async function getAllCategories() {
     try {
         return await prisma.category.findMany({
             orderBy: {
-                name: 'asc', // 'asc' pour un tri croissant (ordre alphabétique)
+                name: 'asc', 
             },
         });
     } catch (error) {

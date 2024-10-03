@@ -18,7 +18,9 @@ const CategoryPage = () => {
     }, []);
 
     const handleAddCategory = (data: Category) => {
-        setCategories([...categories, data]);
+        const updatedCategories = [...categories, data];
+        updatedCategories.sort((a, b) => a.name.localeCompare(b.name));
+        setCategories(updatedCategories);
     };
 
     return (
