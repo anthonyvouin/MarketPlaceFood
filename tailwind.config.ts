@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import {red} from "next/dist/lib/picocolors";
 
 const config: Config = {
   content: [
@@ -11,6 +12,10 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        light:"#F7EFE9",
+        redColor: "#d51c1c",
+        primaryColor:'#E0475B'
+
       },
     },
   },
