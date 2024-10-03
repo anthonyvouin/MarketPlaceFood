@@ -57,3 +57,31 @@ export async function deleteCategoryById(id: Category['id']) {
         throw new Error('La suppression de la catégorie a échoué');
     }
 }
+
+//Function pour update une category par son id
+export async function updateCategory(category: Category) {
+    if (!category.id) {
+        throw new Error('L\'ID de la catégorie est requis pour la mise à jour.');
+    }
+
+    if (!category.name || category.name.trim() === '') {
+        throw new Error('Le nouveau nom de la catégorie est requis et doit être une chaîne de caractères non vide.');
+    }
+
+    try {
+        const updatedCategory: Category = await prisma.category.update({
+            where: {
+                id: category.id,
+            },
+            data: {
+                name: category.name,
+            },
+        });
+        return updatedCategory;
+    } catch (error: any) {
+        if (error.code === 'P2002') {
+            throw new Error('Une catégorie avec ce nom existe déjà.');
+        }
+        throw new Error('La mise à jour de la catégorie a échoué');
+    }
+}
