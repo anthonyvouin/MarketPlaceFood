@@ -4,10 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-.nav-title{
-  background: var(--light);
-}
 body {
   color: var(--foreground);
   background: var(--background);

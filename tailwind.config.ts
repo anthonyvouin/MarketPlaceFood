@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-import {red} from "next/dist/lib/picocolors";
 
 const config: Config = {
   content: [
