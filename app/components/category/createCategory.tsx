@@ -20,7 +20,6 @@ const CreateCategory = ({emitAddCategory}) => {
 
         try {
             const newCategorySave: Category = await createCategory(newCategory);
-            console.log(emitAddCategory)
             emitAddCategory(newCategorySave)
             setSuccess('Catégorie créée avec succès');
             setName('');
