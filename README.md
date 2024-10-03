@@ -24,3 +24,8 @@ npx  prisma migrate dev
 ```bash
 npx prisma migrate dev --name nom de la migration
 ```
+
+Projet développé par : 
+Anthony Vouin
+Charline Royer
+Matthias Faucon
