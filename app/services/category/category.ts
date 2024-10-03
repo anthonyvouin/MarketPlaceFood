@@ -30,9 +30,30 @@ export async function createCategory(category: Category) {
 // Function pour recupérer toutes les categories 
 export async function getAllCategories() {
     try {
-        return await prisma.category.findMany();
-
+        return await prisma.category.findMany({
+            orderBy: {
+                name: 'asc', // 'asc' pour un tri croissant (ordre alphabétique)
+            },
+        });
     } catch (error) {
         throw new Error('La récupération des catégories a échoué');
+    }
+}
+
+// Function pour supprimmer une category par son id
+export async function deleteCategoryById(id: Category['id']) {
+    if (!id) {
+        throw new Error('L\'ID de la catégorie est requis pour la suppression.');
+    }
+
+    try {
+        await prisma.category.delete({
+            where: {
+                id: id,
+            },
+        });
+        return { message: 'Catégorie supprimée avec succès.' };
+    } catch (error) {
+        throw new Error('La suppression de la catégorie a échoué');
     }
 }
