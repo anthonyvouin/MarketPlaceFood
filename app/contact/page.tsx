@@ -3,8 +3,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { createContact } from '@/app/services/contact/contact'; // Assurez-vous que le chemin est correct
-import { Contact } from '@/app/interface/contact/contact'; // Assurez-vous que le chemin est correct
+import { createContact } from '@/app/services/contact/contact'; 
+import { Contact } from '@/app/interface/contact/contact';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const CreateContact = () => {
     const [firstName, setFirstName] = useState('');
@@ -14,9 +15,17 @@ const CreateContact = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const [captchaValue, setCaptchaValue] = useState<string | null>(null); 
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+
+          
+      // Vérifiez que le captcha est coché
+      if (!captchaValue) {
+        setError('Veuillez prouver que vous n\'êtes pas un robot.');
+        return;
+    }
 
         const newContact: Contact = { firstName, lastName, email, subject, message };
         console.log('Données à envoyer:', newContact); 
@@ -29,6 +38,7 @@ const CreateContact = () => {
             setEmail('');
             setSubject('');
             setMessage('');
+            setCaptchaValue(null);
             setError(null);
         } catch (err) {
             console.error('Erreur lors de la création du contact:', err); 
@@ -39,7 +49,7 @@ const CreateContact = () => {
 
     return (
         <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-md">
-            <h2 className="text-2xl font-semibold mb-4 text-center">Créer un nouveau contact</h2>
+            <h1 className="text-2xl font-semibold mb-4 text-center">Formulaire de contact</h1>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                     <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
@@ -105,6 +115,13 @@ const CreateContact = () => {
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                 </div>
+
+                {/* Ajout de reCAPTCHA */}
+                   <ReCAPTCHA
+                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} // Utilisez la variable d'environnement
+                    onChange={(value:any) => setCaptchaValue(value)} // Stocke la valeur du captcha
+                />
+             
                 <button
                     type="submit"
                     className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
