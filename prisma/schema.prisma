@@ -65,3 +65,15 @@ model Category {
   id   String @id @default(cuid())
   name String @unique
 }
+
+model Contact {
+  id         String   @id @default(cuid())
+  firstName  String   @map("first_name")
+  lastName   String   @map("last_name")
+  email      String
+  subject    String
+  message    String   @db.Text
+  submittedAt DateTime @default(now()) @map("submitted_at")
+ 
+  @@map("contacts")
+}
