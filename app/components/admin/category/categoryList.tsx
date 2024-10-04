@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Category } from '../../interface/category/category';
-import { CategoryListProps } from '../../interface/category/props';
-import { deleteCategoryById } from '../../services/category/category'; // Import de la fonction delete
+import { Category } from '../../../interface/category/category';
+import { CategoryListProps } from '../../../interface/category/props';
+import { deleteCategoryById } from '../../../services/category/category'; // Import de la fonction delete
 
 const CategoryList: React.FC<CategoryListProps> = ({ categories: initialCategories }) => {
     const [categories, setCategories] = useState<Category[]>([]);

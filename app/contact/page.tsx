@@ -1,4 +1,3 @@
-// app/components/CreateContact.tsx
 
 "use client";
 
@@ -21,14 +20,12 @@ const CreateContact = () => {
         event.preventDefault();
 
           
-      // Vérifiez que le captcha est coché
       if (!captchaValue) {
         setError('Veuillez prouver que vous n\'êtes pas un robot.');
         return;
     }
 
         const newContact: Contact = { firstName, lastName, email, subject, message };
-        console.log('Données à envoyer:', newContact); 
 
         try {
             await createContact(newContact);
@@ -41,7 +38,6 @@ const CreateContact = () => {
             setCaptchaValue(null);
             setError(null);
         } catch (err) {
-            console.error('Erreur lors de la création du contact:', err); 
             setError('Erreur lors de la création du contact.');
             setSuccess(null);
         }
@@ -116,10 +112,9 @@ const CreateContact = () => {
                     />
                 </div>
 
-                {/* Ajout de reCAPTCHA */}
                    <ReCAPTCHA
-                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} // Utilisez la variable d'environnement
-                    onChange={(value:any) => setCaptchaValue(value)} // Stocke la valeur du captcha
+                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} 
+                    onChange={(value:any) => setCaptchaValue(value)} 
                 />
              
                 <button

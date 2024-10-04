@@ -1,8 +1,8 @@
 'use client';
 
-import CreateCategory from "@/app/components/category/createCategory";
-import CategoryList from "@/app/components/category/categoryList";
-import UpdateCategory from "@/app/components/category/updateCategory";
+import CreateCategory from "@/app/components/admin/category/createCategory";
+import CategoryList from "@/app/components/admin/category/categoryList";
+import UpdateCategory from "@/app/components/admin/category/updateCategory";
 import { Category } from "@prisma/client";
 import { getAllCategories } from "@/app/services/category/category";
 import { useEffect, useState } from "react";

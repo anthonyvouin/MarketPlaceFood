@@ -5,6 +5,7 @@ import { Contact } from '@/app/interface/contact/contact';
 
 const prisma = new PrismaClient();
 
+// Function pour créer un nouveau contact
 export async function createContact(contact: Contact) {
     if (!contact.firstName || !contact.lastName || !contact.email || !contact.subject || !contact.message) {
         throw new Error('Tous les champs (prénom, nom, email, objet, message) sont requis.');
@@ -26,7 +27,35 @@ export async function createContact(contact: Contact) {
         });
         return newContact;
     } catch (error: any) {
-        console.error('Erreur lors de la création du contact:', error); 
         throw new Error('La création du contact a échoué');
+    }
+}
+
+// Function pour récupérer tous les contacts
+export async function getAllContacts() {
+    try {
+        return await prisma.contact.findMany();
+    } catch (error) {
+        throw new Error('La récupération des contacts a échoué');
+    }
+}
+
+
+
+// Function pour supprimer un contact par son id
+export async function deleteContactById(id: Contact['id']) {
+    if (!id) {
+        throw new Error('L\'ID du contact est requis pour la suppression.');
+    }
+
+    try {
+        await prisma.contact.delete({
+            where: {
+                id: id,
+            },
+        });
+        return { message: 'Contact supprimée avec succès.' };
+    } catch (error) {
+        throw new Error('La suppression du contact a échoué');
     }
 }
