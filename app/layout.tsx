@@ -31,12 +31,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-    {/*<Head>*/}
-    {/*    <link*/}
-    {/*        href="https://fonts.googleapis.com/icon?family=Material+Icons"*/}
-    {/*        rel="stylesheet"*/}
-    {/*    />*/}
-    {/*</Head>*/}
+    <Head>
+        <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet"
+        />
+    </Head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

@@ -15,18 +15,14 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
     return (
         <>
             <Theme>
-
                 <div className="flex">
                     <Sidebar/>
                     <div className="w-full">
                         <HeaderClient/>
                         {children}
                     </div>
-
                 </div>
-
             </Theme>
-
         </>
     );
 }

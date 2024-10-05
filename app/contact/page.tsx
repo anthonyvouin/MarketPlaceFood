@@ -44,9 +44,11 @@ const CreateContact = () => {
     return (
         <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-md">
             <h1 className="text-2xl font-semibold mb-4 text-center">Formulaire de contact</h1>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit}
+                  className="space-y-6">
                 <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="firstName"
+                           className="block text-sm font-medium text-gray-700">
                         Prénom :
                     </label>
                     <input

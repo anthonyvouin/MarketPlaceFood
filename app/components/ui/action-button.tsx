@@ -1,12 +1,7 @@
 "use client"
 import {Button} from "@radix-ui/themes";
 import * as RadixIcons from "@radix-ui/react-icons";
-
-interface ActionButtonProps {
-    onClickAction: () => void;
-    message: string;
-    icon?: string;
-}
+import {ActionButtonProps} from "@/app/interface/ui/button-action-interface";
 
 export default function ActionButton({
                                          onClickAction,
@@ -18,7 +13,6 @@ export default function ActionButton({
     }
 
     const IconComponent = icons[icon];
-
 
     return (
         <Button onClick={onClickAction}>
