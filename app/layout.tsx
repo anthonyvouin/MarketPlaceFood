@@ -1,5 +1,6 @@
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
+import SessionWrapper from "@/lib/SessionWrapper";
 import { Theme } from "@radix-ui/themes";
 import Sidebar from "./components/Sidebar";
 
@@ -18,7 +19,7 @@ export default function RootLayout({
         <body className="min-h-screen">
           <Theme className="flex">
             <Sidebar />
-            {children}
+            <SessionWrapper>{children}</SessionWrapper>
           </Theme>
         </body>
     </html>
