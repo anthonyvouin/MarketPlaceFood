@@ -14,8 +14,11 @@ const config: Config = {
         light:"#F7EFE9",
         redColor: "#d51c1c",
         primaryColor:'#E0475B',
-        actionColor:'#85BC39'
-
+        actionColor:'#85BC39',
+        primaryBackgroundColor: '#EBF2F0',
+      },
+      fontFamily: {
+        manrope: ["Manrope", "sans-serif"],
       },
     },
   },
