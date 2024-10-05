@@ -32,6 +32,10 @@ body {
 }
 
 
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined' !important;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
