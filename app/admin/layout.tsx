@@ -1,21 +1,12 @@
 import SessionWrapper from "@/lib/SessionWrapper";
 import Link from "next/link";
-import Head from "next/head";
 
 export default function AdminLayout({children}: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
         <html lang="en">
-        <Head>
-            {/* Inclure Google Fonts League Spartan dans le head */}
-            <link
-                href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&display=swap"
-                rel="stylesheet"
-            />
-        </Head>
-        <body
-        >
+        <body>
         <div className="flex  h-screen">
             <nav className="flex flex-col width-15  bg-light">
                 <Link href="/admin/dashboard"
