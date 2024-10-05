@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Contact } from '../../../interface/contact/contact'; // Ajustez le chemin d'importation si nécessaire
-import { deleteContactById } from '../../../services/contact/contact'; // Importez la fonction de suppression
+import { Contact } from '../../../interface/contact/contact';
+import { deleteContactById } from '../../../services/contact/contact';
 
 const ContactList: React.FC<{ contacts: Contact[] }> = ({ contacts: initialContacts }) => {
     const [contacts, setContacts] = useState<Contact[]>([]);
