@@ -1,12 +1,8 @@
-
-
 import type {Metadata} from "next";
 import localFont from "next/font/local";
 import SessionWrapper from "@/lib/SessionWrapper";
-import Sidebar from "./components/Sidebar";
 import "@radix-ui/themes/styles.css";
 import "./globals.css";
-import HeaderClient from "@/app/components/header/client-header/header-client";
 import {Theme} from "@radix-ui/themes";
 import Head from "next/head";
 import LayoutWrapper from "./components/layoutWrapper/LayoutWrapper";
@@ -33,24 +29,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-
-
   return (
     <html lang="en">
-    <Head>
-        <link
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-            rel="stylesheet"
-        />
-    </Head>
+    {/*<Head>*/}
+    {/*    <link*/}
+    {/*        href="https://fonts.googleapis.com/icon?family=Material+Icons"*/}
+    {/*        rel="stylesheet"*/}
+    {/*    />*/}
+    {/*</Head>*/}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionWrapper>
-          <LayoutWrapper>       
+            <LayoutWrapper>
             {children}
-          </LayoutWrapper>
+            </LayoutWrapper>
         </SessionWrapper>
       </body>
     </html>

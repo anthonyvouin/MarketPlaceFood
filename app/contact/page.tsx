@@ -4,7 +4,6 @@ import React, {useState} from 'react';
 import {createContact} from '@/app/services/contact/contact';
 import {Contact} from '@/app/interface/contact/contact';
 import ReCAPTCHA from "react-google-recaptcha";
-import {useSession} from "next-auth/react";
 
 const CreateContact = () => {
     const [firstName, setFirstName] = useState('');
@@ -15,12 +14,6 @@ const CreateContact = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [captchaValue, setCaptchaValue] = useState<string | null>(null);
-
-    const {data: session, status} = useSession()
-    if (session && session.user) {
-        console.log(session.user.email)
-    }
-
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -53,7 +46,6 @@ const CreateContact = () => {
             <h1 className="text-2xl font-semibold mb-4 text-center">Formulaire de contact</h1>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                    <p>Signed in as {session?.user?.email}</p>
                     <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
                         Prénom :
                     </label>
