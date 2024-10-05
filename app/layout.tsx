@@ -1,3 +1,5 @@
+
+
 import type {Metadata} from "next";
 import localFont from "next/font/local";
 import SessionWrapper from "@/lib/SessionWrapper";
@@ -7,6 +9,7 @@ import "./globals.css";
 import HeaderClient from "@/app/components/header/client-header/header-client";
 import {Theme} from "@radix-ui/themes";
 import Head from "next/head";
+import LayoutWrapper from "./components/layoutWrapper/LayoutWrapper";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
@@ -20,7 +23,7 @@ const geistMono = localFont({
 });
 
 
-export const metadata = {
+export const metadata : Metadata = {
     title: 'Snap&Shop',
     description: 'Snappez, commandez, cuisinez.'
 };
@@ -30,6 +33,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+
+
   return (
     <html lang="en">
     <Head>
@@ -42,9 +48,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionWrapper>
-            <HeaderClient></HeaderClient>
-
+          <LayoutWrapper>       
             {children}
+          </LayoutWrapper>
         </SessionWrapper>
       </body>
     </html>
