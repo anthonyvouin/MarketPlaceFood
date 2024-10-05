@@ -1,3 +1,4 @@
+import AdminLayout from "@/app/admin/layout";
 
 export default function Admin() {
     return (

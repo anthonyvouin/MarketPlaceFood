@@ -5,7 +5,7 @@ import * as RadixIcons from "@radix-ui/react-icons";
 interface ActionButtonProps {
     onClickAction: () => void;
     message: string;
-    icon?: never;
+    icon?: string;
 }
 
 export default function ActionButton({

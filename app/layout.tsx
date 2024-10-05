@@ -43,7 +43,7 @@ export default function RootLayout({
       >
         <SessionWrapper>
             <HeaderClient></HeaderClient>
-            <Sidebar />
+
             {children}
         </SessionWrapper>
       </body>
