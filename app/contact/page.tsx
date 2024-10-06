@@ -2,7 +2,7 @@
 
 import React, {useState} from 'react';
 import {createContact} from '@/app/services/contact/contact';
-import {Contact} from '@/app/interface/contact/contact';
+import {ContactDto} from '@/app/interface/contact/contactDto';
 import ReCAPTCHA from "react-google-recaptcha";
 import Image from "next/image";
 
@@ -24,7 +24,7 @@ const CreateContact = () => {
             return;
         }
 
-        const newContact: Contact = {firstName, lastName, email, subject, message};
+        const newContact: ContactDto = {firstName, lastName, email, subject, message};
 
         try {
             await createContact(newContact);

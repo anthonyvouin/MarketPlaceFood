@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { getAllContacts } from '@/app/services/contact/contact';
 import ContactList from '@/app/components/admin/contact/contactList';
-import { Contact } from '@/app/interface/contact/contact';
+import { ContactDto } from '@/app/interface/contact/contactDto';
 const ContactsPage: React.FC = () => {
-    const [contacts, setContacts] = useState<Contact[]>([]);
+    const [contacts, setContacts] = useState<ContactDto[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     
     useEffect(() => {
