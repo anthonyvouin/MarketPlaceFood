@@ -2,9 +2,7 @@ import type {Metadata} from "next";
 import localFont from "next/font/local";
 import SessionWrapper from "@/lib/SessionWrapper";
 import "@radix-ui/themes/styles.css";
-import SessionWrapper from "@/lib/SessionWrapper";
 import "./globals.css";
-import {Theme} from "@radix-ui/themes";
 import Head from "next/head";
 import LayoutWrapper from "./components/layoutWrapper/LayoutWrapper";
 
@@ -32,12 +30,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-        <body className="min-h-screen">
-          <Theme className="flex">
-            <Sidebar />
-            {children}
-          </Theme>
-        </body>
+    <Head>
+        <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet"
+        />
+    </Head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <SessionWrapper>
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
+        </SessionWrapper>
+      </body>
     </html>
   );
 }
