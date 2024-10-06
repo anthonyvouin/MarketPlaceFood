@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getAllCategories } from '@/app/services/category/category';
 import { createProduct } from '@/app/services/products/product';
 import { CategoryDto } from '@/app/interface/category/categoryDto';
@@ -21,6 +21,8 @@ export default function CreateProductPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -79,6 +81,9 @@ export default function CreateProductPage() {
                 categoryId: '',
             });
             setImageFile(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
         } catch (err: any) {
             setError("Erreur lors de la création du produit : " + err.message);
         } finally {
@@ -131,6 +136,7 @@ export default function CreateProductPage() {
                             type="file"
                             accept="image/*"
                             onChange={handleImageChange}
+                            ref={fileInputRef} 
                             required
                         />
                     </div>
