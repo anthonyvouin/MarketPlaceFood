@@ -60,3 +60,7 @@ body {
   background-color: #eee;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.height-full{
+  min-height: calc(100vh - 42px);  /* 42 = taille de la barre*/
+}
