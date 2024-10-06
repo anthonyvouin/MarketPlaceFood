@@ -41,7 +41,7 @@ export default function CreateProductPage() {
     const { name, value } = e.target;
     setProduct((prevProduct) => ({
       ...prevProduct,
-      [name]: name === 'price' ? parseFloat(value) : value,
+      [name]: value,
     }));
   };
 
@@ -142,8 +142,8 @@ export default function CreateProductPage() {
               value={product.price}
               onChange={handleChange}
               required
+              step="0.01"
               min="0"
-              step="1"
             />
           </div>
           <div>
