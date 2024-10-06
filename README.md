@@ -15,7 +15,7 @@ npm run dev
 ## Lancer les migrations
 
 ```bash
-npx  prisma migrate dev
+npx  prisma migrate dev 
 ```
 
 
