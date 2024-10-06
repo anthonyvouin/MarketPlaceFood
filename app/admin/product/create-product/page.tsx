@@ -1,9 +1,13 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
-import { getAllCategories } from '@/app/services/category/category';
-import { createProduct } from '@/app/services/products/product';
-import { CategoryDto } from '@/app/interface/category/categoryDto';
-import { uploadImage } from '@/lib/uploadImage';
+import React, {useState, useEffect, useRef} from 'react';
+import {getAllCategories} from '@/app/services/category/category';
+import {createProduct} from '@/app/services/products/product';
+import {CategoryDto} from '@/app/interface/category/categoryDto';
+import {uploadImage} from '@/lib/uploadImage';
+import DragAndDrop from "@/app/components/dragAndDrop/dragAndDrop";
+import ImagePreview from "@/app/components/imagePreview/imagePreview";
+import ActionButton from "@/app/components/ui/action-button";
+
 
 export default function CreateProductPage() {
     const [product, setProduct] = useState({
@@ -40,19 +44,13 @@ export default function CreateProductPage() {
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setProduct((prevProduct) => ({
             ...prevProduct,
             [name]: value,
         }));
     };
 
-
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setImageFile(e.target.files[0]);
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -62,14 +60,15 @@ export default function CreateProductPage() {
 
 
         try {
-            let imagePath = product.image;
+            let imagePath: string = '';
+            console.log(imagePath)
             if (imageFile) {
                 const formData = new FormData();
                 formData.append('file', imageFile);
                 imagePath = await uploadImage(formData);
             }
 
-            const productWithImage = { ...product, image: imagePath };
+            const productWithImage = {...product, image: imagePath};
             await createProduct(productWithImage);
             setSuccess("Produit créé avec succès !");
             setProduct({
@@ -91,88 +90,119 @@ export default function CreateProductPage() {
         }
     };
 
-    return (
-        <div>
-            <h1>Créer un Produit</h1>
-            {loadingCategories ? (
-                <p>Chargement des catégories...</p>
-            ) : (
-                <form onSubmit={handleSubmit}>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
-                    {success && <p style={{ color: 'green' }}>{success}</p>}
+    const deleteImage = () => {
+        setImageFile(null)
+    }
 
-                    <div>
-                        <label>Nom:</label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={product.name}
-                            onChange={handleChange}
-                            required
-                        />
+    const handleImage = (image: File) => {
+        if (image) {
+            setImageFile(image);
+        } else {
+            setImageFile(null);
+        }
+    };
+
+    return (
+        <div className="bg-primaryBackgroundColor min-h-screen">
+            <div className="p-5 bg-primaryBackgroundColor">
+                <h1 className="text-2xl mb-5">Créer un Produit</h1>
+                {loadingCategories ? (
+                    <p>Chargement des catégories...</p>
+                ) : (
+                    <div className="flex justify-center">
+                        <div className="w-3/6 max-w-xl p-6 mr-12 bg-white shadow-md rounded-md">
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                {error && <p style={{color: 'red'}}>{error}</p>}
+                                {success && <p style={{color: 'green'}}>{success}</p>}
+
+                                <div className="flex justify-between">
+                                    <div>
+                                        <label>Nom</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            className="w-60 block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"
+                                            value={product.name}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label>Slug</label>
+                                        <input
+                                            type="text"
+                                            name="slug"
+                                            value={product.slug}
+                                            onChange={handleChange}
+                                            className="w-60 block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex justify-between">
+                                    <div>
+                                        <label>Prix</label>
+                                        <input
+                                            type="number"
+                                            name="price"
+                                            value={product.price}
+                                            onChange={handleChange}
+                                            className="block w-60 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"
+                                            required
+                                            step="0.01"
+                                            min="0"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label>Catégorie</label>
+                                        <select
+                                            name="categoryId"
+                                            value={product.categoryId}
+                                            onChange={handleChange}
+                                            className="block w-60 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"
+                                            required
+                                        >
+                                            <option value="">Sélectionnez une catégorie</option>
+                                            {categories.map((category) => (
+                                                <option key={category.id} value={category.id}>
+                                                    {category.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <label>Description</label>
+                                    <textarea
+                                        name="description"
+                                        value={product.description}
+                                        className="w-full h-32 block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+
+                                {imageFile ? (
+                                    <div className='flex items-center justify-center'>
+                                        <ImagePreview file={imageFile}></ImagePreview>
+                                        <ActionButton onClickAction={() => deleteImage()} message="Supprimer" positionIcon="right" icon='delete' color="tomato"/>
+                                    </div>
+
+                                ) : (<DragAndDrop onDrop={handleImage}></DragAndDrop>)}
+
+
+                                <button type="submit" disabled={loading}
+                                        className="w-full py-2 px-4 bg-actionColor transition ease-in-out delay-150 hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                    {loading ? 'Création en cours...' : 'Créer le produit'}
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                    <div>
-                        <label>Slug:</label>
-                        <input
-                            type="text"
-                            name="slug"
-                            value={product.slug}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label>Description:</label>
-                        <textarea
-                            name="description"
-                            value={product.description}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label>Image:</label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            ref={fileInputRef} 
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label>Prix:</label>
-                        <input
-                            type="number"
-                            name="price"
-                            value={product.price}
-                            onChange={handleChange}
-                            required
-                            step="0.01"
-                            min="0"
-                        />
-                    </div>
-                    <div>
-                        <label>Catégorie:</label>
-                        <select
-                            name="categoryId"
-                            value={product.categoryId}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Sélectionnez une catégorie</option>
-                            {categories.map((category) => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <button type="submit" disabled={loading}>
-                        {loading ? 'Création en cours...' : 'Créer le produit'}
-                    </button>
-                </form>
-            )}
+
+                )}
+            </div>
         </div>
+
     );
 }

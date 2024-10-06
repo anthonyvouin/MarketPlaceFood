@@ -37,10 +37,10 @@ export default function ProductPage() {
     return (
         <div>
             <div className="flex flex-row-reverse">
-                <ActionButton onClickAction={() => navigateToRoute()} message="Créer un produit" icon="plus" positionIcon='left'></ActionButton>
+                <ActionButton onClickAction={() => navigateToRoute()} message="Créer un produit" icon="plus" positionIcon='left' color="jade"></ActionButton>
             </div>
             {products.length === 0 ? (
-                <p className="text-center text-gray-500">Aucune catégorie disponible.</p>
+                <p className="text-center text-gray-500">Aucuns produits disponible.</p>
             ) : (
                 <div>
                     <Table.Root>
