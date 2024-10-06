@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { getAllCategories } from '@/app/services/category/category';
 import { createProduct } from '@/app/services/products/product';
-
 import { Category } from '@/app/interface/category/category';
+import { uploadImage } from '@/lib/uploadImage';
 
 export default function CreateProductPage() {
   const [product, setProduct] = useState({
@@ -15,6 +15,7 @@ export default function CreateProductPage() {
     categoryId: '',
   });
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -27,7 +28,6 @@ export default function CreateProductPage() {
         const fetchedCategories = await getAllCategories();
         setCategories(fetchedCategories);
       } catch (err) {
-        console.error("Erreur lors de la récupération des catégories :", err);
         setError("Erreur lors de la récupération des catégories.");
       } finally {
         setLoadingCategories(false);
@@ -45,31 +45,46 @@ export default function CreateProductPage() {
     }));
   };
 
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(null);
 
-  
 
     try {
-      await createProduct(product);
-      setSuccess("Produit créé avec succès !");
-      setProduct({
-        name: '',
-        slug: '',
-        description: '',
-        image: '',
-        price: 0,
-        categoryId: '',
-      });
-    } catch (err: any) {
-      setError("Erreur lors de la création du produit : " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+        let imagePath = product.image;
+        if (imageFile) {
+          const formData = new FormData();
+          formData.append('file', imageFile);
+          imagePath = await uploadImage(formData);
+        }
+  
+        const productWithImage = { ...product, image: imagePath };
+        await createProduct(productWithImage);
+        setSuccess("Produit créé avec succès !");
+        setProduct({
+          name: '',
+          slug: '',
+          description: '',
+          image: '',
+          price: 0,
+          categoryId: '',
+        });
+        setImageFile(null);
+      } catch (err: any) {
+        setError("Erreur lors de la création du produit : " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
   return (
     <div>
@@ -111,12 +126,11 @@ export default function CreateProductPage() {
             />
           </div>
           <div>
-            <label>Image (URL):</label>
+            <label>Image:</label>
             <input
-              type="text"
-              name="image"
-              value={product.image}
-              onChange={handleChange}
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
               required
             />
           </div>
