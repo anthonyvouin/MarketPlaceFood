@@ -44,12 +44,32 @@ export async function createProduct(product: ProductDto) {
     }
 }
 
-export async function getProducts() {
+export async function getAllProducts(): Promise<ProductDto[]> {
     try {
-        const products = await prisma.product.findMany();
-        return products;
+        const products: ProductWithCategory[] = await prisma.product.findMany({
+            orderBy: {
+                name: 'asc',
+            },
+            include: {
+                category: true,
+            },
+        });
+        return transformProductDto(products);
     } catch (error) {
-        console.error("Erreur lors de la récupération des produits :", error);
-        throw new Error('La récupération des produits a échoué.');
+        throw new Error('La récupération des produits a échoué');
     }
+}
+
+
+export async function transformProductDto(products: ProductWithCategory[]): Promise<ProductDto[]> {
+    const result: ProductDto[] = []
+
+    products.map((element: ProductWithCategory) => {
+        const product: ProductDto = {
+            ...element, price: element.price.toNumber()
+        }
+        result.push(product)
+    })
+
+    return result
 }

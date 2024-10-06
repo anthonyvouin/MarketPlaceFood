@@ -2,11 +2,11 @@
 import ActionButton from "@/app/components/ui/action-button";
 import {useRouter} from "next/navigation";
 import React, {useEffect, useState} from "react";
-import {getAllProducts} from "@/app/services/products/product";
 import {Product} from "@prisma/client";
 import {Table} from "@radix-ui/themes";
 import {ProductDto} from "@/app/interface/product/productDto";
 import {formatPrice} from "@/app/pipe/format";
+import {getAllProducts} from "@/app/services/products/product";
 
 
 export default function ProductPage() {
@@ -53,7 +53,6 @@ export default function ProductPage() {
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
-
 
                             {products.map((product: ProductDto) => (
                                 <Table.Row>
