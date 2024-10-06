@@ -35,6 +35,10 @@ export default function AdminLayout({children}: Readonly<{
                           className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation">
                         Contacts
                     </Link>
+                    <Link href="/admin/product"
+                          className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation">
+                        Produits
+                    </Link>
                 </nav>
 
                 <div className="width-85 p-2.5">
