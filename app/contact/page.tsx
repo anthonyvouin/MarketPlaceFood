@@ -1,9 +1,8 @@
-
 "use client";
 
-import React, { useState } from 'react';
-import { createContact } from '@/app/services/contact/contact'; 
-import { Contact } from '@/app/interface/contact/contact';
+import React, {useState} from 'react';
+import {createContact} from '@/app/services/contact/contact';
+import {Contact} from '@/app/interface/contact/contact';
 import ReCAPTCHA from "react-google-recaptcha";
 
 const CreateContact = () => {
@@ -14,18 +13,17 @@ const CreateContact = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
-    const [captchaValue, setCaptchaValue] = useState<string | null>(null); 
+    const [captchaValue, setCaptchaValue] = useState<string | null>(null);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-          
-      if (!captchaValue) {
-        setError('Veuillez prouver que vous n\'êtes pas un robot.');
-        return;
-    }
+        if (!captchaValue) {
+            setError('Veuillez prouver que vous n\'êtes pas un robot.');
+            return;
+        }
 
-        const newContact: Contact = { firstName, lastName, email, subject, message };
+        const newContact: Contact = {firstName, lastName, email, subject, message};
 
         try {
             await createContact(newContact);
@@ -46,9 +44,11 @@ const CreateContact = () => {
     return (
         <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-md">
             <h1 className="text-2xl font-semibold mb-4 text-center">Formulaire de contact</h1>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit}
+                  className="space-y-6">
                 <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="firstName"
+                           className="block text-sm font-medium text-gray-700">
                         Prénom :
                     </label>
                     <input
@@ -112,11 +112,11 @@ const CreateContact = () => {
                     />
                 </div>
 
-                   <ReCAPTCHA
-                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} 
-                    onChange={(value:any) => setCaptchaValue(value)} 
+                <ReCAPTCHA
+                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                    onChange={(value: any) => setCaptchaValue(value)}
                 />
-             
+
                 <button
                     type="submit"
                     className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
