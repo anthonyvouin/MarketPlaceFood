@@ -13,7 +13,7 @@ const config: Config = {
         foreground: "var(--foreground)",
         light:"#F7EFE9",
         redColor: "#d51c1c",
-        primaryColor:'#E0475B',
+        primaryColor:'#F54747',
         actionColor:'#85BC39',
         primaryBackgroundColor: '#EBF2F0',
       },

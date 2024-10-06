@@ -23,33 +23,48 @@ export default function HeaderClient() {
                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                    focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"/>
 
-            <div className="flex gap-5">
+            <div className="flex gap-5 items-center">
                 <Link href="/contact">
                     <Avatar
+                        size="2"
+                        className="bg-actionColor"
                         fallback={
-                            <Box className='flex justify-center justify-items-center' width="24px" height="24px">
-                                <EnvelopeClosedIcon width="24" height="20"/>
+                            <Box className='flex justify-center items-center' width="15px" height="15px">
+                                <EnvelopeClosedIcon className='text-light' width="15" height="15"/>
                             </Box>
                         }
                         radius="full"
-                        color="indigo"
-                        variant="solid"
+                        variant="soft"
                     />
                 </Link>
-
                 <Avatar
+                    size="2"
+                    className="bg-actionColor"
                     fallback={
-                        <Box className='flex justify-center justify-items-center' width="24px" height="24px">
-                            <BellIcon width="24" height="20"/>
+                        <Box className='flex justify-center items-center' width="15px" height="15px">
+                            <BellIcon className="text-light" width="15" height="15"/>
                         </Box>
                     }
                     radius="full"
-                    color="indigo"
-                    variant="solid"
+                    variant="soft"
                 />
 
-                <Avatar fallback={name} radius="full"/>
-                <LogoutButton></LogoutButton>
+                {status === 'authenticated' ? (
+                    <>
+                        <Avatar className="bg-actionColor"
+                                size="2"
+                                fallback={
+                                    <Box>
+                                        <span className="text-light">{name}</span>
+                                    </Box>}
+                                radius="full"/>
+                        <LogoutButton/>
+                    </>
+                ) : (
+                    <Link href="/login"
+                          className="border-b-2 border-actionColor">Se connecter</Link>
+                )}
+
 
             </div>
         </div>
