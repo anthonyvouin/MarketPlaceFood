@@ -40,3 +40,13 @@ export async function createProduct(product: Product) {
         throw new Error('La création du produit a échoué.');
     }
 }
+
+export async function getProducts() {
+    try {
+        const products = await prisma.product.findMany();
+        return products;
+    } catch (error) {
+        console.error("Erreur lors de la récupération des produits :", error);
+        throw new Error('La récupération des produits a échoué.');
+    }
+}

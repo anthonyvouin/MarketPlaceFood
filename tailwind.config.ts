@@ -17,6 +17,12 @@ const config: Config = {
         actionColor:'#85BC39',
         primaryBackgroundColor: '#EBF2F0',
       },
+      backgroundColor: {
+        tertiaryColorPink: '#FBB6B2',
+        tertiaryColorOrange: '#F6C778',
+        tertiaryColorBlue: '#61D4EC',
+        tertiaryColorPurple: '#9682DA',
+      },
       fontFamily: {
         manrope: ["Manrope", "sans-serif"],
       },
