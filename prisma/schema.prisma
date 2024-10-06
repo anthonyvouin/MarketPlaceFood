@@ -62,9 +62,13 @@ model VerificationToken {
 }
 
 model Category {
-  id   String @id @default(cuid())
-  name String @unique
+  id       String    @id @default(cuid())
+  name     String    @unique
+  products Product[] 
+
+  @@map("categories")
 }
+
 
 model Contact {
   id         String   @id @default(cuid())
@@ -76,4 +80,21 @@ model Contact {
   submittedAt DateTime @default(now()) @map("submitted_at")
  
   @@map("contacts")
+}
+
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  image       String
+  price       Float
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  categoryId  String   @map("category_id")
+
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  @@map("products")
 }
