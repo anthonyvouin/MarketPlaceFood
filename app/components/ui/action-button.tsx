@@ -8,17 +8,19 @@ export default function ActionButton({
                                          message,
                                          positionIcon,
                                          icon,
+                                         color
                                      }: ActionButtonProps) {
     const icons = {
         logout: RadixIcons.ExitIcon,
-        plus: RadixIcons.PlusIcon
+        plus: RadixIcons.PlusIcon,
+        delete: RadixIcons.TrashIcon
     }
 
     const IconComponent = icons[icon];
 
     return (
         <Button onClick={onClickAction}
-                color="jade"
+                color={color}
                 variant="outline">
             {IconComponent && positionIcon === 'left' ? <IconComponent/> : ''}
             {message}

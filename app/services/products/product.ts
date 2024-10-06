@@ -1,6 +1,6 @@
 "use server"
 
-import {Prisma, PrismaClient} from '@prisma/client';
+import {Prisma, PrismaClient, Product} from '@prisma/client';
 import {ProductDto} from '@/app/interface/product/productDto';
 
 
@@ -11,8 +11,29 @@ export type ProductWithCategory = Prisma.ProductGetPayload<{
 }>;
 
 export async function createProduct(product: ProductDto) {
+
+    if(!product.image){
+        throw new Error('Image non renseignée');
+    }
+
     if (!product.name || !product.slug || !product.description || !product.image || product.price == null || !product.categoryId) {
         throw new Error('Tous les champs (nom, slug, description, image, prix, identifiant de catégorie) sont requis.');
+    }
+
+    const existingName: Product | null = await prisma.product.findUnique({
+        where: {name: product.name}
+    })
+
+    if(existingName){
+        throw new Error('Ce nom est déjà utilisé sur un autre produit');
+    }
+
+    const existingSlug: Product | null = await prisma.product.findUnique({
+        where: {slug: product.slug}
+    })
+
+    if(existingSlug){
+        throw new Error('Ce slug est déjà attribué à un autre produit');
     }
 
     try {

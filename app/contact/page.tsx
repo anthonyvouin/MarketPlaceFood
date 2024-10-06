@@ -57,7 +57,7 @@ const CreateContact = () => {
                       className="space-y-6">
                     <div>
                         <label htmlFor="firstName"
-                               className="block text-sm font-medium text-gray-700">
+                              >
                             Prénom :
                         </label>
                         <input

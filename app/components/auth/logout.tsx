@@ -7,7 +7,7 @@ export default function LogoutButton() {
     return (
         <div className="flex flex-col space-y-4">
 
-            <ActionButton onClickAction={() => signOut()} message="Se deconnecter" positionIcon='right' icon="logout"></ActionButton>
+            <ActionButton onClickAction={() => signOut()} message="Se deconnecter" positionIcon='right' icon="logout" color="jade"></ActionButton>
         </div>
     )
 }
