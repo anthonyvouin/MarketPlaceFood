@@ -14,13 +14,13 @@ const ProductCard = ({ product, bgColor }: ProductCardProps) => {
           <p>%</p>
         </span>
   } */}
-      <div className="flex justify-center items-start  h-full">
+      <div className="flex justify-center items-start h-full">
         <Image 
           src={product.image}
           alt={product.name}
           width={150}
-          height={100}
-          className="object-contain" 
+          height={150}
+          className="object-contain max-w-[150px] max-h-32" 
         />
       </div>
       <p className="text-lg font-bold ">{product.name}</p>
