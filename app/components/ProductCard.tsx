@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 import Image from 'next/image';
 import { PlusIcon } from "@radix-ui/react-icons";
-import { Product } from '@/app/interface/product/product';
 import { ProductCardProps } from '@/app/interface/product/productCardProps';
 
 
@@ -17,7 +16,7 @@ const ProductCard = ({ product, bgColor }: ProductCardProps) => {
   } */}
       <div className="flex justify-center items-start  h-full">
         <Image 
-          src="/images/fraise.png" 
+          src={product.image}
           alt={product.name}
           width={150}
           height={100}
