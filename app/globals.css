@@ -63,5 +63,6 @@ body {
 }
 
 .height-full{
-  min-height: calc(100vh - 42px);  /* 42 = taille de la barre*/
+  min-height: calc(100vh - 136.64px);  /* 42 = taille de la barre*/
 }
+

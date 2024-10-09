@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { CategoryDto } from '@/app/interface/category/categoryDto';
 import { CategoryListProps } from '@/app/interface/category/props';
-import { deleteCategoryById } from '@/app/services/category/category'; // Import de la fonction delete
+import { deleteCategoryById } from '@/app/services/category/category';
 
 const CategoryList: React.FC<CategoryListProps> = ({ categories: initialCategories }) => {
     const [categories, setCategories] = useState<CategoryDto[]>([]);
