@@ -20,7 +20,6 @@ const Adresses = () => {
                 const getUser: UserWithAdress | null = await getUserById(session.user.id);
                 if (getUser) {
                     setUser(getUser);
-                    console.log(user.addresses)
                 }
 
             }
