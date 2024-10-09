@@ -43,7 +43,7 @@ const CreateContact = () => {
     };
 
     return (
-        <div className="flex items-center pt-8 bg-primaryBackgroundColor height-full">
+        <div className="flex items-center bg-primaryBackgroundColor height-full">
 
             <div className="w-3/6 pl-12">
                 <h1 className="text-2xl mb-2.5 text-darkActionColor font-semibold">Contactez-Nous</h1>

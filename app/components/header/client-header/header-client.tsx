@@ -52,13 +52,16 @@ export default function HeaderClient() {
 
                 {status === 'authenticated' ? (
                     <>
-                        <Avatar className="bg-actionColor"
-                                size="2"
-                                fallback={
-                                    <Box>
-                                        <span className="text-light">{name}</span>
-                                    </Box>}
-                                radius="full"/>
+                       <Link href="/profil">
+                           <Avatar className="bg-actionColor"
+                                   size="2"
+                                   fallback={
+                                       <Box>
+                                           <span className="text-light">{name}</span>
+                                       </Box>}
+                                   radius="full"/>
+                       </Link>
+
                         <LogoutButton/>
                     </>
                 ) : (

@@ -45,6 +45,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  addresses     Address[]
 
   @@map("users")
 }
@@ -92,4 +93,21 @@ model Product {
   category Category @relation(fields: [categoryId], references: [id])
 
   @@map("products")
+}
+
+model Address {
+  id                String  @id @default(cuid())
+  name              String
+  address           String
+  additionalAddress String?
+  zipCode           String
+  city              String
+  phoneNumber       String
+  note              String?  @db.Text
+  isPrincipal       Boolean
+  isVisible         Boolean
+  userId            String  @map("user_id")
+  user              User    @relation(fields: [userId], references: [id])
+
+  @@map("address")
 }
