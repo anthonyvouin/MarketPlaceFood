@@ -49,11 +49,11 @@ const Profile = () => {
                 setUser((prevUser) => {
                     if (prevUser) {
                         return {
-                            ...prevUser, // Conserve les propriétés existantes
-                            name: userUpdate.name, // Met à jour seulement le nom
+                            ...prevUser,
+                            name: userUpdate.name,
                         };
                     }
-                    return prevUser; // Retourne prevUser si c'est null
+                    return prevUser;
                 });
                 setSuccess(`Modifications enregistrées`);
 
