@@ -7,7 +7,7 @@ const ImagePreview = ({ file }) => {
         const objectUrl = URL.createObjectURL(file);
         setPreviewUrl(objectUrl);
 
-        return () => URL.revokeObjectURL(objectUrl);  // Libérer l'URL en mémoire
+        return () => URL.revokeObjectURL(objectUrl);  
     }, [file]);
 
     return (
