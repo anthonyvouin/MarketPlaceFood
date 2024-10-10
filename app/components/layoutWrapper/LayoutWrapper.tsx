@@ -6,6 +6,8 @@ import Sidebar from "@/app/components/sidebar/Sidebar";
 import {Theme} from "@radix-ui/themes";
 import ProfilSidebar from "@/app/components/sidebar/profil-sidebar";
 import React from "react";
+import { ToastProvider } from "@/app/provider/toastProvider";
+import {DialogProvider} from "@/app/provider/DialogProvider";
 
 export default function LayoutWrapper({children}: { children: React.ReactNode }) {
     const pathname: string = usePathname();
@@ -17,6 +19,8 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
     if (pathname.startsWith("/profil")) {
         return (<>
                 <Theme>
+                    <ToastProvider>
+                        <DialogProvider>
                     <div className="flex">
                         <ProfilSidebar/>
                         <div className="w-full">
@@ -24,6 +28,8 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                             {children}
                         </div>
                     </div>
+                        </DialogProvider>
+                    </ToastProvider>
                 </Theme>
             </>
         )

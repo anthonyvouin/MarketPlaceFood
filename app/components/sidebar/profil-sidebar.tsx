@@ -7,8 +7,8 @@ import {GearIcon, BellIcon, FileTextIcon, HomeIcon} from "@radix-ui/react-icons"
 const links = [
     {name: 'Générale', href: '/', icon: GearIcon},
     {name: 'Adresses', href: '/profil/adresses', icon: HomeIcon},
-    {name: 'Notifications', href: '/products', icon: BellIcon},
-    {name: 'Commandes', href: '/products', icon: FileTextIcon},
+    {name: 'Notifications', href: '/notification', icon: BellIcon},
+    {name: 'Commandes', href: '/commandes', icon: FileTextIcon},
 ];
 
 const ProfilSidebar = () => {

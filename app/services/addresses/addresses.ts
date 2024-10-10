@@ -56,3 +56,9 @@ export async function updateAdress(address: AddressDto) {
     });
 
 }
+
+export async function deleteAdress(id: string){
+    return prisma.address.delete({
+        where: {id}
+    })
+}

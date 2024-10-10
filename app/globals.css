@@ -1,5 +1,5 @@
 @import "style/width.css";
-
+@import "style/height.css";
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
 
 
@@ -56,13 +56,17 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-
 .google-button:active {
   background-color: #eee;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.height-full{
-  min-height: calc(100vh - 136.64px);  /* 136.64 = taille de la barre header*/
+.success{
+  background: #F0F6FF;
+  border: 1px solid #BFDBFE;
+  color: #316CEC;
 }
 
+.transform-translate-middle{
+  transform: translate(-50%, -50%);
+}
