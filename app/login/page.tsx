@@ -1,13 +1,15 @@
 import ButtonsProvider from "../components/auth/ButtonsProvider";
-
-
+import LoginForm from "../components/auth/loginForm";
 
 export default function Login() {
   return (
     <div>
           
-    <h1>Page d'inscription avec google </h1>
+    <h1>Page de connexion avec google </h1>
     <ButtonsProvider />
+    <LoginForm />
+
+
 
 
     </div>

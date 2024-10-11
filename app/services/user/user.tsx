@@ -1,6 +1,8 @@
 'use server';
 import {Prisma, PrismaClient} from "@prisma/client";
 import {UserDto} from "@/app/interface/user/userDto";
+import bcrypt from 'bcrypt';
+import { UserRegisterDto } from "@/app/interface/user/useRegisterDto";
 
 const prisma = new PrismaClient();
 export type UserWithAdress = Prisma.UserGetPayload<{
@@ -43,9 +45,9 @@ export async function updateUser(user: UserDto) {
         const userDto: UserDto = {
             id: updatedUser.id || undefined,
             name: updatedUser.name,
-            email: updatedUser.email,
+            email: updatedUser.email,   
             emailVerified: updatedUser.emailVerified,
-            image: updatedUser.image,
+            image: updatedUser.image,   
             addresses: updatedUser.addresses || [],
         };
         return userDto
@@ -55,4 +57,36 @@ export async function updateUser(user: UserDto) {
     }
 
 
+}
+
+
+
+export async function registerUser(formData: FormData) {
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    if (!name || !email || !password) {
+        throw new Error("Tous les champs sont obligatoires.");
+    }
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+
+    if (existingUser) {
+        throw new Error('Cet utilisateur existe déjà.');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser: UserRegisterDto = await prisma.user.create({
+        data: {
+            name,
+            email,
+            password: hashedPassword,
+            emailVerified: null,
+            image: null,
+        },
+    });
+
+    return newUser; 
 }
