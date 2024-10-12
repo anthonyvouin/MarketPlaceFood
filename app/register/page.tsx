@@ -1,34 +1,74 @@
-"use client";  
+'use client';
 
-import RegisterForm from '../components/auth/registerForm'; 
-import { registerUser } from '@/app/services/user/user'; 
-import { signIn } from 'next-auth/react'; // Import signIn method
-
+import { useState } from "react";
+import { useRouter } from "next/navigation"; 
+import { createUser } from "@/app/services/user/user"; 
+import { signIn } from "next-auth/react"; 
+import { UserRegisterDto } from "../interface/user/useRegisterDto";
 export default function SignUpPage() {
-    const handleRegisterUser = async (formData: FormData) => {
-        try {
-            const newUser = await registerUser(formData);
-            
-            const result = await signIn("credentials", {
-                email: newUser.email,
-                password: formData.get('password') as string, 
-                redirect: false, 
-            });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const router = useRouter();
 
-            if (result?.error) {
-                console.error("Erreur lors de la connexion :", result.error);
-            } else {
-                console.log("Inscription et connexion réussies !");
-            }
-        } catch (error) {
-            console.error("Erreur lors de l'inscription :", error);
-        }
-    };
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    return (
-        <div>
-            <h1>Créer un compte</h1>
-            <RegisterForm onSubmit={handleRegisterUser} />
-        </div>
-    );
+    try {
+      const user: UserRegisterDto = await createUser(email, name, password);
+      console.log("Utilisateur créé :", user);
+
+      const result = await signIn("credentials", {
+        email: user.email,
+        password: password,
+        redirect: false,
+      });
+
+      console.log("Résultat de la connexion :", result);
+
+      if (result?.error) {
+        console.error("Erreur lors de la connexion :", result.error);
+      } else {
+        console.log("Connexion réussie !");
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'inscription :", error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSignUp} className="form">
+      <h2>Sign Up</h2>
+
+      <label htmlFor="name">Name</label>
+      <input
+        type="text"
+        id="name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
+
+      <label htmlFor="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
+
+      <label htmlFor="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+      />
+
+      <button type="submit">Create Account</button>
+    </form>
+  );
 }

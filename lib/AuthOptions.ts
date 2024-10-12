@@ -1,18 +1,16 @@
-import { NextAuthOptions } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { prisma } from '@/lib/db';
-import bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';  // Pour générer un ID de session unique
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import { prisma } from "./db";
+import bcrypt from "bcrypt";
+import { SignJWT } from 'jose'; // Importation de SignJWT
 
-export const authOptions: NextAuthOptions = {
+// Clé secrète pour JWT
+const JWT_SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'votre_secret_de_test');
+
+export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -24,77 +22,67 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials?.email },
         });
 
-        if (!user) {
-          throw new Error("Aucun utilisateur trouvé");
+        if (user && user.password && credentials && await bcrypt.compare(credentials.password, user.password)) {
+          const jwtToken = await new SignJWT({ id: user.id, email: user.email })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime('1h')
+            .sign(JWT_SECRET);
+          
+          return { ...user, jwt: jwtToken };
         }
-
-        const isPasswordValid = await bcrypt.compare(credentials!.password, user.password!);
-
-        if (!isPasswordValid) {
-          throw new Error("Mot de passe incorrect");
-        }
-
-        return user;
+        return null;
       },
     }),
-  ],
-  callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      if (credentials) {
-       const accountExists = await prisma.account.findUnique({
-          where: {
-            provider_providerAccountId: {
-              provider: 'credentials',
-              providerAccountId: user.id,
-            },
-          },
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      async profile(profile) {
+        let user = await prisma.user.findUnique({
+          where: { email: profile.email },
         });
 
-        if (!accountExists) {
-          await prisma.account.create({
+        if (!user) {
+          // Si l'utilisateur n'existe pas, le créer
+          user = await prisma.user.create({
             data: {
-              userId: user.id,
-              type: 'credentials',
-              provider: 'credentials',
-              providerAccountId: user.id,
-              access_token: null,
-              refresh_token: null,
-              token_type: null,
+              email: profile.email,
+              name: profile.name,
+              image: profile.picture,
             },
           });
         }
 
-        const sessionToken = uuidv4(); 
-        const expires = new Date();
-        expires.setDate(expires.getDate() + 30); 
+        // Créer un token JWT pour l'utilisateur Google
+        const jwtToken = await new SignJWT({ id: user.id, email: user.email })
+          .setProtectedHeader({ alg: 'HS256' })
+          .setExpirationTime('1h')
+          .sign(JWT_SECRET);
 
-        await prisma.session.create({
-          data: {
-            sessionToken: sessionToken,
-            userId: user.id,
-            expires: expires,
-          },
-        });
-
-        return { sessionToken }; 
-      }
-
-      return true;
-    },
-    async session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id;  
-      }
-
-      console.log("Session: ", session);
-
-      return session;
-    },
+        // Log de la création du token pour Google
+        console.log('JWT Token créé pour le compte Google:', jwtToken);
+        return { ...user, jwt: jwtToken };
+      },
+    }),
+  ],
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60,
+  },
+  callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;  
+        token.id = user.id;
+        token.email = user.email;
+        token.jwt = user.jwt;
       }
       return token;
     },
+    async session({ session, token }) {
+      session.user.id = token.id;
+      session.user.email = token.email;
+      session.user.jwt = token.jwt;
+      return session;
+    },
+    
   },
 };
