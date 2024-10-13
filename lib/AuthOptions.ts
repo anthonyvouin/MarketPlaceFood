@@ -3,9 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./db";
 import bcrypt from "bcrypt";
-import { SignJWT } from 'jose'; // Importation de SignJWT
+import { SignJWT } from 'jose'; 
 
-// Clé secrète pour JWT
 const JWT_SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'votre_secret_de_test');
 
 export const authOptions = {

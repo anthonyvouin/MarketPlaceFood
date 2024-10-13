@@ -39,9 +39,9 @@ export default function SignUpPage() {
 
   return (
     <form onSubmit={handleSignUp} className="form">
-      <h2>Sign Up</h2>
+      <h2>Incription</h2>
 
-      <label htmlFor="name">Name</label>
+      <label htmlFor="name">Nom</label>
       <input
         type="text"
         id="name"
@@ -59,7 +59,7 @@ export default function SignUpPage() {
         required
       />
 
-      <label htmlFor="password">Password</label>
+      <label htmlFor="password">Mot de passe</label>
       <input
         type="password"
         id="password"
@@ -68,7 +68,7 @@ export default function SignUpPage() {
         required
       />
 
-      <button type="submit">Create Account</button>
+      <button type="submit">Sauvegarder</button>
     </form>
   );
 }
