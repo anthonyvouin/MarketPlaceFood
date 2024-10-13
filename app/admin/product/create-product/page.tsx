@@ -61,7 +61,6 @@ export default function CreateProductPage() {
 
         try {
             let imagePath: string = '';
-            console.log(imagePath)
             if (imageFile) {
                 const formData = new FormData();
                 formData.append('file', imageFile);

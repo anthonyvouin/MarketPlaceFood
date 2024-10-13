@@ -15,7 +15,6 @@ export default function ProductPage() {
     useEffect(() => {
         const fetchCategories = async () => {
             const categoriesData: ProductDto[] = await getAllProducts();
-            console.log(categoriesData)
             setProducts(categoriesData);
         }
         fetchCategories();

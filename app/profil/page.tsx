@@ -14,11 +14,8 @@ const Profile = () => {
     useEffect(() => {
         if (session) {
             const fetchUser = async () => {
-                const getUser: UserWithAdress | null = await getUserById(session.user.id);
-                if (getUser) {
-                    setUser(getUser);
-                }
-
+                await getUserById(session.user.id)
+                    .then((e: UserWithAdress | null) => setUser(e));
             }
             fetchUser();
 

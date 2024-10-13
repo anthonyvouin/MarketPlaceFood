@@ -34,7 +34,6 @@ export async function getAdressById(addressId: string, userId: string): Promise<
             id: addressId
         },
     });
-    console.log(address)
 
     if (!address) {
         throw new Error(`Aucune addresse trouvée`);

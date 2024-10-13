@@ -1,6 +1,10 @@
 'use server';
 import {Prisma, PrismaClient} from "@prisma/client";
 import {UserDto} from "@/app/interface/user/userDto";
+import bcrypt from 'bcrypt';
+import {UserRegisterDto} from "@/app/interface/user/useRegisterDto";
+import {verifyAuth} from "@/app/core/verifyAuth";
+
 
 const prisma = new PrismaClient();
 export type UserWithAdress = Prisma.UserGetPayload<{
@@ -9,7 +13,9 @@ export type UserWithAdress = Prisma.UserGetPayload<{
 
 
 export async function getUserById(id: string): Promise<UserWithAdress | null> {
+
     try {
+        await verifyAuth();
         return await prisma.user.findUnique({
             where: {id},
             include: {addresses: true}
@@ -55,4 +61,32 @@ export async function updateUser(user: UserDto) {
     }
 
 
+}
+
+
+export async function createUser(email: string, name: string, password: string): Promise<UserRegisterDto> {
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await prisma.user.create({
+            data: {
+                email,
+                name,
+                password: hashedPassword,
+            },
+        });
+
+        const userDto: UserRegisterDto = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            password: '',
+            emailVerified: user.emailVerified,
+            image: user.image,
+        };
+
+        return userDto;
+    } catch (error) {
+        throw new Error("Erreur lors de la création de l'utilisateur.");
+    }
 }
