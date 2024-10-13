@@ -15,10 +15,7 @@ export type UserWithAdress = Prisma.UserGetPayload<{
 export async function getUserById(id: string): Promise<UserWithAdress | null> {
 
     try {
-
-        const authPayload = await verifyAuth();
-        console.log(authPayload)
-
+        await verifyAuth();
         return await prisma.user.findUnique({
             where: {id},
             include: {addresses: true}

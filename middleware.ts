@@ -7,14 +7,11 @@ const JWT_SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'votr
 export async function middleware(req: NextRequest) {
     const token: JWT | null = await getToken({req});
 
-    console.log('Token récupéré :', token);
     if (!token || !token.jwt) {
         return NextResponse.redirect(new URL('/login', req.url));
     }
 
     try {
-        console.log(`jwt front`)
-        console.log(token.jwt)
         const {payload} = await jwtVerify(token.jwt, JWT_SECRET);
 
         if (payload) {
@@ -29,5 +26,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config: { matcher: string[] } = {
-    matcher: ['/', '/admin'],
+    matcher: ['/profil', '/admin'],
 };

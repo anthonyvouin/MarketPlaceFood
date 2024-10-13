@@ -26,12 +26,9 @@ export default function SignInPage() {
         redirect: false,  
       });
 
-      console.log("Résultat de la connexion :", result);
-
       if (result?.error) {
         console.error("Erreur lors de la connexion :", result.error);
       } else {
-        console.log("Connexion réussie !");
         router.push("/profil");  
       }
     } catch (error) {
