@@ -20,9 +20,9 @@ export default function HeaderClient() {
         <header className="flex items-center justify-between px-20 h-[15vh] bg-primaryBackgroundColor">
             <h1 className="font-manrope font-bold">Accueil 🙂</h1>
             <input type='text'
-                   placeholder='Rechercher un produit'
+                   placeholder='&#128269; Rechercher un produit'
                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg h-10 w-1/4
-                   focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"/>
+                   focus:ring-blue-500 focus:outline-none focus:border-actionColor block p-2.5"/>
 
             <div className="flex gap-5 items-center">
                 <Link href="/contact">
@@ -52,21 +52,22 @@ export default function HeaderClient() {
 
                 {status === 'authenticated' ? (
                     <>
-                        <Avatar className="bg-actionColor"
-                                size="2"
-                                fallback={
-                                    <Box>
-                                        <span className="text-light">{name}</span>
-                                    </Box>}
-                                radius="full"/>
+                       <Link href="/profil">
+                           <Avatar className="bg-actionColor"
+                                   size="2"
+                                   fallback={
+                                       <Box>
+                                           <span className="text-light">{name}</span>
+                                       </Box>}
+                                   radius="full"/>
+                       </Link>
+
                         <LogoutButton/>
                     </>
                 ) : (
                     <Link href="/login"
                           className="border-b-2 border-actionColor">Se connecter</Link>
                 )}
-
-
             </div>
         </header>
     )

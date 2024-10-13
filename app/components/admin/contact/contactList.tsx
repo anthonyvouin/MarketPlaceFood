@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Contact } from '../../../interface/contact/contact';
-import { deleteContactById } from '../../../services/contact/contact';
+import { ContactDto } from '@/app/interface/contact/contactDto';
+import { deleteContactById } from '@/app/services/contact/contact';
 
-const ContactList: React.FC<{ contacts: Contact[] }> = ({ contacts: initialContacts }) => {
-    const [contacts, setContacts] = useState<Contact[]>([]);
+const ContactList: React.FC<{ contacts: ContactDto[] }> = ({ contacts: initialContacts }) => {
+    const [contacts, setContacts] = useState<ContactDto[]>([]);
 
     useEffect(() => {
         if (initialContacts && Array.isArray(initialContacts)) {
@@ -13,7 +13,7 @@ const ContactList: React.FC<{ contacts: Contact[] }> = ({ contacts: initialConta
         }
     }, [initialContacts]);
 
-    const handleDelete = async (id: Contact['id']) => {
+    const handleDelete = async (id: ContactDto['id']) => {
         try {
             await deleteContactById(id);
             setContacts((prevContacts) => prevContacts.filter((contact) => contact.id !== id));
@@ -29,7 +29,7 @@ const ContactList: React.FC<{ contacts: Contact[] }> = ({ contacts: initialConta
                 <p className="text-center text-gray-500">Aucun contact disponible.</p>
             ) : (
                 <ul className="space-y-2">
-                    {contacts.map((contact: Contact) => (
+                    {contacts.map((contact: ContactDto) => (
                         <li key={contact.id} className="border-b border-gray-200 py-2">
                             <div className="flex justify-between items-center">
                                 <div className="flex-1">

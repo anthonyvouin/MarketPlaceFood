@@ -1,12 +1,12 @@
 'use server';
 
 import { PrismaClient } from '@prisma/client';
-import { Contact } from '@/app/interface/contact/contact';
+import { ContactDto } from '@/app/interface/contact/contactDto';
 
 const prisma = new PrismaClient();
 
 // Function pour créer un nouveau contact
-export async function createContact(contact: Contact) {
+export async function createContact(contact: ContactDto) {
     if (!contact.firstName || !contact.lastName || !contact.email || !contact.subject || !contact.message) {
         throw new Error('Tous les champs (prénom, nom, email, objet, message) sont requis.');
     }
@@ -16,7 +16,7 @@ export async function createContact(contact: Contact) {
     }
 
     try {
-        const newContact: Contact = await prisma.contact.create({
+        const newContact: ContactDto = await prisma.contact.create({
             data: {
                 firstName: contact.firstName,
                 lastName: contact.lastName,
@@ -43,7 +43,7 @@ export async function getAllContacts() {
 
 
 // Function pour supprimer un contact par son id
-export async function deleteContactById(id: Contact['id']) {
+export async function deleteContactById(id: ContactDto['id']) {
     if (!id) {
         throw new Error('L\'ID du contact est requis pour la suppression.');
     }

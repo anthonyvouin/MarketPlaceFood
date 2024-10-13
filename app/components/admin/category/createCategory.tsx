@@ -3,8 +3,8 @@
 import React, {useState} from 'react';
 import {createCategory} from '@/app/services/category/category';
 import {
-    Category
-} from '@/app/interface/category/category';
+    CategoryDto
+} from '@/app/interface/category/categoryDto';
 
 
 const CreateCategory = ({emitAddCategory}) => {
@@ -16,10 +16,10 @@ const CreateCategory = ({emitAddCategory}) => {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        const newCategory: Category = {name};
+        const newCategory: CategoryDto = {name};
 
         try {
-            const newCategorySave: Category = await createCategory(newCategory);
+            const newCategorySave: CategoryDto = await createCategory(newCategory);
             emitAddCategory(newCategorySave)
             setSuccess('Catégorie créée avec succès');
             setName('');

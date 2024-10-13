@@ -1,19 +1,19 @@
 'use server';
 
-import {PrismaClient} from '@prisma/client';
-import {Category} from '@/app/interface/category/category';
+import {Category, PrismaClient} from '@prisma/client';
+import {CategoryDto} from '@/app/interface/category/categoryDto';
 
 const prisma = new PrismaClient();
 
 
 // Function pour créer une category
-export async function createCategory(category: Category) {
+export async function createCategory(category: CategoryDto) {
     if (!category.name || category.name.trim() === '') {
         throw new Error('Le nom de la catégorie est requis et doit être une chaîne de caractères non vide.');
     }
 
     try {
-        const newCategory: Category = await prisma.category.create({
+        const newCategory: CategoryDto = await prisma.category.create({
             data: {
                 name: category.name,
             },
@@ -28,11 +28,11 @@ export async function createCategory(category: Category) {
 }
 
 // Function pour recupérer toutes les categories 
-export async function getAllCategories() {
+export async function getAllCategories(): Promise<Category[]> {
     try {
         return await prisma.category.findMany({
             orderBy: {
-                name: 'asc', 
+                name: 'asc',
             },
         });
     } catch (error) {
@@ -41,7 +41,7 @@ export async function getAllCategories() {
 }
 
 // Function pour supprimmer une category par son id
-export async function deleteCategoryById(id: Category['id']) {
+export async function deleteCategoryById(id: CategoryDto['id']) {
     if (!id) {
         throw new Error('L\'ID de la catégorie est requis pour la suppression.');
     }
@@ -52,14 +52,14 @@ export async function deleteCategoryById(id: Category['id']) {
                 id: id,
             },
         });
-        return { message: 'Catégorie supprimée avec succès.' };
+        return {message: 'Catégorie supprimée avec succès.'};
     } catch (error) {
         throw new Error('La suppression de la catégorie a échoué');
     }
 }
 
 //Function pour update une category par son id
-export async function updateCategory(category: Category) {
+export async function updateCategory(category: CategoryDto) {
     if (!category.id) {
         throw new Error('L\'ID de la catégorie est requis pour la mise à jour.');
     }
@@ -69,7 +69,7 @@ export async function updateCategory(category: Category) {
     }
 
     try {
-        const updatedCategory: Category = await prisma.category.update({
+        const updatedCategory: CategoryDto = await prisma.category.update({
             where: {
                 id: category.id,
             },

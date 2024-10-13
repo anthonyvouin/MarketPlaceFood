@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Category } from '../../../interface/category/category';
-import { CategoryListProps } from '../../../interface/category/props';
-import { deleteCategoryById } from '../../../services/category/category'; // Import de la fonction delete
+import { CategoryDto } from '@/app/interface/category/categoryDto';
+import { CategoryListProps } from '@/app/interface/category/props';
+import { deleteCategoryById } from '@/app/services/category/category';
 
 const CategoryList: React.FC<CategoryListProps> = ({ categories: initialCategories }) => {
-    const [categories, setCategories] = useState<Category[]>([]);
+    const [categories, setCategories] = useState<CategoryDto[]>([]);
 
     useEffect(() => {
         if (initialCategories && Array.isArray(initialCategories)) {
@@ -14,7 +14,7 @@ const CategoryList: React.FC<CategoryListProps> = ({ categories: initialCategori
         }
     }, [initialCategories]);
 
-    const handleDelete = async (id: Category['id']) => {
+    const handleDelete = async (id: CategoryDto['id']) => {
         try {
             await deleteCategoryById(id);
             setCategories((prevCategories) => prevCategories.filter((category) => category.id !== id));
@@ -30,7 +30,7 @@ const CategoryList: React.FC<CategoryListProps> = ({ categories: initialCategori
                 <p className="text-center text-gray-500">Aucune catégorie disponible.</p>
             ) : (
                 <ul className="space-y-2">
-                    {categories.map((category: Category) => (
+                    {categories.map((category: CategoryDto) => (
                         <li key={category.id} className="border-b border-gray-200 py-2 flex justify-between items-center">
                             <span className="font-medium">{category.name}</span>
 

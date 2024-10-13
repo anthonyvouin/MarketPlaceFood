@@ -1,5 +1,5 @@
-import {Category} from "@/app/interface/category/category";
+import {CategoryDto} from "@/app/interface/category/categoryDto";
 
 export interface CategoryListProps {
-    categories: Category[];
+    categories: CategoryDto[];
 }
