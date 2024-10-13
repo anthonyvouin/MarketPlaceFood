@@ -13,11 +13,11 @@ import { Category } from '../interface/category/category';
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<{ [key in keyof Product]?: any }>({});
-  const [priceRange, setPriceRange] = useState([10, 100]);
+  const [priceRange, setPriceRange] = useState([0, 100]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-  const bgColors = ['bg-red-100', 'bg-blue-100', 'bg-green-100', 'bg-yellow-100'];
+  const bgColors = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
 
   const fetchProducts = async (filters: any) => {
     try {
@@ -66,7 +66,7 @@ export default function Products() {
           <h3 className="text-lg font-semibold mb-2">Prix</h3>
           {priceRange[0]} - {priceRange[1]} €
           <Slider
-            defaultValue={[10, 100]}
+            defaultValue={[0, 100]}
             min={0}
             max={50}
             step={1}
