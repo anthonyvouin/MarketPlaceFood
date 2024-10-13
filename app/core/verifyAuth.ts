@@ -34,20 +34,18 @@ export async function verifyAuth() {
             }
 
         } catch (e) {
-            console.error('Invalid token')
-            throw new Error('Invalid token');
+            if (e instanceof JWTError) {
+                console.error('Erreur JWT :', 'erreur');
+            } else if (e instanceof Error) {
+                console.error('Erreur générale :', e.message, e.stack);
+            } else {
+                throw new Error('Invalid token')
+            }
         }
 
     } else {
-        if (e instanceof JWTError) {
-            console.error('Erreur JWT :','lala');
-        } else if (e instanceof Error) {
-            // Logue les autres erreurs avec leur stack
-            console.error('Erreur générale :', e.message, e.stack);
-        }
 
-        // Lance une nouvelle erreur avec un message plus générique pour l'utilisateur
-        throw new Error('Une erreur est survenue lors du traitement du token.'); // Message d'erreur que l'utilisateur verra
+        throw new Error(`Vous n'êtes pas authentifié`); // Message d'erreur que l'utilisateur verra
     }
 
 }
