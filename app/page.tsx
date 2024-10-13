@@ -1,27 +1,27 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import ProductCard from "./components/ProductCard";
-import { getProducts } from "./services/products/product";
-import { Product } from "./interface/product/product";
+import {ProductDto} from "@/app/interface/product/productDto";
+import {getAllProducts} from "@/app/services/products/product";
 
 export default function Home() {
 
-  const [products, setProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState<ProductDto[]>([]);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const products = await getProducts()
-      return setProducts(products);
-    }
-    fetchProducts();
-  },[]);
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const products: ProductDto[] = await getAllProducts()
+            return setProducts(products);
+        }
+        fetchProducts();
+    }, []);
 
 
-  const bgColors = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
-  return (
-    <div className="w-full bg-primaryBackgroundColor min-h-[85vh]">
-      <section className="h-[85vh]">
+    const bgColors = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
+    return (
+        <div className="w-full bg-primaryBackgroundColor min-h-[85vh]">
+            <section className="h-[85vh]">
         <div className="w-full h-full bg-primaryBackgroundColor">
           <div className="flex flex-col justify-center items-center h-full">
             <h1 className="font-manrope font-bold text-5xl text-gray-900">Bienvenue sur notre site</h1>
@@ -35,12 +35,12 @@ export default function Home() {
           <hr className="border-2 w-40 border-gray-900 rounded-full" />
         </div>
 
-        <div className="grid grid-cols-4 gap-10 ">
+                <div className="grid grid-cols-4 gap-10 ">
           {products.map((product, index) => (
             <ProductCard key={product.id} product={product} bgColor={bgColors[index % bgColors.length]} />
           ))}
         </div>
-      </section>
-    </div>
-  );
+            </section>
+        </div>
+    );
 }

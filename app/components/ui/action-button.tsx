@@ -6,22 +6,25 @@ import {ActionButtonProps} from "@/app/interface/ui/button-action-interface";
 export default function ActionButton({
                                          onClickAction,
                                          message,
-                                         position,
+                                         positionIcon,
                                          icon,
+                                         color
                                      }: ActionButtonProps) {
     const icons = {
-        logout: RadixIcons.ExitIcon
+        logout: RadixIcons.ExitIcon,
+        plus: RadixIcons.PlusIcon,
+        delete: RadixIcons.TrashIcon
     }
 
     const IconComponent = icons[icon];
 
     return (
         <Button onClick={onClickAction}
-                color="jade"
+                color={color}
                 variant="outline">
-            {IconComponent && position === 'left' ? <IconComponent/> : ''}
+            {IconComponent && positionIcon === 'left' ? <IconComponent/> : ''}
             {message}
-            {IconComponent && position === 'right' ? <IconComponent/> : ''}
+            {IconComponent && positionIcon === 'right' ? <IconComponent/> : ''}
 
         </Button>
     )

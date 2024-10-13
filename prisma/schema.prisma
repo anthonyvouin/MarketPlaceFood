@@ -27,24 +27,17 @@ model Account {
   @@map("accounts")
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique @map("session_token")
-  userId       String   @map("user_id")
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("sessions")
-}
 
 model User {
   id            String    @id @default(cuid())
   name          String?
+  password      String?   
   email         String?   @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
-  sessions      Session[]
+  addresses     Address[]
 
   @@map("users")
 }
@@ -80,7 +73,7 @@ model Contact {
 
 model Product {
   id          String   @id @default(cuid())
-  name        String
+  name        String   @unique
   slug        String   @unique
   description String   @db.Text
   image       String
@@ -92,4 +85,21 @@ model Product {
   category Category @relation(fields: [categoryId], references: [id])
 
   @@map("products")
+}
+
+model Address {
+  id                String  @id @default(cuid())
+  name              String
+  address           String
+  additionalAddress String?
+  zipCode           String
+  city              String
+  phoneNumber       String
+  note              String?  @db.Text
+  isPrincipal       Boolean
+  isVisible         Boolean
+  userId            String  @map("user_id")
+  user              User    @relation(fields: [userId], references: [id])
+
+  @@map("address")
 }

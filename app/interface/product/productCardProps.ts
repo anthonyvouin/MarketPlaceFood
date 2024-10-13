@@ -1,6 +1,6 @@
-import { Product } from "@/app/interface/product/product";
+import {ProductDto} from "@/app/interface/product/productDto";
 
 export interface ProductCardProps {
-    product: Product;
+    product: ProductDto;
     bgColor: string;
   }

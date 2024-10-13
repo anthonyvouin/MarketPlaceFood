@@ -1,5 +1,5 @@
 @import "style/width.css";
-
+@import "style/height.css";
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
 
 
@@ -8,5 +8,65 @@
 @tailwind utilities;
 
 body {
-  font-family: 'Manrope', sans-serif;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.underline-animation::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  width: 5px;
+  height: 0;
+  background-color: currentColor; /* Utilise la couleur du texte */
+  transition: width 0.3s ease-out;
+}
+
+.underline-animation:hover::after {
+  height: 50%;
+  bottom: 15px;
+}
+
+.nav-title{
+  font-family: 'League Spartan', sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.google-button {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  color: #555;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.google-button:hover {
+  background-color: #f7f7f7;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.google-button:active {
+  background-color: #eee;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.success{
+  background: #F0F6FF;
+  border: 1px solid #BFDBFE;
+  color: #316CEC;
+}
+
+.transform-translate-middle{
+  transform: translate(-50%, -50%);
 }

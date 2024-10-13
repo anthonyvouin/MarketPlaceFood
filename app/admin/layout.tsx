@@ -3,6 +3,7 @@ import Link from "next/link";
 import React from "react";
 import Head from "next/head";
 import {Theme} from "@radix-ui/themes";
+import HeaderClient from "@/app/components/header/client-header/header-client";
 
 export default function AdminLayout({children}: Readonly<{
     children: React.ReactNode;
@@ -41,8 +42,10 @@ export default function AdminLayout({children}: Readonly<{
                     </Link>
                 </nav>
 
-                <div className="width-85 p-2.5">
-                    <SessionWrapper>{children}</SessionWrapper>
+                <div className="width-85">
+                    <SessionWrapper>
+                        {children}
+                    </SessionWrapper>
                 </div>
 
             </div>
