@@ -1,9 +1,8 @@
 import classNames from 'classnames';
 import Image from 'next/image';
-import {PlusIcon} from "@radix-ui/react-icons";
-import {ProductCardProps} from '@/app/interface/product/productCardProps';
+import { PlusIcon } from "@radix-ui/react-icons";
+import { ProductCardProps } from '@/app/interface/product/productCardProps';
 import {formatPrice} from "@/app/pipe/format";
-
 
 const ProductCard = ({product, bgColor}: ProductCardProps) => {
     return (
@@ -15,13 +14,13 @@ const ProductCard = ({product, bgColor}: ProductCardProps) => {
           <p>%</p>
         </span>
   } */}
-            <div className="flex justify-center items-start  h-full">
-                <Image
-                    src="/images/fraise.png"
-                    alt={product.name}
-                    width={150}
-                    height={100}
-                    className="object-contain"
+      <div className="flex justify-center items-start h-full">
+        <Image
+          src={product.image}
+          alt={product.name}
+          width={150}
+          height={150}
+          className="object-contain max-w-[150px] max-h-32"
                 />
             </div>
             <p className="text-lg font-bold ">{product.name}</p>

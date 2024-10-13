@@ -20,12 +20,26 @@ export default function Home() {
 
     const bgColors = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
     return (
-        <div className="flex w-full bg-primaryBackgroundColor h-[85vh]">
-            <section className="grid grid-cols-4 gap-10 px-20 py-10">
+        <div className="w-full bg-primaryBackgroundColor min-h-[85vh]">
+            <section className="h-[85vh]">
+        <div className="w-full h-full bg-primaryBackgroundColor">
+          <div className="flex flex-col justify-center items-center h-full">
+            <h1 className="font-manrope font-bold text-5xl text-gray-900">Bienvenue sur notre site</h1>
+            <p className="font-manrope font-light text-2xl text-gray-900">L'IA c'est trop bien</p>
+          </div>
+        </div>
+      </section>
+      <section className="px-20 py-10 w-full">
+        <div className="mb-10 flex flex-col gap-2">
+          <h2 className="font-manrope font-bold text-2xl text-gray-900">Notre sélection de produit</h2>
+          <hr className="border-2 w-40 border-gray-900 rounded-full" />
+        </div>
 
-                {products.map((product, index) => (
-                    <ProductCard key={product.id} product={product} bgColor={bgColors[index % bgColors.length]}/>
-                ))}
+                <div className="grid grid-cols-4 gap-10 ">
+          {products.map((product, index) => (
+            <ProductCard key={product.id} product={product} bgColor={bgColors[index % bgColors.length]} />
+          ))}
+        </div>
             </section>
         </div>
     );

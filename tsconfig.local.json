@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "baseUrl": ".",  // Définit la racine des chemins relatifs
+    "paths": {
+      "@/*": ["./*"]  // Remplacez './src' par le dossier racine de votre projet
+    },
+    // ... autres options
+  },
+  "include": [
+    "src/**/*",
+    "prisma/**/*"
+  ]
+}
