@@ -3,14 +3,19 @@ import {Prisma, PrismaClient} from "@prisma/client";
 import {UserDto} from "@/app/interface/user/userDto";
 import bcrypt from 'bcrypt';
 import { UserRegisterDto } from "@/app/interface/user/useRegisterDto";
+import { verifyAuth } from "@/app/core/verifyAuth";
+import { NextRequest } from 'next/server'; 
+
 const prisma = new PrismaClient();
 export type UserWithAdress = Prisma.UserGetPayload<{
     include: { addresses: true }
 }>;
 
 
-export async function getUserById(id: string): Promise<UserWithAdress | null> {
+export async function getUserById(req: NextRequest, id: string): Promise<UserWithAdress | null> {
     try {
+
+        const authPayload = await verifyAuth(req);
         return await prisma.user.findUnique({
             where: {id},
             include: {addresses: true}
@@ -21,7 +26,6 @@ export async function getUserById(id: string): Promise<UserWithAdress | null> {
     }
 
 }
-
 export async function updateUser(user: UserDto) {
     if (!user.id) {
         throw new Error(`L'ID de l'utilisateur est requis pour la mise à jour.`);
