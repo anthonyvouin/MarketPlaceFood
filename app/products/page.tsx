@@ -13,7 +13,7 @@ import { Category } from '../interface/category/category';
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<{ [key in keyof Product]?: any }>({});
-  const [priceRange, setPriceRange] = useState([0, 100]);
+  const [priceRange, setPriceRange] = useState([0, 50]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
@@ -66,7 +66,7 @@ export default function Products() {
           <h3 className="text-lg font-semibold mb-2">Prix</h3>
           {priceRange[0]} - {priceRange[1]} €
           <Slider
-            defaultValue={[0, 100]}
+            defaultValue={[0, 50]}
             min={0}
             max={50}
             step={1}
