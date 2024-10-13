@@ -12,7 +12,7 @@ export type ProductWithCategory = Prisma.ProductGetPayload<{
 
 export async function createProduct(product: ProductDto) {
 
-    if(!product.image){
+    if (!product.image) {
         throw new Error('Image non renseignée');
     }
 
@@ -24,7 +24,7 @@ export async function createProduct(product: ProductDto) {
         where: {name: product.name}
     })
 
-    if(existingName){
+    if (existingName) {
         throw new Error('Ce nom est déjà utilisé sur un autre produit');
     }
 
@@ -32,7 +32,7 @@ export async function createProduct(product: ProductDto) {
         where: {slug: product.slug}
     })
 
-    if(existingSlug){
+    if (existingSlug) {
         throw new Error('Ce slug est déjà attribué à un autre produit');
     }
 
@@ -78,6 +78,41 @@ export async function getAllProducts(): Promise<ProductDto[]> {
         return transformProductDto(products);
     } catch (error) {
         throw new Error('La récupération des produits a échoué');
+    }
+}
+
+//? Le typage peut évoluer en fonction des besoins 
+export async function filterProduct(filters: {
+    [key in keyof ProductDto]?: {
+        equals?: string | number | boolean | null;
+        lte?: number;
+        gte?: number;
+        lt?: number;
+        gt?: number;
+        contains?: string;
+        startsWith?: string;
+        endsWith?: string;
+        in?: string[] | number[];
+        notIn?: string[] | number[];
+    }
+}) {
+    try {
+        let customFilters: any[] = []
+        if (filters) {
+            customFilters = Object.entries(filters)?.map(([key, value]) => ({
+                [key]: value
+            }));
+        }
+
+        const products: ProductWithCategory[] = await prisma.product.findMany({
+            where: customFilters.length > 0 ? {AND: customFilters} : {},
+            include: {category: true}
+        });
+
+        return transformProductDto(products);
+    } catch (error) {
+        console.error("Erreur lors du filtrage des produits :", error);
+        throw new Error('Le filtrage des produits a échoué.');
     }
 }
 
