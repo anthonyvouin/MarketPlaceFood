@@ -50,7 +50,7 @@ async function seedOpenFoodFactsProducts() {
         continue;
       }
 
-      // COn regarde si le slug existe déjà
+      // On regarde si le slug existe déjà
       const existingProduct = await prisma.product.findUnique({
         where: { slug: generateSlug(product.product_name_fr) },
       });
@@ -59,12 +59,13 @@ async function seedOpenFoodFactsProducts() {
         console.log(`Le produit avec le slug ${existingProduct.slug} existe déjà. Ignoré.`);
         continue;
       }
+      
       const formattedProduct = {
         name: product.product_name_fr,
         slug: generateSlug(product.product_name_fr),
         description: product.generic_name_fr,
         image: product.image_url || "",
-        price: new Prisma.Decimal(product.prices_tags && product.prices_tags[0] ? parseFloat(product.prices_tags[0]) : 10),
+        price: new Prisma.Decimal(product.prices_tags && product.prices_tags[0] ? parseFloat(product.prices_tags[0]).toFixed(2) : (Math.random() * 10).toFixed(2)),
         categoryId: await findOrCreateCategory(product.categories_tags_fr),
       };
 
@@ -80,11 +81,11 @@ async function seedOpenFoodFactsProducts() {
 }
 
 function generateSlug(productName: string): string {
-  // Convert to lowercase
+  // En minuscule
   let slug = productName.toLowerCase();
-  // Replace spaces with hyphens
+  // On récupère les espaces pour les transformer en -
   slug = slug.replace(/\s+/g, '-');
-  // Remove special characters
+  // et on exclu les caractères spéciaux => ^ = not en regex
   slug = slug.replace(/[^a-z0-9-]/g, '');
   return slug;
 }

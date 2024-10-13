@@ -50,3 +50,34 @@ export async function getProducts() {
         throw new Error('La récupération des produits a échoué.');
     }
 }
+
+//? Le typage peut évoluer en fonction des besoins 
+export async function filterProduct(filters: { [key in keyof Product]?: { 
+    equals?: string | number | boolean | null; 
+    lte?: number; 
+    gte?: number;
+    lt?: number;
+    gt?: number;
+    contains?: string;
+    startsWith?: string;
+    endsWith?: string;
+    in?: string[] | number[];
+    notIn?: string[] | number[];
+}}) {
+    try {
+        let customFilters: any[] = []
+        if (filters) {
+            customFilters = Object.entries(filters)?.map(([key, value]) => ({
+                [key]: value
+            }));
+        }
+
+        const products = await prisma.product.findMany({
+            where: customFilters.length > 0 ? { AND: customFilters } : {},
+        });
+        return products;
+    } catch (error) {
+        console.error("Erreur lors du filtrage des produits :", error);
+        throw new Error('Le filtrage des produits a échoué.');
+    }
+}
