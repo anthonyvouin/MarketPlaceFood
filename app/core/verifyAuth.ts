@@ -1,24 +1,53 @@
-import { jwtVerify } from 'jose';
-import { NextRequest } from 'next/server';
+"use server"
+
+import {jwtVerify} from 'jose';
+import {cookies} from "next/headers";
+import {decode} from "next-auth/jwt";
+
+class JWTError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'JWTError';
+    }
+}
 
 const JWT_SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'votre_secret_de_test');
 
-export async function verifyAuth(req: NextRequest) {
-  const token = req.cookies.get('next-auth.session-token') || req.cookies.get('next-auth-token'); // Assurez-vous que le token est bien là
+export async function verifyAuth() {
+    const cookieStore = cookies();
+    const token = cookieStore.get('next-auth.session-token')?.value;
+    if (token) {
+        try {
+            const decoded = await decode({
+                token: token,
+                secret: process.env.NEXTAUTH_SECRET ? process.env.NEXTAUTH_SECRET : 'votre_secret_de_test'
+            });
 
-  if (!token) {
-    throw new Error('Non autorisé : aucun token trouvé.');
-  }
+            if (!decoded) {
+                throw new JWTError('Token invalide');
+            }
 
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, {
-      algorithms: ['HS256'], // Spécifiez l'algorithme utilisé
-    });
+            if (decoded) {
+                const {payload} = await jwtVerify(decoded.jwt as string, JWT_SECRET);
+                return {message: 'Action successful!', user: payload};
 
-    // Retourne les informations contenues dans le JWT
-    return payload; 
-  } catch (error) {
-    console.error('Erreur de vérification du JWT:', error);
-    throw new Error('Non autorisé : token invalide.');
-  }
+            }
+
+        } catch (e) {
+            console.error('Invalid token')
+            throw new Error('Invalid token');
+        }
+
+    } else {
+        if (e instanceof JWTError) {
+            console.error('Erreur JWT :','lala');
+        } else if (e instanceof Error) {
+            // Logue les autres erreurs avec leur stack
+            console.error('Erreur générale :', e.message, e.stack);
+        }
+
+        // Lance une nouvelle erreur avec un message plus générique pour l'utilisateur
+        throw new Error('Une erreur est survenue lors du traitement du token.'); // Message d'erreur que l'utilisateur verra
+    }
+
 }

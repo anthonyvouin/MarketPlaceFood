@@ -15,6 +15,7 @@ const Profile = () => {
         if (session) {
             const fetchUser = async () => {
                 const getUser: UserWithAdress | null = await getUserById(session.user.id);
+                console.log(getUser)
                 if (getUser) {
                     setUser(getUser);
                 }

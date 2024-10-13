@@ -2,9 +2,9 @@
 import {Prisma, PrismaClient} from "@prisma/client";
 import {UserDto} from "@/app/interface/user/userDto";
 import bcrypt from 'bcrypt';
-import { UserRegisterDto } from "@/app/interface/user/useRegisterDto";
-import { verifyAuth } from "@/app/core/verifyAuth";
-import { NextRequest } from 'next/server'; 
+import {UserRegisterDto} from "@/app/interface/user/useRegisterDto";
+import {verifyAuth} from "@/app/core/verifyAuth";
+
 
 const prisma = new PrismaClient();
 export type UserWithAdress = Prisma.UserGetPayload<{
@@ -12,10 +12,13 @@ export type UserWithAdress = Prisma.UserGetPayload<{
 }>;
 
 
-export async function getUserById(req: NextRequest, id: string): Promise<UserWithAdress | null> {
+export async function getUserById(id: string): Promise<UserWithAdress | null> {
+
     try {
 
-        const authPayload = await verifyAuth(req);
+        const authPayload = await verifyAuth();
+        console.log(authPayload)
+
         return await prisma.user.findUnique({
             where: {id},
             include: {addresses: true}
@@ -26,6 +29,7 @@ export async function getUserById(req: NextRequest, id: string): Promise<UserWit
     }
 
 }
+
 export async function updateUser(user: UserDto) {
     if (!user.id) {
         throw new Error(`L'ID de l'utilisateur est requis pour la mise à jour.`);
@@ -48,9 +52,9 @@ export async function updateUser(user: UserDto) {
         const userDto: UserDto = {
             id: updatedUser.id || undefined,
             name: updatedUser.name,
-            email: updatedUser.email,   
+            email: updatedUser.email,
             emailVerified: updatedUser.emailVerified,
-            image: updatedUser.image,   
+            image: updatedUser.image,
             addresses: updatedUser.addresses || [],
         };
         return userDto
@@ -63,30 +67,29 @@ export async function updateUser(user: UserDto) {
 }
 
 
-
 export async function createUser(email: string, name: string, password: string): Promise<UserRegisterDto> {
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-    
+
         const user = await prisma.user.create({
-          data: {
-            email,
-            name,
-            password: hashedPassword,
-          },
+            data: {
+                email,
+                name,
+                password: hashedPassword,
+            },
         });
-    
+
         const userDto: UserRegisterDto = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          password: '', 
-          emailVerified: user.emailVerified,
-          image: user.image,
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            password: '',
+            emailVerified: user.emailVerified,
+            image: user.image,
         };
-    
-        return userDto; 
-      } catch (error) {
+
+        return userDto;
+    } catch (error) {
         throw new Error("Erreur lors de la création de l'utilisateur.");
-      }
     }
+}
