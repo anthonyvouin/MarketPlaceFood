@@ -2,8 +2,9 @@ import Link from 'next/link';
 import Image from 'next/image'
 import {Flex} from '@radix-ui/themes';
 import {HomeIcon, HobbyKnifeIcon} from '@radix-ui/react-icons';
+import {SidebarLinks} from "@/app/interface/sidebar-links/sidebar-links";
 
-const links = [
+const links: SidebarLinks[] = [
     {name: 'Accueil', href: '/', icon: HomeIcon},
     {name: 'Produits', href: '/products', icon: HobbyKnifeIcon},
 ];

@@ -2,9 +2,10 @@ import Link from 'next/link';
 import Image from 'next/image'
 import {Flex} from '@radix-ui/themes';
 import {GearIcon, BellIcon, FileTextIcon, HomeIcon} from "@radix-ui/react-icons"
+import {SidebarLinks} from "@/app/interface/sidebar-links/sidebar-links";
 
 
-const links = [
+const links: SidebarLinks[] = [
     {name: 'Générale', href: '/profil', icon: GearIcon},
     {name: 'Adresses', href: '/profil/adresses', icon: HomeIcon},
     {name: 'Notifications', href: '/notification', icon: BellIcon},
