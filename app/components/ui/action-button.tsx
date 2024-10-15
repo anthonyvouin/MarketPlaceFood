@@ -21,7 +21,8 @@ export default function ActionButton({
     return (
         <Button onClick={onClickAction}
                 color={color}
-                variant="outline">
+                variant="outline"
+                style={{cursor:"pointer !important"}}>
             {IconComponent && positionIcon === 'left' ? <IconComponent/> : ''}
             {message}
             {IconComponent && positionIcon === 'right' ? <IconComponent/> : ''}

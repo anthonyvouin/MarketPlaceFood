@@ -1,15 +1,20 @@
 'use client';
 
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useRouter } from "next/navigation"; 
 import { createUser } from "@/app/services/user/user"; 
 import { signIn } from "next-auth/react"; 
 import { UserRegisterDto } from "../interface/user/useRegisterDto";
+import {getPageName} from "@/app/utils/utils";
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const router = useRouter();
+
+    useEffect(() => {
+        getPageName();
+    }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();

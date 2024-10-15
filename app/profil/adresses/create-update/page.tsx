@@ -8,6 +8,7 @@ import {useRouter, useSearchParams} from "next/navigation";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import Image from "next/image";
 import {ToastContext} from "@/app/provider/toastProvider";
+import {getPageName} from "@/app/utils/utils";
 
 type adressInput = 'address' | 'city' | 'zipCode' | 'phoneNumber' | 'additionalAddress' | 'name' | 'note'
 
@@ -49,6 +50,10 @@ const CreateUpdate = () => {
         }
 
     }, [session]);
+
+    useEffect(() => {
+        getPageName();
+    }, []);
 
     const handleChange = (input: adressInput, value: string) => {
         setAddress((prevUser) => {

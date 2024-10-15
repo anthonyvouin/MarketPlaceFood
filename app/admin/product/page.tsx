@@ -7,6 +7,7 @@ import {Table} from "@radix-ui/themes";
 import {ProductDto} from "@/app/interface/product/productDto";
 import {formatPrice} from "@/app/pipe/format";
 import {getAllProducts} from "@/app/services/products/product";
+import {getPageName} from "@/app/utils/utils";
 
 
 export default function ProductPage() {
@@ -17,6 +18,7 @@ export default function ProductPage() {
             const categoriesData: ProductDto[] = await getAllProducts();
             setProducts(categoriesData);
         }
+        getPageName();
         fetchCategories();
     }, []);
 
