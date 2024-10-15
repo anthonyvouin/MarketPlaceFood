@@ -4,6 +4,7 @@ import React, {useEffect, useState} from 'react';
 import {useSession} from "next-auth/react";
 import {getUserById, updateUser, UserWithAdress} from "@/app/services/user/user";
 import {UserDto} from "@/app/interface/user/userDto";
+import {getPageName} from "@/app/utils/utils";
 
 const Profile = () => {
     const {data: session, status} = useSession()
@@ -21,6 +22,10 @@ const Profile = () => {
 
         }
     }, [session]);
+
+    useEffect(() => {
+        getPageName();
+    }, []);
 
     const handleChange = (input: 'name' | 'email', value: string) => {
         setUser((prevUser) => {

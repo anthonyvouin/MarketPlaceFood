@@ -9,6 +9,7 @@ import * as Checkbox from '@radix-ui/react-checkbox';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { getAllCategories } from '../services/category/category';
 import { Category } from '../interface/category/category';
+import {getPageName} from "@/app/utils/utils";
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -40,6 +41,10 @@ export default function Products() {
   useEffect(() => {
     fetchProducts(filters);
   }, [filters]);
+
+  useEffect(() => {
+    getPageName();
+  }, []);
 
   const handleFilterChange = (key: keyof Product, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));

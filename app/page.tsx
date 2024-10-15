@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import ProductCard from "./components/ProductCard";
 import {ProductDto} from "@/app/interface/product/productDto";
 import {getAllProducts} from "@/app/services/products/product";
+import {getPageName} from "@/app/utils/utils";
 
 export default function Home() {
 
@@ -14,6 +15,7 @@ export default function Home() {
             const products: ProductDto[] = await getAllProducts()
             return setProducts(products);
         }
+        getPageName();
         fetchProducts();
     }, []);
 

@@ -3,9 +3,10 @@
 import CreateCategory from "@/app/components/admin/category/createCategory";
 import CategoryList from "@/app/components/admin/category/categoryList";
 import UpdateCategory from "@/app/components/admin/category/updateCategory";
-import { Category } from "@prisma/client";
-import { getAllCategories } from "@/app/services/category/category";
-import { useEffect, useState } from "react";
+import {Category} from "@prisma/client";
+import {getAllCategories} from "@/app/services/category/category";
+import {useEffect, useState} from "react";
+import {getPageName} from "@/app/utils/utils";
 
 const CategoryPage = () => {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -15,6 +16,7 @@ const CategoryPage = () => {
             const categoriesData: Category[] = await getAllCategories();
             setCategories(categoriesData);
         }
+        getPageName();
         fetchCategories();
     }, []);
 
@@ -36,10 +38,10 @@ const CategoryPage = () => {
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8 text-center">Gestion des catégories</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <CreateCategory emitAddCategory={handleAddCategory} />
-                <UpdateCategory categories={categories} onUpdateCategory={handleUpdateCategory} />
+                <CreateCategory emitAddCategory={handleAddCategory}/>
+                <UpdateCategory categories={categories} onUpdateCategory={handleUpdateCategory}/>
             </div>
-            <CategoryList categories={categories} />
+            <CategoryList categories={categories}/>
         </div>
     );
 };
