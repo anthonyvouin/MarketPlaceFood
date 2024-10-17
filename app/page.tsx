@@ -37,7 +37,7 @@ export default function Home() {
 
                 <div className="grid grid-cols-4 gap-10 ">
           {products.map((product, index) => (
-            <ProductCard key={product.id} product={product} bgColor={bgColors[index % bgColors.length]} />
+            <ProductCard productId={product.id} key={product.id} product={product} bgColor={bgColors[index % bgColors.length]} />
           ))}
         </div>
             </section>
