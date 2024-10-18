@@ -15,12 +15,11 @@ export async function createAddress(address: AddressDto): Promise<AddressDto> {
 
 
     try {
-        const newAdress: AddressDto = await prisma.address.create({
+        return await prisma.address.create({
             data: {
                 ...address,
             },
         });
-        return newAdress;
     } catch (error: any) {
 
         throw new Error(`erreur lors de l'enregistrement de l'adresse`);
