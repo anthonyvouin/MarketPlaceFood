@@ -80,6 +80,18 @@ export async function getAllProducts(): Promise<ProductDto[]> {
         throw new Error('La récupération des produits a échoué');
     }
 }
+export async function getProductById(id: string) {
+    try {
+        const product = await prisma.product.findUnique({
+            where: { id },
+            include: { category: true },
+        });
+        return JSON.parse(JSON.stringify(product));
+    } catch (error) {
+        console.error("Erreur lors de la récupération du produit :", error);
+        throw new Error('La récupération du produit a échoué.');
+    }
+}
 
 //? Le typage peut évoluer en fonction des besoins 
 export async function filterProduct(filters: {
