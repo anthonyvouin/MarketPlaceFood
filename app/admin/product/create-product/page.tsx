@@ -7,6 +7,7 @@ import {uploadImage} from '@/lib/uploadImage';
 import DragAndDrop from "@/app/components/dragAndDrop/dragAndDrop";
 import ImagePreview from "@/app/components/imagePreview/imagePreview";
 import ActionButton from "@/app/components/ui/action-button";
+import {getPageName} from "@/app/utils/utils";
 
 
 export default function CreateProductPage() {
@@ -39,7 +40,7 @@ export default function CreateProductPage() {
                 setLoadingCategories(false);
             }
         };
-
+        getPageName();
         fetchCategories();
     }, []);
 

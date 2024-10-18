@@ -2,6 +2,7 @@
 
 import {Prisma, PrismaClient, Product} from '@prisma/client';
 import {ProductDto} from '@/app/interface/product/productDto';
+import {CategoryDto} from "@/app/interface/category/categoryDto";
 
 
 const prisma = new PrismaClient();
@@ -10,7 +11,7 @@ export type ProductWithCategory = Prisma.ProductGetPayload<{
     include: { category: true };
 }>;
 
-export async function createProduct(product: ProductDto) {
+export async function createProduct(product: ProductDto): Promise<ProductDto> {
 
     if (!product.image) {
         throw new Error('Image non renseignée');
@@ -37,7 +38,7 @@ export async function createProduct(product: ProductDto) {
     }
 
     try {
-        const existingCategory = await prisma.category.findUnique({
+        const existingCategory: CategoryDto | null = await prisma.category.findUnique({
             where: {id: product.categoryId},
         });
 
@@ -47,7 +48,7 @@ export async function createProduct(product: ProductDto) {
 
         const formattedPrice: number = parseFloat(Number(product.price).toFixed(2));
 
-        const newProduct: ProductDto = await prisma.product.create({
+        return await prisma.product.create({
             data: {
                 name: product.name,
                 slug: product.slug,
@@ -57,8 +58,6 @@ export async function createProduct(product: ProductDto) {
                 categoryId: product.categoryId,
             },
         });
-
-        return newProduct;
     } catch (error: any) {
         console.error("Erreur lors de la création du produit :", error);
         throw new Error('La création du produit a échoué.');
@@ -80,11 +79,12 @@ export async function getAllProducts(): Promise<ProductDto[]> {
         throw new Error('La récupération des produits a échoué');
     }
 }
-export async function getProductById(id: string) {
+
+export async function getProductById(id: string): Promise<any> {
     try {
         const product = await prisma.product.findUnique({
-            where: { id },
-            include: { category: true },
+            where: {id},
+            include: {category: true},
         });
         return JSON.parse(JSON.stringify(product));
     } catch (error) {
@@ -93,7 +93,6 @@ export async function getProductById(id: string) {
     }
 }
 
-//? Le typage peut évoluer en fonction des besoins 
 export async function filterProduct(filters: {
     [key in keyof ProductDto]?: {
         equals?: string | number | boolean | null;

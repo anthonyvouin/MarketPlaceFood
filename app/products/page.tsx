@@ -9,6 +9,7 @@ import {CheckIcon} from '@radix-ui/react-icons';
 import {getAllCategories} from '../services/category/category';
 import {ProductDto} from '../interface/product/productDto';
 import {CategoryDto} from '../interface/category/categoryDto';
+import {getPageName} from "@/app/utils/utils";
 
 export default function Products() {
     const [products, setProducts] = useState<ProductDto[]>([]);
@@ -37,9 +38,13 @@ export default function Products() {
         }
     }, [selectedCategories]);
 
-    useEffect(() => {
+    useEffect((): void => {
         fetchProducts(filters);
     }, [filters]);
+
+    useEffect((): void => {
+        getPageName();
+    }, []);
 
     const handleFilterChange = (key: keyof ProductDto, value: any): void => {
         setFilters(prev => ({...prev, [key]: value}));

@@ -1,10 +1,11 @@
 "use client";
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {createContact} from '@/app/services/contact/contact';
 import {ContactDto} from '@/app/interface/contact/contactDto';
 import ReCAPTCHA from "react-google-recaptcha";
 import Image from "next/image";
+import {getPageName} from "@/app/utils/utils";
 
 const CreateContact = () => {
     const [firstName, setFirstName] = useState('');
@@ -15,6 +16,10 @@ const CreateContact = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+
+    useEffect(() => {
+        getPageName()
+    }, []);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -53,11 +58,11 @@ const CreateContact = () => {
                 <Image src="/images/contact.png" width={424} height={327} alt="DriveFood"/>
             </div>
             <div className="w-3/6  p-6 mr-12 bg-white shadow-md rounded-md">
-            <form onSubmit={handleSubmit}
+                <form onSubmit={handleSubmit}
                       className="space-y-6">
                     <div>
                         <label htmlFor="firstName"
-                              >
+                        >
                             Prénom :
                         </label>
                         <input
@@ -128,7 +133,7 @@ const CreateContact = () => {
 
                     <button
                         type="submit"
-                        className="w-full py-2 px-4 bg-actionColor transition ease-in-out delay-150 hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="w-full py-2 px-4 bg-actionColor transition ease-in-out delay-150 hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
                         Envoyer
                     </button>

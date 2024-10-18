@@ -15,12 +15,11 @@ export async function createAddress(address: AddressDto): Promise<AddressDto> {
 
 
     try {
-        const newAdress: AddressDto = await prisma.address.create({
+        return await prisma.address.create({
             data: {
                 ...address,
             },
         });
-        return newAdress;
     } catch (error: any) {
 
         throw new Error(`erreur lors de l'enregistrement de l'adresse`);
@@ -42,7 +41,7 @@ export async function getAdressById(addressId: string, userId: string): Promise<
     return address;
 }
 
-export async function updateAdress(address: AddressDto) {
+export async function updateAdress(address: AddressDto): Promise<AddressDto> {
     return prisma.address.update({
         where: {
             id: address.id,
@@ -56,7 +55,7 @@ export async function updateAdress(address: AddressDto) {
 
 }
 
-export async function deleteAdress(id: string){
+export async function deleteAdress(id: string): Promise<AddressDto> {
     return prisma.address.delete({
         where: {id}
     })

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { getAllContacts } from '@/app/services/contact/contact';
 import ContactList from '@/app/components/admin/contact/contactList';
 import { ContactDto } from '@/app/interface/contact/contactDto';
+import {getPageName} from "@/app/utils/utils";
 const ContactsPage: React.FC = () => {
     const [contacts, setContacts] = useState<ContactDto[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -20,6 +21,7 @@ const ContactsPage: React.FC = () => {
             }
         };
 
+        getPageName();
         fetchContacts();
     }, []);
 

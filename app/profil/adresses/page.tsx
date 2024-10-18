@@ -9,6 +9,7 @@ import {Badge} from "@radix-ui/themes";
 import {ClipboardIcon, HomeIcon, MobileIcon, TrashIcon} from "@radix-ui/react-icons";
 import {DialogContext} from "@/app/provider/DialogProvider";
 import {deleteAdress} from "@/app/services/addresses/addresses";
+import {getPageName} from "@/app/utils/utils";
 
 const Adresses = () => {
     const {data: session, status} = useSession()
@@ -27,6 +28,10 @@ const Adresses = () => {
 
         }
     }, [session]);
+
+    useEffect((): void => {
+        getPageName();
+    }, []);
 
     const handleDelete = (address: AddressDto): void => {
 

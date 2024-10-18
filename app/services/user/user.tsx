@@ -27,7 +27,7 @@ export async function getUserById(id: string): Promise<UserWithAdress | null> {
 
 }
 
-export async function updateUser(user: UserDto) {
+export async function updateUser(user: UserDto): Promise<UserDto> {
     if (!user.id) {
         throw new Error(`L'ID de l'utilisateur est requis pour la mise à jour.`);
     }
@@ -46,7 +46,7 @@ export async function updateUser(user: UserDto) {
             },
         });
 
-        const userDto: UserDto = {
+        return {
             id: updatedUser.id || undefined,
             name: updatedUser.name,
             email: updatedUser.email,
@@ -54,7 +54,6 @@ export async function updateUser(user: UserDto) {
             image: updatedUser.image,
             addresses: updatedUser.addresses || [],
         };
-        return userDto
 
     } catch (e) {
         throw new Error(`La mise à jour de l'utilisateur a échouée`);
@@ -63,10 +62,9 @@ export async function updateUser(user: UserDto) {
 
 }
 
-
 export async function createUser(email: string, name: string, password: string): Promise<UserRegisterDto> {
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword: string = await bcrypt.hash(password, 10);
 
         const user = await prisma.user.create({
             data: {
@@ -76,7 +74,7 @@ export async function createUser(email: string, name: string, password: string):
             },
         });
 
-        const userDto: UserRegisterDto = {
+        return {
             id: user.id,
             name: user.name,
             email: user.email,
@@ -85,7 +83,6 @@ export async function createUser(email: string, name: string, password: string):
             image: user.image,
         };
 
-        return userDto;
     } catch (error) {
         throw new Error("Erreur lors de la création de l'utilisateur.");
     }

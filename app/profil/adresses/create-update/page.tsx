@@ -8,6 +8,7 @@ import {useRouter, useSearchParams} from "next/navigation";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import Image from "next/image";
 import {ToastContext} from "@/app/provider/toastProvider";
+import {getPageName} from "@/app/utils/utils";
 
 type adressInput = 'address' | 'city' | 'zipCode' | 'phoneNumber' | 'additionalAddress' | 'name' | 'note'
 
@@ -19,7 +20,7 @@ const CreateUpdate = () => {
     const searchParams = useSearchParams();
     const id: string | null = searchParams.get('id')
 
-    useEffect(() => {
+    useEffect((): void => {
         if (session) {
             let newAddress: AddressDto = {
                 name: '',
@@ -50,7 +51,11 @@ const CreateUpdate = () => {
 
     }, [session]);
 
-    const handleChange = (input: adressInput, value: string) => {
+    useEffect((): void => {
+        getPageName();
+    }, []);
+
+    const handleChange = (input: adressInput, value: string): void => {
         setAddress((prevUser) => {
             if (prevUser) {
                 return {
