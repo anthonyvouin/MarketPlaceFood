@@ -2,19 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import { filterProduct } from '../services/products/product';
-import { Product } from '../interface/product/product';
 import ProductCard from '../components/ProductCard';
 import { Slider } from '@radix-ui/themes';
 import * as Checkbox from '@radix-ui/react-checkbox';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { getAllCategories } from '../services/category/category';
-import { Category } from '../interface/category/category';
+import { ProductDto } from '../interface/product/productDto';
+import { CategoryDto } from '../interface/category/categoryDto';
 
 export default function Products() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filters, setFilters] = useState<{ [key in keyof Product]?: any }>({});
+  const [products, setProducts] = useState<ProductDto[]>([]);
+  const [filters, setFilters] = useState<{ [key in keyof ProductDto]?: any }>({});
   const [priceRange, setPriceRange] = useState([0, 50]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const bgColors = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
@@ -41,7 +41,7 @@ export default function Products() {
     fetchProducts(filters);
   }, [filters]);
 
-  const handleFilterChange = (key: keyof Product, value: any) => {
+  const handleFilterChange = (key: keyof ProductDto, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
@@ -103,11 +103,15 @@ export default function Products() {
 
       <div className="grid grid-cols-4 gap-10">
         {products.map((product, index) => (
+          <>
+          <p>{product.id}</p>
           <ProductCard
+            productId={product.id}
             key={product.id}
             product={product}
             bgColor={bgColors[index % bgColors.length]}
-          />
+            />
+          </>
         ))}
       </div>
     </section>
