@@ -20,7 +20,7 @@ const CreateUpdate = () => {
     const searchParams = useSearchParams();
     const id: string | null = searchParams.get('id')
 
-    useEffect(() => {
+    useEffect((): void => {
         if (session) {
             let newAddress: AddressDto = {
                 name: '',
@@ -51,11 +51,11 @@ const CreateUpdate = () => {
 
     }, [session]);
 
-    useEffect(() => {
+    useEffect((): void => {
         getPageName();
     }, []);
 
-    const handleChange = (input: adressInput, value: string) => {
+    const handleChange = (input: adressInput, value: string): void => {
         setAddress((prevUser) => {
             if (prevUser) {
                 return {

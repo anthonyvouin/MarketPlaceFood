@@ -5,20 +5,17 @@ import {CategoryDto} from '@/app/interface/category/categoryDto';
 
 const prisma = new PrismaClient();
 
-
-// Function pour créer une category
-export async function createCategory(category: CategoryDto) {
+export async function createCategory(category: CategoryDto): Promise<CategoryDto> {
     if (!category.name || category.name.trim() === '') {
         throw new Error('Le nom de la catégorie est requis et doit être une chaîne de caractères non vide.');
     }
 
     try {
-        const newCategory: CategoryDto = await prisma.category.create({
+        return await prisma.category.create({
             data: {
                 name: category.name,
             },
         });
-        return newCategory;
     } catch (error: any) {
         if (error.code === 'P2002') {
             throw new Error('Une catégorie avec ce nom existe déjà.');
@@ -27,7 +24,6 @@ export async function createCategory(category: CategoryDto) {
     }
 }
 
-// Function pour recupérer toutes les categories 
 export async function getAllCategories(): Promise<Category[]> {
     try {
         return await prisma.category.findMany({
@@ -40,10 +36,9 @@ export async function getAllCategories(): Promise<Category[]> {
     }
 }
 
-// Function pour supprimmer une category par son id
-export async function deleteCategoryById(id: CategoryDto['id']) {
+export async function deleteCategoryById(id: CategoryDto['id']): Promise<{ message: string }> {
     if (!id) {
-        throw new Error('L\'ID de la catégorie est requis pour la suppression.');
+        throw new Error(`L'ID de la catégorie est requis pour la suppression.`);
     }
 
     try {
@@ -58,10 +53,9 @@ export async function deleteCategoryById(id: CategoryDto['id']) {
     }
 }
 
-//Function pour update une category par son id
-export async function updateCategory(category: CategoryDto) {
+export async function updateCategory(category: CategoryDto): Promise<CategoryDto> {
     if (!category.id) {
-        throw new Error('L\'ID de la catégorie est requis pour la mise à jour.');
+        throw new Error(`L'ID de la catégorie est requis pour la mise à jour.`);
     }
 
     if (!category.name || category.name.trim() === '') {
@@ -69,7 +63,7 @@ export async function updateCategory(category: CategoryDto) {
     }
 
     try {
-        const updatedCategory: CategoryDto = await prisma.category.update({
+        return await prisma.category.update({
             where: {
                 id: category.id,
             },
@@ -77,7 +71,6 @@ export async function updateCategory(category: CategoryDto) {
                 name: category.name,
             },
         });
-        return updatedCategory;
     } catch (error: any) {
         if (error.code === 'P2002') {
             throw new Error('Une catégorie avec ce nom existe déjà.');

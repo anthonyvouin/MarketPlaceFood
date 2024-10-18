@@ -14,7 +14,7 @@ const Profile = () => {
     const [success, setSuccess] = useState<string | null>(null);
     useEffect(() => {
         if (session) {
-            const fetchUser = async () => {
+            const fetchUser = async (): Promise<void> => {
                 await getUserById(session.user.id)
                     .then((e: UserWithAdress | null) => setUser(e));
             }
@@ -23,11 +23,11 @@ const Profile = () => {
         }
     }, [session]);
 
-    useEffect(() => {
+    useEffect((): void => {
         getPageName();
     }, []);
 
-    const handleChange = (input: 'name' | 'email', value: string) => {
+    const handleChange = (input: 'name' | 'email', value: string): void => {
         setUser((prevUser) => {
             if (prevUser) {
                 return {

@@ -42,7 +42,7 @@ export async function getAdressById(addressId: string, userId: string): Promise<
     return address;
 }
 
-export async function updateAdress(address: AddressDto) {
+export async function updateAdress(address: AddressDto): Promise<AddressDto> {
     return prisma.address.update({
         where: {
             id: address.id,
@@ -56,7 +56,7 @@ export async function updateAdress(address: AddressDto) {
 
 }
 
-export async function deleteAdress(id: string){
+export async function deleteAdress(id: string): Promise<AddressDto> {
     return prisma.address.delete({
         where: {id}
     })

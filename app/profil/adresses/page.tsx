@@ -29,7 +29,7 @@ const Adresses = () => {
         }
     }, [session]);
 
-    useEffect(() => {
+    useEffect((): void => {
         getPageName();
     }, []);
 

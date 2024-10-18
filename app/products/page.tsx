@@ -38,15 +38,15 @@ export default function Products() {
         }
     }, [selectedCategories]);
 
-    useEffect(() => {
+    useEffect((): void => {
         fetchProducts(filters);
     }, [filters]);
 
-    useEffect(() => {
-    getPageName();
-  }, []);
+    useEffect((): void => {
+        getPageName();
+    }, []);
 
-  const handleFilterChange = (key: keyof ProductDto, value: any): void => {
+    const handleFilterChange = (key: keyof ProductDto, value: any): void => {
         setFilters(prev => ({...prev, [key]: value}));
     };
 
