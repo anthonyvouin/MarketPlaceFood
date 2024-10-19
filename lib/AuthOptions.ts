@@ -4,14 +4,14 @@ import GoogleProvider from "next-auth/providers/google";
 import {prisma} from "./db";
 import bcrypt from "bcrypt";
 import {SignJWT} from 'jose';
-import { sendWelcomeEmail } from "@/app/services/mail/email";
+import {sendWelcomeEmail} from "@/app/services/mail/email";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'votre_secret_de_test');
 
 export const authOptions = {
     adapter: PrismaAdapter(prisma),
     pages: {
-        signIn: '/login', 
+        signIn: '/login',
     },
     providers: [
         CredentialsProvider({
@@ -71,19 +71,17 @@ export const authOptions = {
             return session;
         },
 
-        async signIn({ user, account }) {
-            if (account?.provider === 'google') {
+        async signIn({user, account}) {
+            if (account && account.provider === 'google') {
                 const existingUser = await prisma.user.findUnique({
-                    where: { email: user.email }
+                    where: {email: user.email}
                 });
-        
+
                 if (!existingUser) {
                     await sendWelcomeEmail(user.email, user.name || 'Utilisateur');
-                } else {
-                    console.log('Utilisateur déjà existant');
                 }
             }
-        
+
             return true;
         }
     },
