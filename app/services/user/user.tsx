@@ -4,7 +4,7 @@ import {UserDto} from "@/app/interface/user/userDto";
 import bcrypt from 'bcrypt';
 import {UserRegisterDto} from "@/app/interface/user/useRegisterDto";
 import {verifyAuth} from "@/app/core/verifyAuth";
-
+import { sendWelcomeEmail } from "../mail/email";
 
 const prisma = new PrismaClient();
 export type UserWithAdress = Prisma.UserGetPayload<{
@@ -73,6 +73,9 @@ export async function createUser(email: string, name: string, password: string):
                 password: hashedPassword,
             },
         });
+
+       
+        await sendWelcomeEmail(user.email!, user.name!);
 
         return {
             id: user.id,
