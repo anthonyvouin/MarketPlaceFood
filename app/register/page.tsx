@@ -51,7 +51,7 @@ export default function SignUpPage() {
                         <div>
                             <label htmlFor="name"
                                    className="block text-sm font-medium text-gray-700 mb-1">
-                                Nom
+                                Nom et Prénom
                             </label>
                             <input
                                 type="text"

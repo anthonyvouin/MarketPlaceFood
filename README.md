@@ -5,7 +5,7 @@
 git clone
 ```
 
-## Run server ! 
+## Run server 
 
 ```bash
 npm run dev

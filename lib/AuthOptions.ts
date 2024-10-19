@@ -10,7 +10,7 @@ const JWT_SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'votr
 export const authOptions = {
     adapter: PrismaAdapter(prisma),
     pages: {
-        signIn: '/login', // Indiquer une page de connexion personnalisée
+        signIn: '/login', 
     },
     providers: [
         CredentialsProvider({
@@ -35,6 +35,8 @@ export const authOptions = {
                 return null;
             },
         }),
+
+
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID as string,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
@@ -67,6 +69,6 @@ export const authOptions = {
             session.user.jwt = token.jwt;
             return session;
         },
-
+    
     },
 };
