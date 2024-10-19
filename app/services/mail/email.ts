@@ -1,4 +1,3 @@
-// services/mail/email.ts
 import nodemailer from 'nodemailer';
 
 export const sendWelcomeEmail = async (email: string, name: string) => {
@@ -21,7 +20,7 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
         <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; background-color:#EBF2F0; border: 1px solid #ddd; border-radius: 5px;">
             <img src="http://localhost:3000/images/logo.svg" alt="Logo de Snap&Shop" style="max-width: 100%; height: auto; margin-bottom: 20px;">
 
-            <h2 style="color: #85BC39;">Bonjour<strong>${name}</strong>,</h2>
+            <h2 style="color: #85BC39;">Bonjour <strong>${name}</strong>,</h2>
             <p style="font-size: 16px;">Bienvenue sur notre site !</p>
             <p style="font-size: 16px;">Nous sommes ravis de vous compter parmi nous !</p>
             <p style="font-size: 16px;">Pour commencer, vous pouvez explorer nos fonctionnalités et découvrir tout ce que nous avons à offrir.</p>
