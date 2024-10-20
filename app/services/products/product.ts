@@ -93,6 +93,19 @@ export async function getProductById(id: string): Promise<any> {
     }
 }
 
+export async function getProductBySlug(slug: string): Promise<any> {
+    try {
+        const product = await prisma.product.findUnique({
+            where: {slug: slug},
+            include: {category: true},
+        });
+        return JSON.parse(JSON.stringify(product));
+    } catch (error) {
+        console.error("Erreur lors de la récupération du produit :", error);
+        throw new Error('La récupération du produit a échoué.');
+    }
+}
+
 export async function filterProduct(filters: {
     [key in keyof ProductDto]?: {
         equals?: string | number | boolean | null;
