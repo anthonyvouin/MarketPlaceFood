@@ -78,3 +78,18 @@ export async function updateCategory(category: CategoryDto): Promise<CategoryDto
         throw new Error('La mise à jour de la catégorie a échoué');
     }
 }
+
+export async function getCategoriesData() {
+  const categories = await prisma.category.findMany({
+    include: {
+      _count: {
+        select: { products: true },
+      },
+    },
+  });
+
+  return categories.map((category) => ({
+    name: category.name,
+    productCount: category._count.products,
+  }));
+}
