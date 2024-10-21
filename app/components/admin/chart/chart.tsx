@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
+import { ChartCategoryProps } from "@/app/interface/chart/ChartCategoryPropsDTO";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,14 +25,7 @@ ChartJS.register(
   Legend
 );
 
-interface CategoryData {
-  name: string;
-  productCount: number;
-}
 
-interface ChartCategoryProps {
-  categoriesData: CategoryData[];
-}
 
 export default function ChartCategory({ categoriesData }: ChartCategoryProps) {
   const [chartData, setChartData] = useState<ChartData<"line"> | null>(null);
