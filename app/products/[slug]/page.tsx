@@ -1,6 +1,6 @@
 "use client";
 
-import {getProductById} from "@/app/services/products/product";
+import {getProductBySlug} from "@/app/services/products/product";
 import {useEffect, useState} from "react";
 import {useParams, useRouter} from 'next/navigation'
 import {ProductDto} from "@/app/interface/product/productDto";
@@ -10,16 +10,17 @@ import {formatPrice} from "@/app/pipe/format";
 
 export default function Product() {
     const [product, setProduct] = useState<ProductDto | null>(null);
-    const {id} = useParams() as { id: string };
+    const {slug} = useParams() as { slug: string };
     const router = useRouter();
 
     useEffect((): void => {
         const fetchProduct = async () => {
-            const product = await getProductById(id);
+            const product = await getProductBySlug(slug);
+            console.log(product);
             return setProduct(product);
         }
         fetchProduct();
-    }, [id]);
+    }, [slug]);
 
     return (
         <section className="bg-primaryBackgroundColor font-manrope h-[85vh] w-full px-40">
