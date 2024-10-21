@@ -1,4 +1,3 @@
-// app/graphique/page.tsx
 import { getCategoriesData } from "@/app/services/category/category";
 import ChartCategory from "@/app/components/admin/chart/chart";
 
