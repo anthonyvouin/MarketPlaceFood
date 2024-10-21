@@ -110,7 +110,7 @@ export default function Products() {
                 {products.map((product: ProductDto, index) => (
                     <>
                         <ProductCard
-                            productId={product.id!}
+                            productSlug={product.slug}
                             key={product.id}
                             product={product}
                             bgColor={bgColors[index % bgColors.length]}

@@ -5,9 +5,9 @@ import { ProductCardProps } from '@/app/interface/product/productCardProps';
 import { formatPrice } from "@/app/pipe/format";
 import Link from 'next/link';
 
-const ProductCard = ({ product, bgColor, productId }: ProductCardProps) => {
+const ProductCard = ({ product, bgColor, productSlug }: ProductCardProps) => {
     return (
-        <Link href={`/products/${productId}`} className={classNames(`${bgColor} bg-opacity-25`, 'w-full rounded-lg shadow-md p-4 grid grid-cols-1 grid-rows-[1.5fr,0.5fr,1fr,1fr] h-[28rem] font-manrope')}>
+        <Link href={`/products/${productSlug}`} className={classNames(`${bgColor} bg-opacity-25`, 'w-full rounded-lg shadow-md p-4 grid grid-cols-1 grid-rows-[1.5fr,0.5fr,1fr,1fr] h-[28rem] font-manrope')}>
             <div className="flex justify-center items-start h-full">
                 <Image
                     src={product?.image ? product?.image : "/images/default-image.png"}
