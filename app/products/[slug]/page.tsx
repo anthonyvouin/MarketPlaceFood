@@ -16,7 +16,6 @@ export default function Product() {
     useEffect((): void => {
         const fetchProduct = async () => {
             const product = await getProductBySlug(slug);
-            console.log(product);
             return setProduct(product);
         }
         fetchProduct();

@@ -6,10 +6,13 @@ import {ProductDto} from "@/app/interface/product/productDto";
 import {getAllProducts} from "@/app/services/products/product";
 import {generateRecipes} from "./services/ia-integration/ia";
 import {getPageName} from "@/app/utils/utils";
+import { RecipeDto } from "./interface/recipe";
+import RecipeCard from "./components/OneRecipeCard";
 
 export default function Home() {
 
     const [products, setProducts] = useState<ProductDto[]>([]);
+    const [recipes, setRecipes] = useState<RecipeDto[]>([]);
 
     useEffect((): void => {
         const fetchProducts = async (): Promise<void> => {
@@ -22,7 +25,7 @@ export default function Home() {
 
     const callGenerateRecipes = async (): Promise<void> => {
         const recipes = await generateRecipes();
-        console.log(recipes);
+        setRecipes(recipes);
     }
 
 
@@ -35,6 +38,11 @@ export default function Home() {
                         <h1 className="font-manrope font-bold text-5xl text-gray-900">Bienvenue sur notre site</h1>
                         <p className="font-manrope font-light text-2xl text-gray-900">L'IA c'est trop bien</p>
                         <button onClick={callGenerateRecipes}>Générer des recettes</button>
+                        <div className="grid grid-cols-3 gap-5">
+                            { recipes && recipes.map((recipe, index) => (
+                                <RecipeCard recipe={recipe} key={index}/>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>

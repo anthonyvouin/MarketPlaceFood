@@ -56,7 +56,6 @@ async function seedOpenFoodFactsProducts() {
       });
 
       if (existingProduct) {
-        console.log(`Le produit avec le slug ${existingProduct.slug} existe déjà. Ignoré.`);
         continue;
       }
       
@@ -69,12 +68,10 @@ async function seedOpenFoodFactsProducts() {
         categoryId: await findOrCreateCategory(product.categories_tags_fr),
       };
 
-      console.log('Création du produit :', formattedProduct);
 
       await createProduct(formattedProduct);
     }
 
-    console.log('Le seeding des produits depuis OpenFoodFacts est terminé.');
   } catch (error) {
     console.error("Erreur lors du seeding des produits :", error);
   }

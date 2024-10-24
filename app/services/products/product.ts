@@ -64,14 +64,33 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
     }
 }
 
-export async function getAllProducts(): Promise<ProductDto[]> {
+export async function getAllProducts(fields={}): Promise<ProductDto[]> {
     try {
+        if (Object.keys(fields).length === 0) {
+            fields = {
+                id: true,
+                name: true,
+                slug: true,
+                description: true,
+                image: true,
+                price: true,
+                createdAt: true,
+                updatedAt: true,
+                categoryId: true,
+                category: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                }
+            }
+        }
         const products: ProductWithCategory[] = await prisma.product.findMany({
+            select: {
+               ...fields
+            },
             orderBy: {
                 name: 'asc',
-            },
-            include: {
-                category: true,
             },
         });
         return transformProductDto(products);
