@@ -34,25 +34,26 @@ export async function updateUser(user: UserDto): Promise<UserDto> {
 
     try {
         const updatedUser: UserDto = await prisma.user.update({
-            where: {
-                id: user.id,
-            },
+          where: {
+            id: user.id,
+          },
 
-            data: {
-                name: user.name,
-            },
-            include: {
-                addresses: true,
-            },
+          data: {
+            name: user.name,
+          },
+          include: {
+            addresses: true,
+          },
         });
 
         return {
-            id: updatedUser.id || undefined,
-            name: updatedUser.name,
-            email: updatedUser.email,
-            emailVerified: updatedUser.emailVerified,
-            image: updatedUser.image,
-            addresses: updatedUser.addresses || [],
+          id: updatedUser.id || undefined,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          emailVerified: updatedUser.emailVerified,
+          image: updatedUser.image,
+          addresses: updatedUser.addresses || [],
+          role: updatedUser.role, 
         };
 
     } catch (e) {
@@ -71,6 +72,7 @@ export async function createUser(email: string, name: string, password: string):
                 email,
                 name,
                 password: hashedPassword,
+                role:"USER"
             },
         });
 
@@ -78,12 +80,13 @@ export async function createUser(email: string, name: string, password: string):
         await sendWelcomeEmail(user.email!, user.name!);
 
         return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            password: '',
-            emailVerified: user.emailVerified,
-            image: user.image,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          password: "",
+          emailVerified: user.emailVerified,
+          image: user.image,
+          role: user.role, 
         };
 
     } catch (error) {
