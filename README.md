@@ -25,7 +25,7 @@ npx  prisma migrate dev
 npx prisma migrate dev --name nom de la migration
 ```
 
-## Remplir la base de données ! 
+## Remplir la base de données
 
 ```bash
 npx prisma db seed
