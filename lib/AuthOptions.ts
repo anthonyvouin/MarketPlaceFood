@@ -7,7 +7,7 @@ import { SignJWT } from "jose";
 import { sendWelcomeEmail } from "@/app/services/mail/email";
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "votre_secret_de_test"
+  process.env.NEXTAUTH_SECRET 
 );
 
 export const authOptions = {

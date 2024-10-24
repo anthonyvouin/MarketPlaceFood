@@ -3,7 +3,7 @@ import { getToken, JWT } from "next-auth/jwt";
 import { jwtVerify } from "jose";
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "votre_secret_de_test"
+  process.env.NEXTAUTH_SECRET 
 );
 
 export async function middleware(req: NextRequest) {
