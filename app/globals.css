@@ -1,11 +1,14 @@
 @import "style/width.css";
 @import "style/height.css";
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@import 'primeicons/primeicons.css';
+@import "primereact/resources/themes/lara-light-cyan/theme.css";
 
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 body {
     color: var(--foreground);
@@ -64,19 +67,25 @@ body {
 }
 
 
-.separator-ou::after{
-    content:'Ou';
+.separator-ou::after {
+    content: 'Ou';
 }
 
-.separator-not-sign-in::after{
-    content:'Pas encore inscrit ?'
+.separator-not-sign-in::after {
+    content: 'Pas encore inscrit ?'
 }
 
-.separator::after{
-    position: absolute;
-    top:18px;
-    background: white;
-    padding: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+.p-divider-solid.p-divider-horizontal:before {
+    border-top-style: solid !important;
+}
+
+.p-divider.p-divider-horizontal:before {
+    border-top: 1px #e5e7eb;
+}
+
+.p-checkbox-box{
+    border: 1px solid lightgray !important;
+}
+.p-checkbox.p-highlight .p-checkbox-box{
+    background: #85BC39;
 }

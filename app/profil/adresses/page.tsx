@@ -5,11 +5,10 @@ import {useSession} from "next-auth/react";
 import {getUserById, UserWithAdress} from "@/app/services/user/user";
 import Link from "next/link";
 import {AddressDto} from "@/app/interface/address/addressDto";
-import {Badge} from "@radix-ui/themes";
-import {ClipboardIcon, HomeIcon, MobileIcon, TrashIcon} from "@radix-ui/react-icons";
 import {DialogContext} from "@/app/provider/DialogProvider";
 import {deleteAdress} from "@/app/services/addresses/addresses";
 import {getPageName} from "@/app/utils/utils";
+import {Badge} from "primereact/badge";
 
 const Adresses = () => {
     const {data: session, status} = useSession()
@@ -69,11 +68,11 @@ const Adresses = () => {
                              className='bg-white p-5 rounded-lg w-96 h-56 relative'>
                             <div className="flex justify-between items-center">
                                 <h2 className="text-xl font-bold">{address.name}</h2>
-                                {address.isPrincipal ? (<Badge color="green">Addresse principale</Badge>) : ('')}
+                                {address.isPrincipal ? (<Badge value="Adresse Principale"></Badge>) : ('')}
                             </div>
 
                             <div className="flex mt-2">
-                                <HomeIcon className="mr-3 mt-1"></HomeIcon>
+                                <span className="pi pi-hone"></span>
                                 <div>
                                     <p>{address.additionalAddress}</p>
                                     <p>{address.address}</p>
@@ -83,12 +82,12 @@ const Adresses = () => {
                             </div>
 
                             <div className="flex items-center">
-                                <MobileIcon className="mr-3"></MobileIcon>
+                                <span className="pi pi-mobile"></span>
                                 <p>{address.phoneNumber}</p>
                             </div>
 
                             <div className="flex items-center">
-                                {address.note ? (<ClipboardIcon className="mr-3"></ClipboardIcon>) : ''}
+                                {address.note ? (<span className="pi pi-clipboard"></span>) : ''}
                                 <p className="italic ">{address.note}</p>
                             </div>
 
@@ -100,8 +99,7 @@ const Adresses = () => {
                                         <span className='text-actionColor underline text-sm'>Définir comme addresse principale</span>
                                     </div>) : ('')}
                                 <span className="text-sm">&ensp;|&ensp;</span>
-                                <TrashIcon className="mt-1 text-redColor cursor-pointer"
-                                           onClick={() => handleDelete(address)}></TrashIcon>
+                                <span className="pi pi-trash" onClick={() => handleDelete(address)}></span>
                             </div>
                         </div>
                     ))

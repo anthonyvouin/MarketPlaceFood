@@ -1,5 +1,5 @@
 'use client';
-import { Suspense } from 'react';
+import {Suspense} from 'react';
 import React, {useContext, useEffect, useState} from 'react';
 import {useSession} from "next-auth/react";
 import {AddressDto} from "@/app/interface/address/addressDto";
@@ -16,7 +16,7 @@ const CreateUpdatePage = () => {
     const {data: session, status} = useSession()
     const [address, setAddress] = useState<AddressDto | null>(null);
     const router: AppRouterInstance = useRouter();
-    const {showToast} = useContext(ToastContext);
+    const {show} = useContext(ToastContext);
     const searchParams = useSearchParams();
     const id: string | null = searchParams.get('id')
 
@@ -73,14 +73,14 @@ const CreateUpdatePage = () => {
             if (id) {
                 updateAdress(address).then((): void => {
                     router.push(`/profil/adresses`)
-                    showToast('adresse modifiée ', 'success')
-                }).catch((e) => showToast(e, 'error'))
+                    show('Modification', 'Adresse modifiée ', 'info')
+                }).catch((e) => show('Erreur', e, 'error'))
 
             } else {
                 createAddress(address).then((): void => {
-                    showToast('adresse créée ', 'success')
+                    show('Création', 'Adresse créée ', 'info')
                     router.push(`/profil/adresses`)
-                }).catch((e) => showToast(e, 'error'))
+                }).catch((e) => show('Erreur', e, 'error'))
 
             }
         }
@@ -178,7 +178,7 @@ const CreateUpdatePage = () => {
 
 const CreateUpdate = () => (
     <Suspense fallback={<div>Loading...</div>}>
-        <CreateUpdatePage />
+        <CreateUpdatePage/>
     </Suspense>
 );
 

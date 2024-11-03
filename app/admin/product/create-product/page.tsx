@@ -6,7 +6,7 @@ import {CategoryDto} from '@/app/interface/category/categoryDto';
 import {uploadImage} from '@/lib/uploadImage';
 import DragAndDrop from "@/app/components/dragAndDrop/dragAndDrop";
 import ImagePreview from "@/app/components/imagePreview/imagePreview";
-import ActionButton from "@/app/components/ui/action-button";
+import RoundedButton from "@/app/components/ui/rounded-button";
 import {getPageName} from "@/app/utils/utils";
 
 
@@ -190,7 +190,7 @@ export default function CreateProductPage() {
                                 {imageFile ? (
                                     <div className='flex items-center justify-center'>
                                         <ImagePreview file={imageFile}></ImagePreview>
-                                        <ActionButton onClickAction={() => deleteImage()} message="Supprimer" positionIcon="right" icon='delete' color="tomato"/>
+                                        <RoundedButton onClickAction={() => deleteImage()} message="Supprimer" positionIcon="right" icon='delete' classes="tomato"/>
                                     </div>
 
                                 ) : (<DragAndDrop onDrop={handleImage}></DragAndDrop>)}

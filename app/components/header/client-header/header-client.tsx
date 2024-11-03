@@ -1,18 +1,19 @@
 "use client"
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
-import {Avatar, Box} from "@radix-ui/themes";
-import {BellIcon, EnvelopeClosedIcon} from "@radix-ui/react-icons";
 import Link from "next/link";
 import LogoutButton from "@/app/components/auth/logout";
+import {Avatar} from "primereact/avatar";
+import {Button} from "primereact/button";
 
 export default function HeaderClient() {
     const [name, setName] = useState('');
     const {data: session, status} = useSession()
 
+    console.log(session)
     useEffect(() => {
         if (session && session.user && session.user.name) {
-            setName(session.user.name[0]);
+            setName((session.user.name[0]).toUpperCase());
         }
     }, [session]);
 
@@ -26,41 +27,34 @@ export default function HeaderClient() {
 
             <div className="flex gap-5 items-center">
                 <Link href="/contact">
-                    <Avatar
-                        size="2"
-                        className="bg-actionColor"
-                        fallback={
-                            <Box className='flex justify-center items-center' width="15px" height="15px">
-                                <EnvelopeClosedIcon className='text-light' width="15" height="15"/>
-                            </Box>
-                        }
-                        radius="full"
-                        variant="soft"
+                    <Button
+                        rounded
+                        icon="pi pi-envelope"
+                        className="bg-actionColor text-white w-8 h-8 text-xs"
                     />
                 </Link>
-                <Avatar
-                    size="2"
-                    className="bg-actionColor"
-                    fallback={
-                        <Box className='flex justify-center items-center' width="15px" height="15px">
-                            <BellIcon className="text-light" width="15" height="15"/>
-                        </Box>
-                    }
-                    radius="full"
-                    variant="soft"
+                <Button
+                    rounded
+                    icon="pi pi-bell"
+                    className="bg-actionColor text-white w-8 h-8 text-xs"
                 />
-
                 {status === 'authenticated' ? (
                     <>
-                       <Link href="/profil">
-                           <Avatar className="bg-actionColor"
-                                   size="2"
-                                   fallback={
-                                       <Box>
-                                           <span className="text-light">{name}</span>
-                                       </Box>}
-                                   radius="full"/>
-                       </Link>
+                        <Link href="/profil">
+                            <Avatar label={name} shape="circle" className="bg-actionColor text-white"/>
+                        </Link>
+
+
+                        {session?.user["role"] === "ADMIN" ? (
+                            <Link href="/admin">
+                                <Button
+                                    rounded
+                                    icon="pi pi-folder"
+                                    className="bg-info text-white w-8 h-8 text-xs"
+                                >
+                                </Button>
+                            </Link>
+                        ) : ("")}
 
                         <LogoutButton/>
                     </>
@@ -68,6 +62,8 @@ export default function HeaderClient() {
                     <Link href="/login"
                           className="border-b-2 border-actionColor">Se connecter</Link>
                 )}
+
+
             </div>
         </header>
     )

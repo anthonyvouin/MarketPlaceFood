@@ -3,7 +3,7 @@
 import React, {createContext, useState, ReactNode} from 'react';
 import {Dialog} from "@/app/interface/dialog/dialog";
 import {DialogContextType} from "@/app/interface/dialog/dialog-context-type";
-import {Button} from "@radix-ui/themes";
+import {Button} from "primereact/button";
 
 export const DialogContext: React.Context<DialogContextType> = createContext<DialogContextType>({
     showDialog: (): void => {
@@ -44,7 +44,7 @@ export const DialogProvider = ({children}: { children: ReactNode }) => {
                     <div className='absolute bottom-0 left-0 w-full '>
                         <div className='flex justify-center pb-4'>
                             <div className='mr-24'>
-                                <Button color='gray' variant="outline" onClick={handleAnnuler}>Annuler</Button>
+                                <Button color='gray' outlined onClick={handleAnnuler}>Annuler</Button>
                             </div>
                             <Button color='grass' onClick={handleValidate}>Valider</Button>
                         </div>

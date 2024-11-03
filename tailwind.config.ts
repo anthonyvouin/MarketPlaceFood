@@ -17,6 +17,7 @@ const config: Config = {
         actionColor:'#85BC39',
         darkActionColor:'#294819',
         primaryBackgroundColor: '#EBF2F0',
+        info: '#d7af44'
       },
       backgroundColor: {
         tertiaryColorPink: '#FBB6B2',

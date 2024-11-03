@@ -1,50 +1,31 @@
 "use client";
 
-import React, {createContext, useState, ReactNode, useRef} from 'react';
-import {Toast} from "@/app/interface/toast/toast";
-import {ToastContextType} from "@/app/interface/toast/toast-context-type";
+import React, {Context, createContext, MutableRefObject, ReactNode, useRef} from 'react';
 
-export const ToastContext = createContext<ToastContextType>({
-    showToast: (): void => {
+import {ToastContextType} from "@/app/interface/toast/toast-context-type";
+import {Toast} from 'primereact/toast';
+
+export type typeToast = "success" | "info" | "warn" | "error" | "secondary" | "contrast" | undefined
+
+export const ToastContext: Context<ToastContextType> = createContext<ToastContextType>({
+    show: (): void => {
     },
 });
 
 export const ToastProvider = ({children}: { children: ReactNode }) => {
-    const [toast, setToast] = useState<Toast>({
-        message: '',
-        type: '',
-        visible: false,
-    });
+    const toast: MutableRefObject<Toast | null> = useRef<Toast | null>(null);
 
-    const timeoutRef: React.MutableRefObject<NodeJS.Timeout | null> = useRef<NodeJS.Timeout | null>(null);
+    const show = (title: string, message: string, type: typeToast): void => {
 
-    const showToast = (message: string, type: string): void => {
-        setToast({message, type, visible: true});
-
-        timeoutRef.current = setTimeout((): void => {
-            setToast({message: '', type: '', visible: false});
-            timeoutRef.current = null;
-        }, 3000);
+        if (toast.current) {
+            toast.current.show({severity: type, summary: title, detail: message});
+        }
     };
 
-    const deleteMessage = (): void => {
-        setToast({message: '', type: '', visible: false})
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-        }
-    }
-
     return (
-        <ToastContext.Provider value={{showToast}}>
-            {toast.visible && (
-                <div className={`toast ${toast.type} absolute w-80 top-5 right-5 h-12 p-2.5 z-50 rounded-md shadow-lg flex justify-between`}>
-                    <p>{toast.message}</p>
-                    <p className="cursor-pointer font-semibold"
-                       onClick={() => deleteMessage()}>x</p>
-                </div>
-            )}
+        <ToastContext.Provider value={{show}}>
+            <Toast ref={toast}></Toast>
             {children}
-
         </ToastContext.Provider>
     );
 };

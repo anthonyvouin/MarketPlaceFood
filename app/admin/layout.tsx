@@ -2,7 +2,6 @@ import SessionWrapper from "@/lib/SessionWrapper";
 import Link from "next/link";
 import React from "react";
 import Head from "next/head";
-import {Theme} from "@radix-ui/themes";
 
 export default function AdminLayout({children}: Readonly<{
     children: React.ReactNode;
@@ -16,7 +15,6 @@ export default function AdminLayout({children}: Readonly<{
           />
         </Head>
         <body>
-          <Theme>
             <div className="flex  h-screen">
               <nav className="flex flex-col width-15  bg-light">
                 <Link
@@ -61,7 +59,6 @@ export default function AdminLayout({children}: Readonly<{
                 <SessionWrapper>{children}</SessionWrapper>
               </div>
             </div>
-          </Theme>
         </body>
       </html>
     );

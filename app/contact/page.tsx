@@ -7,6 +7,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import Image from "next/image";
 import {getPageName} from "@/app/utils/utils";
 
+
 const CreateContact = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -41,7 +42,7 @@ const CreateContact = () => {
             setMessage('');
             setCaptchaValue(null);
             setError(null);
-        } catch (err : unknown) {
+        } catch (err: unknown) {
             if (err instanceof Error) {
                 setError('Erreur lors de la création du contact.');
             }
@@ -133,10 +134,8 @@ const CreateContact = () => {
                         onChange={(value: SetStateAction<string | null>) => setCaptchaValue(value)}
                     />
 
-                    <button
-                        type="submit"
-                        className="w-full py-2 px-4 bg-actionColor transition ease-in-out delay-150 hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
+                    <button type="submit"
+                            className="w-full py-2 px-4 bg-actionColor transition ease-in-out delay-150 hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Envoyer
                     </button>
                 </form>

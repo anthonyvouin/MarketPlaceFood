@@ -1,14 +1,15 @@
 "use client"
-import ActionButton from "@/app/components/ui/action-button";
+import RoundedButton from "@/app/components/ui/rounded-button";
 import {useRouter} from "next/navigation";
 import React, {useEffect, useState} from "react";
 import {Product} from "@prisma/client";
-import {Table} from "@radix-ui/themes";
 import {ProductDto} from "@/app/interface/product/productDto";
 import {formatPrice} from "@/app/pipe/format";
 import {getAllProducts} from "@/app/services/products/product";
 import {getPageName} from "@/app/utils/utils";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
+import {DataTable} from "primereact/datatable";
+import {Column} from "primereact/column";
 
 
 export default function ProductPage() {
@@ -34,50 +35,37 @@ export default function ProductPage() {
         console.log(id)
     }
 
+    const priceFormated = (product: ProductDto) => {
+        return formatPrice(product.price)
+    }
+
+    const deleteAction = (product: ProductDto) => {
+        return <button
+            onClick={() => handleDelete(product.id!)}
+            className="text-red-600 hover:text-red-800"
+            title="Supprimer cette catégorie"
+        >
+            ❌
+        </button>
+    }
+
 
     return (
         <div>
-            <div className="flex flex-row-reverse">
-                <ActionButton onClickAction={() => navigateToRoute()} message="Créer un produit" icon="plus" positionIcon='left' color="jade"></ActionButton>
+            <div className="flex flex-row-reverse pt-1 pb-2.5">
+                <RoundedButton onClickAction={() => navigateToRoute()} message="Créer un produit" icon="pi pi-plus" positionIcon='left' classes="border-actionColor text-actionColor"></RoundedButton>
             </div>
             {products.length === 0 ? (
                 <p className="text-center text-gray-500">Aucuns produits disponible.</p>
             ) : (
                 <div>
-                    <Table.Root>
-                        <Table.Header>
-                            <Table.Row>
-                                <Table.ColumnHeaderCell>Nom</Table.ColumnHeaderCell>
-                                <Table.ColumnHeaderCell>prix</Table.ColumnHeaderCell>
-                                <Table.ColumnHeaderCell>categorie</Table.ColumnHeaderCell>
-                                <Table.ColumnHeaderCell>actions</Table.ColumnHeaderCell>
-                            </Table.Row>
-                        </Table.Header>
-                        <Table.Body>
-
-                            {products.map((product: ProductDto) => (
-                                <Table.Row key={product.id}>
-                                    <Table.RowHeaderCell>{product.name}</Table.RowHeaderCell>
-                                    <Table.Cell>{formatPrice(product.price)} €</Table.Cell>
-                                    <Table.Cell>{product.category ? product.category.name : ''}</Table.Cell>
-                                    <Table.Cell>
-                                        {product.id ? (
-                                            <button
-                                                onClick={() => handleDelete(product.id!)}
-                                                className="text-red-600 hover:text-red-800"
-                                                title="Supprimer cette catégorie"
-                                            >
-                                                ❌
-                                            </button>) : ''}
-                                    </Table.Cell>
-                                </Table.Row>
-                            ))}
-
-                        </Table.Body>
-                    </Table.Root>
-
+                    <DataTable value={products} tableStyle={{minWidth: '50rem'}}>
+                        <Column field="name" header="Nom"></Column>
+                        <Column field="price" header="Prix" body={priceFormated}></Column>
+                        <Column field="name" header="Categorie"></Column>
+                        <Column header="Action" body={deleteAction}></Column>
+                    </DataTable>
                 </div>
-
             )}
         </div>
 
