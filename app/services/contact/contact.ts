@@ -1,7 +1,8 @@
 'use server';
 
 import {PrismaClient} from '@prisma/client';
-import {ContactDto} from '@/app/interface/contact/contactDto';
+import { ContactDto } from '@/app/interface/contact/contactDto';
+import { verifyAuth } from '@/app/core/verifyAuth';
 
 const prisma = new PrismaClient();
 
@@ -31,6 +32,9 @@ export async function createContact(contact: ContactDto): Promise<ContactDto> {
 
 export async function getAllContacts(): Promise<ContactDto[]> {
     try {
+
+        await verifyAuth(["ADMIN"]);
+
         return await prisma.contact.findMany();
     } catch (error) {
         throw new Error('La récupération des contacts a échoué');
