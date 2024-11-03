@@ -1,5 +1,5 @@
 'use client';
-
+import {Suspense} from 'react';
 import React, {useContext, useEffect, useState} from 'react';
 import {useSession} from "next-auth/react";
 import {AddressDto} from "@/app/interface/address/addressDto";
@@ -12,11 +12,11 @@ import {getPageName} from "@/app/utils/utils";
 
 type adressInput = 'address' | 'city' | 'zipCode' | 'phoneNumber' | 'additionalAddress' | 'name' | 'note'
 
-const CreateUpdate = () => {
+const CreateUpdatePage = () => {
     const {data: session, status} = useSession()
     const [address, setAddress] = useState<AddressDto | null>(null);
     const router: AppRouterInstance = useRouter();
-    const {showToast} = useContext(ToastContext);
+    const {show} = useContext(ToastContext);
     const searchParams = useSearchParams();
     const id: string | null = searchParams.get('id')
 
@@ -73,14 +73,14 @@ const CreateUpdate = () => {
             if (id) {
                 updateAdress(address).then((): void => {
                     router.push(`/profil/adresses`)
-                    showToast('adresse modifiée ', 'success')
-                }).catch((e) => showToast(e, 'error'))
+                    show('Modification', 'Adresse modifiée ', 'info')
+                }).catch((e) => show('Erreur', e, 'error'))
 
             } else {
                 createAddress(address).then((): void => {
-                    showToast('adresse créée ', 'success')
+                    show('Création', 'Adresse créée ', 'info')
                     router.push(`/profil/adresses`)
-                }).catch((e) => showToast(e, 'error'))
+                }).catch((e) => show('Erreur', e, 'error'))
 
             }
         }
@@ -109,7 +109,7 @@ const CreateUpdate = () => {
                     <input type="text"
                            id="additionnalAddress"
                            autoComplete='fasle'
-                           value={address ? address.additionalAddress : ''}
+                           value={address && address.additionalAddress ? address.additionalAddress : ''}
                            onChange={(e) => handleChange('additionalAddress', e.target.value)}
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"/>
                 </div>
@@ -160,7 +160,7 @@ const CreateUpdate = () => {
                     <label htmlFor="note">Note pour le livreur</label>
                     <textarea
                         id="note"
-                        value={address ? address.note : ''}
+                        value={address && address.note ? address.note : ''}
                         onChange={(e) => handleChange('note', e.target.value)}
                         className="mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm w-full h-32"/>
                 </div>
@@ -175,5 +175,11 @@ const CreateUpdate = () => {
 
     );
 };
+
+const CreateUpdate = () => (
+    <Suspense fallback={<div>Loading...</div>}>
+        <CreateUpdatePage/>
+    </Suspense>
+);
 
 export default CreateUpdate;

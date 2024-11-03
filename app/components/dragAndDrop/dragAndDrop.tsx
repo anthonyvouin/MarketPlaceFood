@@ -1,8 +1,8 @@
-import {useRef, useState} from "react";
+import {RefObject, useRef, useState} from "react";
 
 const Dropzone = ({onDrop}) => {
     const [highlight, setHighlight] = useState(false);
-    const fileInputRef = useRef(null);
+    const fileInputRef: RefObject<HTMLInputElement> = useRef<HTMLInputElement>(null);
 
     const handleDragOver = (e) => {
         e.preventDefault();

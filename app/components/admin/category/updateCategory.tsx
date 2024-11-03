@@ -38,8 +38,11 @@ const UpdateCategory = ({categories, onUpdateCategory}) => {
             setSuccess('Catégorie mise à jour avec succès');
             setSelectedCategory(null);
             setNewName('');
-        } catch (err) {
-            setError('Erreur lors de la mise à jour de la catégorie');
+        } catch (err : unknown) {
+            if (err instanceof Error) {
+                setError('Erreur lors de la mise à jour de la catégorie');
+            }
+
         }
     };
 
