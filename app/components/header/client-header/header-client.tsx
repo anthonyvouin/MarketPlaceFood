@@ -10,7 +10,6 @@ export default function HeaderClient() {
     const [name, setName] = useState('');
     const {data: session, status} = useSession()
 
-    console.log(session)
     useEffect(() => {
         if (session && session.user && session.user.name) {
             setName((session.user.name[0]).toUpperCase());
@@ -62,8 +61,6 @@ export default function HeaderClient() {
                     <Link href="/login"
                           className="border-b-2 border-actionColor">Se connecter</Link>
                 )}
-
-
             </div>
         </header>
     )

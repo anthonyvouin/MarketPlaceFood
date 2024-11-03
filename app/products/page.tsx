@@ -93,15 +93,6 @@ export default function Products() {
                                     checked={selectedCategories.includes(category.id!)}
 
                                 />
-                                {/*<Checkbox.Root*/}
-                                {/*    id={category.id}*/}
-                                {/*    checked={selectedCategories.includes(category.id!)} // Vérifie si la catégorie est sélectionnée*/}
-                                {/*    onCheckedChange={() => handleCategoryChange(category.id!)}*/}
-                                {/*    className="w-5 h-5 bg-gray-200 rounded">*/}
-                                {/*    <Checkbox.Indicator>*/}
-                                {/*        <CheckIcon className="text-blue-500 w-4 h-4"/>*/}
-                                {/*    </Checkbox.Indicator>*/}
-                                {/*</Checkbox.Root>*/}
                                 <label htmlFor={category.id} className="text-sm">{category.name}</label>
                             </div>
                         ))}
