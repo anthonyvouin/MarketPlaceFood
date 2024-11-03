@@ -18,7 +18,7 @@ export default function Products() {
     const [categories, setCategories] = useState<CategoryDto[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-    const bgColors = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
+    const bgColors: string[] = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
 
     const fetchProducts = async (filters: any): Promise<void> => {
         try {

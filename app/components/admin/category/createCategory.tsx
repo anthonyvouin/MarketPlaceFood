@@ -23,8 +23,10 @@ const CreateCategory = ({emitAddCategory}) => {
             emitAddCategory(newCategorySave)
             setSuccess('Catégorie créée avec succès');
             setName('');
-        } catch (err) {
-            setError('Erreur lors de la création de la catégorie');
+        } catch (err : unknown) {
+            if (err instanceof Error) {
+                setError('Erreur lors de la création de la catégorie');
+            }
         }
     };
 

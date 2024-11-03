@@ -8,6 +8,7 @@ import {ProductDto} from "@/app/interface/product/productDto";
 import {formatPrice} from "@/app/pipe/format";
 import {getAllProducts} from "@/app/services/products/product";
 import {getPageName} from "@/app/utils/utils";
+import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 
 export default function ProductPage() {
@@ -23,16 +24,15 @@ export default function ProductPage() {
     }, []);
 
 
-    const router = useRouter();
+    const router: AppRouterInstance = useRouter();
 
     const navigateToRoute = (): void => {
         router.push("product/create-product")
     }
 
     const handleDelete = (id: Product['id']): void => {
-
+        console.log(id)
     }
-
 
 
     return (
@@ -56,7 +56,7 @@ export default function ProductPage() {
                         <Table.Body>
 
                             {products.map((product: ProductDto) => (
-                                <Table.Row>
+                                <Table.Row key={product.id}>
                                     <Table.RowHeaderCell>{product.name}</Table.RowHeaderCell>
                                     <Table.Cell>{formatPrice(product.price)} €</Table.Cell>
                                     <Table.Cell>{product.category ? product.category.name : ''}</Table.Cell>

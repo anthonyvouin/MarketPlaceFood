@@ -4,6 +4,8 @@ import "@radix-ui/themes/styles.css";
 import "./globals.css";
 import Head from "next/head";
 import LayoutWrapper from "./components/layoutWrapper/LayoutWrapper";
+import {Metadata} from "next";
+import React from "react";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",

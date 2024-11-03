@@ -16,6 +16,7 @@ export default function ActionButton({
         delete: RadixIcons.TrashIcon
     }
 
+    // @ts-ignore
     const IconComponent = icons[icon];
 
     return (

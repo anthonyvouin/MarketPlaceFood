@@ -34,8 +34,10 @@ export default function CreateProductPage() {
             try {
                 const fetchedCategories = await getAllCategories();
                 setCategories(fetchedCategories);
-            } catch (err) {
-                setError("Erreur lors de la récupération des catégories.");
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                    setError("Erreur lors de la récupération des catégories.");
+                }
             } finally {
                 setLoadingCategories(false);
             }
@@ -83,8 +85,10 @@ export default function CreateProductPage() {
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';
             }
-        } catch (err: any) {
-            setError("Erreur lors de la création du produit : " + err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError("Erreur lors de la création du produit : " + err.message);
+            }
         } finally {
             setLoading(false);
         }
