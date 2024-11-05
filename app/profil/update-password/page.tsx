@@ -16,8 +16,6 @@ const PasswordUpdatePage: React.FC = () => {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
 
     useEffect((): void => {
         if (session) {
@@ -28,11 +26,9 @@ const PasswordUpdatePage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
-        setSuccess(null);
 
         if (newPassword !== confirmPassword) {
-            setError("Les mots de passe ne correspondent pas.");
+            show('Modification du mot de passe', 'Les mots de passe ne correspondent pas.', 'error')
             setLoading(false);
             return;
         }

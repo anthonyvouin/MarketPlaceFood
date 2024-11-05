@@ -106,11 +106,8 @@ const Profile = () => {
                         <button type="submit"> Enregistrer les modifications</button>                        
                     </form>
                 ) : (<p></p>)}
-
-              
             </div>        
         </div>
-
     );
 };
 
