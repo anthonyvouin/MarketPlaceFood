@@ -103,13 +103,11 @@ const Profile = () => {
 
 
                         </div>
-                        <button type="submit"> Enregistrer les modifications</button>
+                        <button type="submit"> Enregistrer les modifications</button>                        
                     </form>
                 ) : (<p></p>)}
-
-            </div>
+            </div>        
         </div>
-
     );
 };
 

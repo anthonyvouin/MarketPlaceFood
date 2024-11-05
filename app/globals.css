@@ -74,9 +74,19 @@ body {
     border-top: 1px #e5e7eb;
 }
 
-.p-checkbox-box{
+.p-checkbox-box {
     border: 1px solid lightgray !important;
 }
-.p-checkbox.p-highlight .p-checkbox-box{
+
+.p-checkbox.p-highlight .p-checkbox-box {
     background: #85BC39;
 }
+
+.p-password {
+    display: block;
+}
+
+.p-inputtext:enabled:focus{
+    box-shadow: 0 0 0 0.2rem #85BC39;
+}
+
