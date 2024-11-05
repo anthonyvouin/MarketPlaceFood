@@ -4,7 +4,7 @@ import {UserDto} from "@/app/interface/user/userDto";
 import bcrypt from 'bcrypt';
 import {UserRegisterDto} from "@/app/interface/user/useRegisterDto";
 import {verifyAuth} from "@/app/core/verifyAuth";
-import { sendWelcomeEmail } from "../mail/email";
+import {sendWelcomeEmail} from "../mail/email";
 import {UpdatePasswordDto} from "@/app/interface/user/userPasswordDto";
 
 const prisma = new PrismaClient();
@@ -35,26 +35,26 @@ export async function updateUser(user: UserDto): Promise<UserDto> {
 
     try {
         const updatedUser: UserDto = await prisma.user.update({
-          where: {
-            id: user.id,
-          },
+            where: {
+                id: user.id,
+            },
 
-          data: {
-            name: user.name,
-          },
-          include: {
-            addresses: true,
-          },
+            data: {
+                name: user.name,
+            },
+            include: {
+                addresses: true,
+            },
         });
 
         return {
-          id: updatedUser.id || undefined,
-          name: updatedUser.name,
-          email: updatedUser.email,
-          emailVerified: updatedUser.emailVerified,
-          image: updatedUser.image,
-          addresses: updatedUser.addresses || [],
-          role: updatedUser.role, 
+            id: updatedUser.id || undefined,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            emailVerified: updatedUser.emailVerified,
+            image: updatedUser.image,
+            addresses: updatedUser.addresses || [],
+            role: updatedUser.role,
         };
 
     } catch (e) {
@@ -73,21 +73,21 @@ export async function createUser(email: string, name: string, password: string):
                 email,
                 name,
                 password: hashedPassword,
-                role:"USER"
+                role: "USER"
             },
         });
 
-       
+
         await sendWelcomeEmail(user.email!, user.name!);
 
         return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          password: "",
-          emailVerified: user.emailVerified,
-          image: user.image,
-          role: user.role, 
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            password: "",
+            emailVerified: user.emailVerified,
+            image: user.image,
+            role: user.role,
         };
 
     } catch (error) {
@@ -95,42 +95,42 @@ export async function createUser(email: string, name: string, password: string):
     }
 }
 
-export async function updatePassword({ userId, oldPassword, newPassword }: UpdatePasswordDto) {
-  try {
-    await verifyAuth(["USER", "ADMIN"]);
+export async function updatePassword({userId, oldPassword, newPassword}: UpdatePasswordDto) {
+    try {
+        await verifyAuth(["USER", "ADMIN"]);
 
-    if (!userId) {
-      throw new Error("L'ID utilisateur est requis pour mettre à jour le mot de passe.");
+        if (!userId) {
+            throw new Error("L'ID utilisateur est requis pour mettre à jour le mot de passe.");
+        }
+
+        const user = await prisma.user.findUnique({
+            where: {id: userId},
+        });
+
+        if (!user || !user.password) {
+            throw new Error("Seuls les utilisateurs classiques peuvent changer leur mot de passe.");
+        }
+
+        const isOldPasswordValid: boolean = await bcrypt.compare(oldPassword, user.password);
+        if (!isOldPasswordValid) {
+            throw new Error("L'ancien mot de passe est incorrect.");
+        }
+
+        const isSameAsOldPassword: boolean = await bcrypt.compare(newPassword, user.password);
+        if (isSameAsOldPassword) {
+            throw new Error("Le nouveau mot de passe doit être différent de l'ancien mot de passe.");
+        }
+
+        const hashedPassword: string = await bcrypt.hash(newPassword, 10);
+
+        await prisma.user.update({
+            where: {id: userId},
+            data: {password: hashedPassword},
+        });
+
+        return {message: "Mot de passe mis à jour avec succès."};
+
+    } catch (error: any) {
+        throw new Error(error.message || "Erreur lors de la mise à jour du mot de passe.");
     }
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user || !user.password) {
-      throw new Error("Seuls les utilisateurs classiques peuvent changer leur mot de passe.");
-    }
-
-    const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
-    if (!isOldPasswordValid) {
-      throw new Error("L'ancien mot de passe est incorrect.");
-    }
-
-    const isSameAsOldPassword = await bcrypt.compare(newPassword, user.password);
-    if (isSameAsOldPassword) {
-      throw new Error("Le nouveau mot de passe doit être différent de l'ancien mot de passe.");
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    await prisma.user.update({
-      where: { id: userId },
-      data: { password: hashedPassword },
-    });
-
-    return { message: "Mot de passe mis à jour avec succès." };
-
-  } catch (error: any) {
-    throw new Error(error.message || "Erreur lors de la mise à jour du mot de passe.");
-  }
 }

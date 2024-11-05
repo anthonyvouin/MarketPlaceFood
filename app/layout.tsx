@@ -6,6 +6,7 @@ import LayoutWrapper from "./components/layoutWrapper/LayoutWrapper";
 import {Metadata} from "next";
 import React from "react";
 
+
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
     variable: "--font-geist-sans",
@@ -16,7 +17,7 @@ const geistMono = localFont({
     variable: "--font-geist-mono",
     weight: "100 900",
 });
-export const metadata : Metadata = {
+export const metadata: Metadata = {
     title: 'Snap&Shop',
     description: 'Snappez, commandez, cuisinez.'
 };
@@ -28,7 +29,7 @@ export default function RootLayout({
 }>) {
 
     return (
-        <html lang="en">
+        <html lang="fr">
         <Head>
             <link
                 href="https://fonts.googleapis.com/icon?family=Material+Icons"
