@@ -8,7 +8,8 @@ import {sendWelcomeEmail} from "../mail/email";
 import {UpdatePasswordDto} from "@/app/interface/user/userPasswordDto";
 import {sendPasswordResetEmail} from "@/app/services/mail/email";
 import crypto from 'crypto';
-
+import { UserWithResetToken } from "@/app/interface/user/resetPasswordDto";
+import { PasswordResetData } from "@/app/interface/user/passwordResetDataDto";
 
 const prisma = new PrismaClient();
 export type UserWithAdress = Prisma.UserGetPayload<{
@@ -139,86 +140,80 @@ export async function updatePassword({userId, oldPassword, newPassword}: UpdateP
 }
 
 
-export async function requestPasswordReset(email: string) {
-    try {
-      // Vérification de l'utilisateur
-      const user = await prisma.user.findUnique({
-        where: { email },
-      });
-  
-      if (!user) {
-        throw new Error("Utilisateur non trouvé.");
-      }
-  
-      // Création du token
-      const token: string = crypto.randomBytes(32).toString('hex');
-      const hashedToken: string = await bcrypt.hash(token, 10);
-  
-      // Définition de l'expiration du token
-      const tokenExpiration: Date = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
+export async function requestPasswordReset(email: string): Promise<void> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
 
-      if (!hashedToken || !tokenExpiration) {
-        throw new Error("Token ou expiration manquants.");
-      }
+    if (!user) {
+      throw new Error("Utilisateur non trouvé.");
+    }
+
+    const token: string = crypto.randomBytes(32).toString('hex');
+    const hashedToken: string = await bcrypt.hash(token, 10);
+
+    const tokenExpiration: Date = new Date(Date.now() + 60 * 60 * 1000); 
+    if (!hashedToken || !tokenExpiration) {
+      throw new Error("Token ou expiration manquants.");
+    }
+
+    const resetData: PasswordResetData = {
+      resetToken: hashedToken,
+      resetTokenExpires: tokenExpiration,
+    };
+
+    await prisma.user.update({
+      where: { email },
+      data: resetData,
+    });
+
+    await sendPasswordResetEmail(email, token);
+  } catch (error) {
+    throw error; 
+  } 
+}
+
+
+
+
+
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+  try {   
+
+    const user: UserWithResetToken | null = await prisma.user.findFirst({
       
-  
-      // Mise à jour de l'utilisateur avec le token et son expiration
-      await prisma.user.update({
-        where: { email },
-        data: {
-          resetToken: hashedToken,
-          resetTokenExpires: tokenExpiration,
+      where: {
+        resetToken: {
+          not: null,  
         },
-      });
-  
-      // Envoi de l'email de réinitialisation
-      await sendPasswordResetEmail(email, token);
-    } catch (error) {
-      console.error("Erreur lors de la demande de réinitialisation du mot de passe:", error);
-    }
-  }
+        resetTokenExpires: {
+          gte: new Date(),  
+        },
+      },
+    });
 
-
-  export async function resetPassword(token: string, newPassword: string) {
-    try {
-      // Recherche de l'utilisateur par token
-      const user = await prisma.user.findFirst({
-        where: {
-          resetToken: {
-            not: null,
-          },
-          resetTokenExpires: {
-            gte: new Date(), // Vérifie que le token n'est pas expiré
-          },
-        },
-      });
-  
-      if (!user) {
-        throw new Error("Token invalide ou expiré.");
-      }
-  
-      // Vérification du token avec bcrypt
-      const isTokenValid = await bcrypt.compare(token, user.resetToken!);
-      if (!isTokenValid) {
-        throw new Error("Token invalide.");
-      }
-  
-      // Hacher le nouveau mot de passe
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-  
-      // Mettre à jour l'utilisateur avec le nouveau mot de passe
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          password: hashedPassword,
-          resetToken: null, // Nettoyage du token après utilisation
-          resetTokenExpires: null,
-        },
-      });
-  
-      console.log("Mot de passe réinitialisé avec succès.");
-    } catch (error) {
-      console.error("Erreur lors de la réinitialisation du mot de passe:", error);
-      throw error;
+    if (!user) {
+      throw new Error("Token invalide ou expiré.");
     }
+
+    const isTokenValid = await bcrypt.compare(token, user.resetToken);
+    if (!isTokenValid) {
+      throw new Error("Token invalide.");
+    }
+
+    const hashedPassword: string = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,  
+        resetToken: null,  
+        resetTokenExpires: null,  
+      },
+    });
+
+  } catch (error) {
+    throw error;  
   }
+}

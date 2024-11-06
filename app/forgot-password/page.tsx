@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { requestPasswordReset } from "@/app/services/user/user"; // Service pour gérer la demande
+import { requestPasswordReset } from "@/app/services/user/user"; 
 import { useRouter } from "next/navigation";
 
 export default function ForgotPasswordPage() {
@@ -13,12 +13,11 @@ export default function ForgotPasswordPage() {
   const handleRequestReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setMessage(""); // Réinitialise le message à chaque tentative
+    setMessage(""); 
 
     try {
-      await requestPasswordReset(email); // Service pour envoyer le token
+      await requestPasswordReset(email); 
       setMessage("Un e-mail de réinitialisation a été envoyé. Vérifiez votre boîte de réception.");
-      // Redirige vers la page d'accueil ou de connexion après l'envoi du mail
       router.push("/login"); 
     } catch (error) {
       setMessage("Erreur lors de l'envoi de l'e-mail. Essayez à nouveau.");
