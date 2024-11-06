@@ -42,6 +42,8 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
     return (
         <>
             <PrimeReactProvider>
+                <ToastProvider>
+
                 <div className="flex">
                     <Sidebar/>
                     <div className="w-full">
@@ -49,6 +51,8 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                         {children}
                     </div>
                 </div>
+                </ToastProvider>
+
             </PrimeReactProvider>
         </>
     );

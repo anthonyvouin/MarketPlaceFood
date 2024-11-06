@@ -1,5 +1,5 @@
 export interface UserWithResetToken {
-    id: string;
+    id: string ;
     email: string;  
     resetToken: string;  
     resetTokenExpires: Date;  
