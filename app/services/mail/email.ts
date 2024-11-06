@@ -41,3 +41,38 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
     console.error(`Erreur lors de l'envoi de l'email : ${error}`);
   }
 };
+
+
+export  const sendPasswordResetEmail = async (email: string, token: string) => {
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_FROM,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  const resetUrl = `http://localhost:3000/reset-password?token=${token}`;
+  const mailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: "Réinitialisation de mot de passe",
+    html: `
+      <div>
+        <p>Bonjour,</p>
+        <p>Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le lien ci-dessous pour le faire :</p>
+        <a href="${resetUrl}">Réinitialiser mon mot de passe</a>
+        <p>Ce lien expirera dans une heure.</p>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Email de réinitialisation envoyé à ${email}`);
+  } catch (error) {
+    console.error(`Erreur lors de l'envoi de l'email : ${error}`);
+  }
+};
