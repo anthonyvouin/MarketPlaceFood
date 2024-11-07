@@ -26,28 +26,29 @@ const PasswordUpdatePage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
         setLoading(true);
-
+    
         if (newPassword !== confirmPassword) {
-            show('Modification du mot de passe', 'Les mots de passe ne correspondent pas.', 'error')
+            show('Modification du mot de passe', 'Les mots de passe ne correspondent pas.', 'error');
             setLoading(false);
             return;
         }
-
+    
         try {
             if (userId) {
                 const payload: UpdatePasswordDto = {userId, oldPassword, newPassword};
                 const result = await updatePassword(payload);
                 if (result && result.message) {
-                    show('Modification du mot de passe', 'Votre nouveau mot de passe à été modifié', 'success')
+                    show('Modification du mot de passe', result.message, 'success');
                     setOldPassword("");
                     setNewPassword("");
                     setConfirmPassword("");
                 }
             }
-
         } catch (err: unknown) {
             if (err instanceof Error) {
-                show('Modification du mot de passe', 'Erreur lors de la mise à jour du mot de passe', 'error')
+                show('Erreur', err.message, 'error');
+            } else {
+                show('Erreur', 'Une erreur inconnue est survenue.', 'error');
             }
         } finally {
             setLoading(false);

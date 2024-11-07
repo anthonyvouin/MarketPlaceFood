@@ -9,6 +9,7 @@ import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-
 import {useEffect} from "react";
 import {getPageName} from "@/app/utils/utils";
 import {Divider} from "primereact/divider";
+import Link from "next/link"; 
 
 export default function Login() {
     const router: AppRouterInstance = useRouter();
@@ -33,7 +34,9 @@ export default function Login() {
                     <div>
                         <h2 className="text-3xl mb-10 font-semibold">Se connecter</h2>
                         <LoginForm/>
-                        <p className="text-primaryColor mt-4 text-right underline text-xs cursor-pointer">Mot de passe oublié</p>
+                        <Link href="/forgot-password">
+                                <p className="text-primaryColor mt-4 text-right underline text-xs cursor-pointer">Mot de passe oublié</p>
+                        </Link>
                     </div>
 
                     <Divider align="center" className="mb-10">
