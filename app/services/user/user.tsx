@@ -8,7 +8,6 @@ import {sendWelcomeEmail} from "../mail/email";
 import {UpdatePasswordDto} from "@/app/interface/user/userPasswordDto";
 import {sendPasswordResetEmail} from "@/app/services/mail/email";
 import crypto from 'crypto';
-import { UserWithResetToken } from "@/app/interface/user/resetPasswordDto";
 import { PasswordResetData } from "@/app/interface/user/passwordResetDataDto";
 
 const prisma = new PrismaClient();
@@ -143,29 +142,32 @@ export async function updatePassword({userId, oldPassword, newPassword}: UpdateP
 }
 
 
-
 export async function requestPasswordReset(email: string): Promise<void> {
   try {
     const user = await prisma.user.findUnique({
       where: { email },
+      select: { password: true },
     });
 
     if (!user) {
       throw new Error("Utilisateur non trouvé.");
     }
 
-    const token: string = crypto.randomBytes(32).toString('hex');
-    const hashedToken: string = await bcrypt.hash(token, 10);
-
-    const tokenExpiration: Date = new Date(Date.now() + 60 * 60 * 1000); 
-    if (!hashedToken || !tokenExpiration) {
-      throw new Error("Token ou expiration manquants.");
+    if (!user.password) {
+      throw new Error("Ce compte est associé à Google. Veuillez gérer le mot de passe depuis votre compte Google.");
     }
 
+    const token: string = crypto.randomBytes(32).toString('hex');
+    const tokenExpiration: Date = new Date(Date.now() + 60 * 60 * 1000);
+
     const resetData: PasswordResetData = {
-      resetToken: hashedToken,
+      resetToken: token,
       resetTokenExpires: tokenExpiration,
     };
+
+    if (!resetData.resetToken || !resetData.resetTokenExpires) {
+      throw new Error("Token ou expiration manquants.");
+    }
 
     await prisma.user.update({
       where: { email },
@@ -173,51 +175,73 @@ export async function requestPasswordReset(email: string): Promise<void> {
     });
 
     await sendPasswordResetEmail(email, token);
-  } catch (error) {
-    throw error; 
-  } 
+
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error("Une erreur est survenue lors de la demande de réinitialisation.");
+  }
 }
 
 
 
-
-
 export async function resetPassword(token: string, newPassword: string): Promise<void> {
-  try {   
+  try {
+    console.log("Recherche de l'utilisateur avec le token:", token);
 
-    const user: UserWithResetToken | null = await prisma.user.findFirst({
-      
+    const user = await prisma.user.findFirst({
       where: {
-        resetToken: {
-          not: null,  
-        },
-        resetTokenExpires: {
-          gte: new Date(),  
-        },
+        resetToken: token, 
+        resetTokenExpires: { gte: new Date() },  
       },
     });
+
 
     if (!user) {
       throw new Error("Token invalide ou expiré.");
     }
 
-    const isTokenValid = await bcrypt.compare(token, user.resetToken);
-    if (!isTokenValid) {
-      throw new Error("Token invalide.");
-    }
-
+    console.log("Hachage du nouveau mot de passe...");
     const hashedPassword: string = await bcrypt.hash(newPassword, 10);
 
+    console.log("Mise à jour du mot de passe...");
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        password: hashedPassword,  
+        password: hashedPassword,
         resetToken: null,  
-        resetTokenExpires: null,  
+        resetTokenExpires: null, 
       },
     });
 
+    console.log("Mot de passe réinitialisé avec succès.");
+
   } catch (error) {
-    throw error;  
+    console.error("Erreur dans la réinitialisation du mot de passe:", error);
+
+    if (error instanceof Error) {
+      throw new Error(error.message);  
+    }
+    throw new Error("Une erreur est survenue lors de la réinitialisation du mot de passe. Veuillez réessayer.");
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

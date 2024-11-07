@@ -21,8 +21,10 @@ const ForgotPasswordPage = () => {
       show("Succès", "Un e-mail de réinitialisation a été envoyé. Vérifiez votre boîte de réception.", "success");
       
       router.push("/login");
-    } catch (error) {
-      show("Erreur", "Le mail n'a pas pu étre envoyé. Veuillez essayer plus tard.", "error");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        show("Erreur", error.message, "error"); 
+      }
     } finally {
       setIsLoading(false);
     }

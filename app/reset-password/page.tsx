@@ -1,40 +1,48 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { resetPassword } from "@/app/services/user/user"; 
+import { Password } from "primereact/password";
+import { ToastContext } from "@/app/provider/toastProvider";
 
 export default function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { show } = useContext(ToastContext);
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
   useEffect(() => {
     if (!token) {
-      setMessage("Token manquant. Veuillez vérifier le lien.");
+      show("Erreur", "Token manquant. Veuillez vérifier le lien.", "error");
     }
-  }, [token]);
+  }, [token, show]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setMessage("");
+
+    if (newPassword !== confirmPassword) {
+      show("Erreur", "Les mots de passe ne correspondent pas.", "error");
+      setIsLoading(false);
+      return;
+    }
 
     if (!token) {
-      setMessage("Token invalide.");
+      show("Erreur", "Token invalide.", "error");
       setIsLoading(false);
       return;
     }
 
     try {
       await resetPassword(token, newPassword);
-      setMessage("Mot de passe réinitialisé avec succès.");
+      show("Succès", "Mot de passe réinitialisé avec succès.", "success");
       router.push("/login");
     } catch (error) {
-      setMessage("Erreur lors de la réinitialisation du mot de passe.");
+      show("Erreur", "Une erreur est survenue lors de la réinitialisation du mot de passe.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -56,14 +64,39 @@ export default function ResetPasswordPage() {
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div>
               <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">Nouveau mot de passe :</label>
-              <input 
-                type="password"
-                id="newPassword"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                placeholder="Entrez votre nouveau mot de passe"
-                className="mt-2 px-3 py-2 w-full border border-gray-300 rounded-md"
+              <Password 
+                id="newPassword" 
+                value={newPassword} 
+                onChange={(e) => setNewPassword(e.target.value)} 
+                required 
+                minLength={8}
+                promptLabel="Changer de mot de passe"
+                weakLabel="Mot de passe simple"
+                mediumLabel="Mot de passe moyen"
+                strongLabel="Mot de passe fort"
+                toggleMask
+                pt={{
+                  input: { className: "px-3 py-2 w-full border border-gray-300 rounded-md" }
+                }}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirmer le mot de passe :</label>
+              <Password 
+                id="confirmPassword" 
+                value={confirmPassword} 
+                onChange={(e) => setConfirmPassword(e.target.value)} 
+                required 
+                minLength={8}
+                promptLabel="Changer de mot de passe"
+                weakLabel="Mot de passe simple"
+                mediumLabel="Mot de passe moyen"
+                strongLabel="Mot de passe fort"
+                toggleMask
+                pt={{
+                  input: { className: "px-3 py-2 w-full border border-gray-300 rounded-md" }
+                }}
               />
             </div>
 
@@ -75,8 +108,6 @@ export default function ResetPasswordPage() {
               {isLoading ? "Réinitialisation en cours..." : "Réinitialiser le mot de passe"}
             </button>
           </form>
-          
-          {message && <p className="text-center text-sm text-gray-600 mt-4">{message}</p>}
         </div>
       </div>
     </div>
