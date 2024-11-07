@@ -5,3 +5,7 @@
 .width-85{
     width: 85%;
 }
+
+.full-width{
+    width: calc(100% - 16rem);
+}

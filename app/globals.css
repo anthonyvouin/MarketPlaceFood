@@ -1,5 +1,6 @@
 @import "style/width.css";
 @import "style/height.css";
+@import "style/padding.css";
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
 @import 'primeicons/primeicons.css';
 @import "primereact/resources/themes/lara-light-cyan/theme.css";
@@ -56,10 +57,14 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.success {
-    background: #F0F6FF;
-    border: 1px solid #BFDBFE;
-    color: #316CEC;
+
+.ft-10px{
+    font-size: 10px;
+}
+
+.badge-shop{
+    right: -7px;
+    top: -3px;
 }
 
 .transform-translate-middle {
