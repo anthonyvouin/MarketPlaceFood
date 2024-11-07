@@ -126,7 +126,6 @@ export async function getProductBySlug(slug: string): Promise<any> {
 }
 
 export async function filterProduct(filters: {
-    [key in keyof ProductDto]?: {
         equals?: string | number | boolean | null;
         lte?: number;
         gte?: number;
@@ -137,8 +136,7 @@ export async function filterProduct(filters: {
         endsWith?: string;
         in?: string[] | number[];
         notIn?: string[] | number[];
-    }
-}) {
+    }) {
     try {
         let customFilters: any[] = []
         if (filters) {

@@ -1,3 +1,5 @@
+import {typeToast} from "@/app/provider/toastProvider";
+
 export interface ToastContextType {
-    showToast: (message: string, type: string) => void;
+    show: (title: string, message: string, type: typeToast) => void;
 }

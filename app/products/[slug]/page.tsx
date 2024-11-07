@@ -5,8 +5,8 @@ import {useEffect, useState} from "react";
 import {useParams, useRouter} from 'next/navigation'
 import {ProductDto} from "@/app/interface/product/productDto";
 import Image from "next/image";
-import {Button, Heading} from "@radix-ui/themes";
 import {formatPrice} from "@/app/pipe/format";
+import {Button} from "primereact/button";
 
 export default function Product() {
     const [product, setProduct] = useState<ProductDto | null>(null);
@@ -26,8 +26,8 @@ export default function Product() {
             <div className="flex flex-col h-full">
                 <div className="flex flex-col gap-5">
                     <div className="flex gap-5">
-                        <Button className="hover:cursor-pointer" onClick={() => router.push('/')}>Accueil</Button>
-                        <Button className="hover:cursor-pointer" onClick={() => router.back()}>Retour</Button>
+                        <Button className="hover:cursor-pointer" label="Accueil" onClick={() => router.push('/')}/>
+                        <Button className="hover:cursor-pointer" label="Retour" onClick={() => router.back()}/>
                     </div>
                     <h1 className="font-bold text-3xl pt-10">Détails du produit</h1>
                 </div>
@@ -36,7 +36,7 @@ export default function Product() {
                     <div className="flex flex-col gap-5">
                         <div className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
-                                <Heading>{product?.name}</Heading>
+                                <h2>{product?.name}</h2>
                                 <p>{product?.description}</p>
                             </div>
                             {product?.price && <p className="font-semibold">{formatPrice(product?.price)} €</p>}

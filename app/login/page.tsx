@@ -3,12 +3,12 @@
 import ButtonsProvider from "../components/auth/ButtonsProvider";
 import LoginForm from "../components/auth/loginForm";
 import Image from "next/image";
-import {Separator} from "@radix-ui/themes";
-import ActionButton from "@/app/components/ui/action-button";
+import RoundedButton from "@/app/components/ui/rounded-button";
 import {useRouter} from "next/navigation";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {useEffect} from "react";
 import {getPageName} from "@/app/utils/utils";
+import {Divider} from "primereact/divider";
 
 export default function Login() {
     const router: AppRouterInstance = useRouter();
@@ -35,22 +35,25 @@ export default function Login() {
                         <LoginForm/>
                         <p className="text-primaryColor mt-4 text-right underline text-xs cursor-pointer">Mot de passe oublié</p>
                     </div>
-                    <div className="relative mb-10">
-                        <Separator color="indigo" size="4" className="mt-10 separator separator-ou"/>
-                    </div>
+
+                    <Divider align="center" className="mb-10">
+                        <span className="text-sm">Ou</span>
+                    </Divider>
+
                     <ButtonsProvider/>
 
-                    <div className="relative mb-6">
-                        <Separator color="indigo" size="4" className="mt-10 separator separator-not-sign-in mb-10"/>
-                        <div className="text-center">
-                            <ActionButton onClickAction={() => goToRegister()}
-                                          message={'Créer un compte'}
-                                          positionIcon={"left"}
-                                          color={"grass"}
-                            />
-                        </div>
+                    <Divider align="center" className="mb-10">
+                        <span className="text-sm">Pas encore inscrit ?</span>
+                    </Divider>
 
+                    <div className="text-center">
+                        <RoundedButton onClickAction={() => goToRegister()}
+                                       message={'Créer un compte'}
+                                       positionIcon={"left"}
+                                       classes={"border-actionColor text-actionColor"}
+                        />
                     </div>
+
                 </div>
             </div>
 

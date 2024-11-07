@@ -1,6 +1,7 @@
 import {NextResponse, NextRequest} from 'next/server';
 import {getToken, JWT} from 'next-auth/jwt';
 import {jwtVerify} from 'jose';
+import {JwtPayload} from "jsonwebtoken";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'votre_secret_de_test');
 
@@ -12,19 +13,26 @@ export async function middleware(req: NextRequest) {
     }
 
     try {
-        const {payload} = await jwtVerify(token.jwt, JWT_SECRET);
+        const userJwt: JwtPayload = await jwtVerify(token.jwt as string, JWT_SECRET);
+        const userRole: string = (userJwt["payload"].role).toLowerCase();
+        const isAdminPage: boolean = req.nextUrl.pathname.startsWith("/admin");
+        const isProfilePage: boolean = req.nextUrl.pathname.startsWith("/profil");
 
-        if (payload) {
-            return NextResponse.next();
-        } else {
-            return NextResponse.redirect(new URL('/login', req.url));
+        if (isAdminPage && userRole !== "admin") {
+            return NextResponse.redirect(new URL("/", req.url));
         }
+
+        if (isProfilePage && (userRole === "user" || userRole === "admin")) {
+            return NextResponse.next();
+        }
+
+        return NextResponse.next();
     } catch (error) {
-        console.error('Erreur de vérification du JWT :', error);
-        return NextResponse.redirect(new URL('/login', req.url));
+        console.error("Erreur de vérification du JWT :", error);
+        return NextResponse.redirect(new URL("/login", req.url));
     }
 }
 
 export const config: { matcher: string[] } = {
-    matcher: ['/profil', '/admin'],
+    matcher: ['/profil/:path*', '/admin/:path*'],
 };

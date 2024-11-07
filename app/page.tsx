@@ -38,7 +38,7 @@ export default function Home() {
                 <div className="w-full h-full bg-primaryBackgroundColor">
                     <div className="flex flex-col justify-center items-center h-full">
                         <h1 className="font-manrope font-bold text-5xl text-gray-900">Bienvenue sur notre site</h1>
-                        <p className="font-manrope font-light text-2xl text-gray-900">L'IA c'est trop bien</p>
+                        <p className="font-manrope font-light text-2xl text-gray-900">L&apos;IA c&apos;est trop bien</p>
                         <button onClick={callGenerateRecipes}>Générer des recettes</button>
                         <div className="grid grid-cols-3 gap-5">
                             { recipes && recipes.map((recipe, index) => (

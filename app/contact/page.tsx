@@ -1,11 +1,12 @@
 "use client";
 
-import React, {useEffect, useState} from 'react';
+import React, {SetStateAction, useEffect, useState} from 'react';
 import {createContact} from '@/app/services/contact/contact';
 import {ContactDto} from '@/app/interface/contact/contactDto';
 import ReCAPTCHA from "react-google-recaptcha";
 import Image from "next/image";
 import {getPageName} from "@/app/utils/utils";
+
 
 const CreateContact = () => {
     const [firstName, setFirstName] = useState('');
@@ -41,8 +42,10 @@ const CreateContact = () => {
             setMessage('');
             setCaptchaValue(null);
             setError(null);
-        } catch (err) {
-            setError('Erreur lors de la création du contact.');
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError('Erreur lors de la création du contact.');
+            }
             setSuccess(null);
         }
     };
@@ -52,9 +55,9 @@ const CreateContact = () => {
 
             <div className="w-3/6 pl-12">
                 <h1 className="text-2xl mb-2.5 text-darkActionColor font-semibold">Contactez-Nous</h1>
-                <p>Vous avez des questions, des suggestions ou un besoin d'assistance ?
+                <p>Vous avez des questions, des suggestions ou un besoin d&apos;assistance ?
                     <br/> Nous sommes là pour vous aider !
-                    <br/>N'hésitez pas à nous écrire en utilisant le formulaire.</p> <br/>
+                    <br/>N&apos;hésitez pas à nous écrire en utilisant le formulaire.</p> <br/>
                 <Image src="/images/contact.png" width={424} height={327} alt="DriveFood"/>
             </div>
             <div className="w-3/6  p-6 mr-12 bg-white shadow-md rounded-md">
@@ -127,14 +130,12 @@ const CreateContact = () => {
                     </div>
 
                     <ReCAPTCHA
-                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                        onChange={(value: any) => setCaptchaValue(value)}
+                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ""}
+                        onChange={(value: SetStateAction<string | null>) => setCaptchaValue(value)}
                     />
 
-                    <button
-                        type="submit"
-                        className="w-full py-2 px-4 bg-actionColor transition ease-in-out delay-150 hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
+                    <button type="submit"
+                            className="w-full py-2 px-4 bg-actionColor transition ease-in-out delay-150 hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Envoyer
                     </button>
                 </form>
