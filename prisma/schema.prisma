@@ -42,6 +42,8 @@ model User {
   role          Role      @default(USER) 
   accounts      Account[]
   addresses     Address[]
+  resetToken       String?
+  resetTokenExpires DateTime?
 
   @@map("users")
 }

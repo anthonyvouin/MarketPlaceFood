@@ -1,112 +1,120 @@
 'use client';
 
-import React, {useEffect, useState} from 'react';
-import {useSession} from "next-auth/react";
-import {getUserById, updateUser, UserWithAdress} from "@/app/services/user/user";
-import {UserDto} from "@/app/interface/user/userDto";
-import {getPageName} from "@/app/utils/utils";
+import React, { useEffect, useState, useContext } from 'react';
+import { useSession } from "next-auth/react";
+import { getUserById, updateUser, UserWithAdress } from "@/app/services/user/user";
+import { UserDto } from "@/app/interface/user/userDto";
+import { useRouter } from 'next/navigation';
+import { ToastContext } from "@/app/provider/toastProvider";
 
 const Profile = () => {
-    const {data: session, status} = useSession()
+    const { data: session } = useSession();
     const [user, setUser] = useState<UserWithAdress | null>(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
+    const { show } = useContext(ToastContext); 
+    const router = useRouter();
+
     useEffect(() => {
         if (session) {
             const fetchUser = async (): Promise<void> => {
                 await getUserById(session.user.id)
-                    .then((e: UserWithAdress | null) => setUser(e));
-            }
+                    .then((e: UserWithAdress | null) => setUser(e))
+                    .catch(() => show("Erreur", "Erreur lors du chargement des données", "error")); 
+            };
             fetchUser();
-
         }
-    }, [session]);
-
-    useEffect((): void => {
-        getPageName();
-    }, []);
+    }, [session, show]);
 
     const handleChange = (input: 'name' | 'email', value: string): void => {
         setUser((prevUser) => {
             if (prevUser) {
-                return {
-                    ...prevUser,
-                    [input]: value
-                };
+                return { ...prevUser, [input]: value };
             }
             return prevUser;
         });
-    }
+    };
 
     const submit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
-        setSuccess(null);
 
         if (user) {
-
             await updateUser(user).then((userUpdate: UserDto): void => {
-                setUser((prevUser) => {
-                    if (prevUser) {
-                        return {
-                            ...prevUser,
-                            name: userUpdate.name,
-                        };
-                    }
-                    return prevUser;
-                });
-                setSuccess(`Modifications enregistrées`);
-
-
+                setUser((prevUser) => prevUser ? { ...prevUser, name: userUpdate.name } : prevUser);
+                show("Succès", "Modifications enregistrées avec succès", "success"); 
             }).catch(() => {
-                setError(`Erreur lors de l'enregistrement des données`);
-            })
+                show("Erreur", "Erreur lors de l'enregistrement des données", "error"); 
+            }).finally(() => {
+                setLoading(false);
+            });
         }
-    }
-
+    };
 
     return (
-        <div>
-            {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-            {success && <p className="mt-2 text-sm text-green-600">{success}</p>}
-            <div className="flex">
-                {user ? (
-                    <form onSubmit={submit}>
-                        <div>
+        <div className="h-[85vh] flex items-center justify-center bg-primaryBackgroundColor overflow-hidden">
+            <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg max-w-4xl mx-4 p-6 md:p-10 space-y-6 md:space-y-0 md:space-x-10">
+                <div className="md:w-1/2 flex flex-col justify-center">
+                    <h1 className="text-2xl font-semibold text-darkActionColor mb-4">Mon Profil</h1>
+                    <p className="text-gray-600 mb-6">
+                        Gérez vos informations de profil et assurez-vous que vos informations sont à jour.
+                    </p>
+                    <img src="/images/profil.svg" alt="Profile" className="w-full h-auto max-w-full"/>
+                </div>
+
+                <div className="md:w-1/2 bg-gray-50 rounded-md p-6 space-y-6">
+                    {user ? (
+                        <form onSubmit={submit} className="space-y-4">
                             <div>
-                                <label htmlFor="name">Prénom et Nom</label>
-                                <input type="text"
-                                       id="name"
-                                       value={user.name!}
-                                       onChange={(e) => handleChange('name', e.target.value)}
-                                       required
-                                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"/>
+                                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Prénom et Nom :</label>
+                                <input 
+                                    type="text"
+                                    id="name"
+                                    value={user.name || ''}
+                                    onChange={(e) => handleChange('name', e.target.value)}
+                                    required
+                                    className="mt-2 px-3 py-2 w-full border border-gray-300 rounded-md"
+                                />
                             </div>
                             <div>
-                                <label htmlFor="email">email</label>
-                                <input type="email"
-                                       id="email"
-                                       value={user.email!}
-                                       onChange={(e) => handleChange('email', e.target.value)}
-                                       required
-                                       disabled
-                                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"/>
+                                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email :</label>
+                                <input 
+                                    type="email"
+                                    id="email"
+                                    value={user.email || ''}
+                                    onChange={(e) => handleChange('email', e.target.value)}
+                                    required
+                                    disabled
+                                    className="mt-2 px-3 py-2 w-full border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                                />
                             </div>
 
                             {user.addresses.length > 0 ? (
-                                <p> Adresse par defaut :</p>
+                                <p className="text-sm text-gray-600">Adresse par défaut :</p>
                             ) : (
-                                <p>Vous n'avez pas encore configuré d'adresse pas défaut</p>
+                                <p className="text-sm text-gray-600">Vous n'avez pas encore configuré d'adresse par défaut</p>
                             )}
 
+                            <button 
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-2 bg-actionColor hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md transition ease-in-out duration-150"
+                            >
+                                {loading ? "Enregistrement..." : "Enregistrer les modifications"}
+                            </button>
 
-                        </div>
-                        <button type="submit"> Enregistrer les modifications</button>                        
-                    </form>
-                ) : (<p></p>)}
-            </div>        
+                            <button
+                                type="button"
+                                onClick={() => router.push('/profil/update-password')}
+                                className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow-md transition ease-in-out duration-150 mt-4"
+                            >
+                                Mettre à jour le mot de passe
+                            </button>
+                        </form>
+                    ) : (
+                        <p className="text-sm text-gray-500">Chargement des informations de l'utilisateur...</p>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };
