@@ -36,11 +36,11 @@ export async function analysePicture(format: string) {
 
     const ingredients = await getAllProducts({ id: true, name: true, price: true })
 
-    console.log(ingredients)
+    // console.log(ingredients)
 
     const formattedIngredients = JSON.stringify(ingredients)
 
-    console.log(formattedIngredients)
+    // console.log(formattedIngredients)
 
     // return ingredients
     let prompt = ""
@@ -51,7 +51,8 @@ export async function analysePicture(format: string) {
         prompt = "Je vais te passer un tableau d'objet (sans le format JSON) de produits et tu devras me sortir un tableau d'objet (sans le format JSON) de recettes qui te semblent pertinentes, sans commentaire, chaque recette doit contenir un nom (name), une description (description), une catégorie (category) qui doit être une des propositions suivantes: Apéritif, Entrée, Plat, Dessert, Gourmandise et un tableau d'ingrédients qui contient les id des produits que tu veux utiliser et la quantité associé à chaque produit"
       default:
         // generate-recipes-from-bdd
-        prompt = "Je vais te passer un tableau d'objet (sans le format JSON) de produits et tu devras me sortir un tableau d'objet (sans le format JSON) de recettes qui te semblent pertinentes, sans commentaire, chaque recette doit contenir un nom (name), une description (description), une catégorie (category) qui doit être une des propositions suivantes: Apéritif, Entrée, Plat, Dessert, Gourmandise et un tableau d'ingrédients qui contient les id des produits que tu veux utiliser et la quantité associé à chaque produit et pour chaque recette"
+        prompt = "Je vais te fournir une liste d'objets représentant des produits. À partir de cette liste, génère un tableau de recettes (maximum 3 recettes) strictement formaté en JSON, structuré comme suit : chaque recette doit inclure un 'name', 'description', 'type' (avec l'une des valeurs suivantes : STARTER, MAIN_DISH, DESSERT, SNACK, SIDE_DISH, BREAKFAST, ou BEVERAGE), 'slug' (généré à partir du nom en minuscules et sans espaces), 'difficulty' (ex: 'Facile'), 'preparationTime' (nombre de minutes, mettre juste le nombre de minutes en int), 'cookingTime' (nombre de minutes, mettre juste le nombre de minutes en int), 'servings', 'image' (chemin de l'image), et un tableau 'ingredients' comprenant pour chaque ingrédient l'id du produit ('productId'), la 'quantity', et l'unit. La sortie doit être strictement au format JSON, sans explications ni commentaires.";
+      // prompt = "Je vais te passer un tableau d'objet (sans le format JSON) de produits et tu devras me sortir un tableau d'objet (sans le format JSON) de recettes qui te semblent pertinentes, sans commentaire, chaque recette doit contenir un nom (name), une description (description), une catégorie (category) qui doit être une des propositions suivantes: Apéritif, Entrée, Plat, Dessert, Gourmandise et un tableau d'ingrédients qui contient les id des produits que tu veux utiliser et la quantité associé à chaque produit et pour chaque recette"
     }
     // response = await ollama.chat({
     //   "model": "mistral",
@@ -67,121 +68,34 @@ export async function analysePicture(format: string) {
     // });
 
     //? ça marche bien j'ai l'impression
-    // response = await openai.chat.completions.create({
-    //   "model": "gpt-4o-mini",
-    //   messages: [
-    //     {
-    //       role: "system",
-    //       content: "Tu es un chef culinaire renommé"
-    //     }, {
-    //       role: "user",
-    //       content: prompt
-    //     }, {
-    //       role: "user",
-    //       content: formattedIngredients
-    //     }
-    //   ]
-    // });
-    const response = [
-      {
-        "name": "Bouchées chocolatées aux noix",
-        "description": "De délicieuses bouchées sucrées à base de chocolat noir et mélanges de noix pour un en-cas irrésistible.",
-        "category": "Gourmandise",
-        "ingredients": [
-          {
-            "id": "cm2i1izm1000una25raqpa9k3",
-            "quantity": "200g"
-          },
-          {
-            "id": "cm2i1izro001gna25vk7hvso0",
-            "quantity": "100g"
-          },
-          {
-            "id": "cm2i1iznl0010na25foy8477t",
-            "quantity": "50g"
-          }
-        ]
-      },
-      {
-        "name": "Salade de fruits secs et amandes",
-        "description": "Une salade légère et nutritive de fruits secs et d'amandes, parfaite en entrée.",
-        "category": "Entrée",
-        "ingredients": [
-          {
-            "id": "cm2i1izm7000una25vb25qotg",
-            "quantity": "150g"
-          },
-          {
-            "id": "cm2i1izl7000qna254vn0dq5g",
-            "quantity": "100g"
-          },
-          {
-            "id": "cm2i1izqr001cna25j1jsdb0u",
-            "quantity": "50g"
-          }
-        ]
-      },
-      {
-        "name": "Tartine croustillante à la tapenade",
-        "description": "Des tartines croustillantes garnies de tapenade d'olives, idéales pour l'apéritif.",
-        "category": "Apéritif",
-        "ingredients": [
-          {
-            "id": "cm2i1izmk000wna258ayqhwye",
-            "quantity": "4 tranches"
-          },
-          {
-            "id": "cm2i1izgu000ana251nlwn9tf",
-            "quantity": "50g"
-          },
-          {
-            "id": "cm2i1izji000jna25jvmlxhd4",
-            "quantity": "1 canette"
-          }
-        ]
-      },
-      {
-        "name": "Gâteau au chocolat intense",
-        "description": "Un gâteau moelleux au chocolat noir, parfait pour les amateurs de chocolat.",
-        "category": "Dessert",
-        "ingredients": [
-          {
-            "id": "cm2i1izm1000una25raqpa9k3",
-            "quantity": "250g"
-          },
-          {
-            "id": "cm2i1izl7000qna254vn0dq5g",
-            "quantity": "100g"
-          },
-          {
-            "id": "cm2i1izle000nna258g7q8qxc",
-            "quantity": "3"
-          }
-        ]
-      },
-      {
-        "name": "Crackers aux noix",
-        "description": "Des crackers salés aux noix, parfaits pour accompagner vos apéritifs.",
-        "category": "Gourmandise",
-        "ingredients": [
-          {
-            "id": "cm2i1izro001gna25vk7hvso0",
-            "quantity": "100g"
-          },
-          {
-            "id": "cm2i1izvd001tna25sipj2fzi",
-            "quantity": "200g"
-          }
-        ]
-      }
-    ]
-    console.log(response)
+    response = await openai.chat.completions.create({
+      "model": "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "Tu es un chef culinaire renommé"
+        }, {
+          role: "user",
+          content: prompt
+        }, {
+          role: "user",
+          content: formattedIngredients
+        }
+      ]
+    });
+
+    // console.log(response.choices[0].message.content)
     let recipesFormatted;
     try {
-      // recipesFormatted = JSON.parse(response?.message?.content);
-      //? recipesFormatted = JSON.parse(response?.choices[0]?.message?.content);
-      recipesFormatted = response
+      let responseContent = response?.choices[0]?.message?.content;
+
+      // Nettoyer la réponse pour supprimer les balises Markdown
+      responseContent = responseContent.replace(/```json/g, '').replace(/```/g, '').trim();
+
+      // Essayer de parser la réponse nettoyée
+      recipesFormatted = JSON.parse(responseContent);
     } catch (error) {
+      console.log("Réponse brute :", response);
       console.error("Failed to parse JSON response:", error);
       return null;
     }

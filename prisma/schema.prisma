@@ -33,17 +33,20 @@ enum Role {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  password      String?   
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  role          Role      @default(USER) 
-  accounts      Account[]
-  addresses     Address[]
-  resetToken       String?
+  id                String    @id @default(cuid())
+  name              String?
+  password          String?
+  email             String?   @unique
+  emailVerified     DateTime?
+  image             String?
+  role              Role      @default(USER)
+  accounts          Account[]
+  addresses         Address[]
+  resetToken        String?
   resetTokenExpires DateTime?
+
+  createdRecipes  Recipe[] @relation("CreatedRecipes") // Recettes créées par l'utilisateur
+  favoriteRecipes Recipe[] @relation("FavoriteRecipes") // Recettes favorites de l'utilisateur
 
   @@map("users")
 }
@@ -88,7 +91,8 @@ model Product {
   updatedAt   DateTime @updatedAt @map("updated_at")
   categoryId  String   @map("category_id")
 
-  category Category @relation(fields: [categoryId], references: [id])
+  category          Category           @relation(fields: [categoryId], references: [id])
+  recipeIngredients RecipeIngredient[]
 
   @@map("products")
 }
@@ -101,7 +105,7 @@ model Address {
   zipCode           String
   city              String
   phoneNumber       String
-  note              String?  @db.Text
+  note              String? @db.Text
   isPrincipal       Boolean
   isVisible         Boolean
   userId            String  @map("user_id")
@@ -110,3 +114,65 @@ model Address {
   @@map("address")
 }
 
+enum RecipeType {
+  STARTER   @map("starter") // Entrée
+  MAIN_DISH @map("main_dish") // Plat principal
+  DESSERT   @map("dessert") // Dessert
+  SNACK     @map("snack") // Gourmandise/Snack
+  SIDE_DISH @map("side_dish") // Accompagnement
+  BREAKFAST @map("breakfast") // Petit-déjeuner
+  BEVERAGE  @map("beverage") // Boisson
+}
+
+model Recipe {
+  id              String     @id @default(cuid())
+  name            String     @unique
+  slug            String     @unique
+  description     String     @db.Text
+  image           String?
+  preparationTime Int
+  cookingTime     Int
+  servings        Int
+  difficulty      String
+  type            RecipeType
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  createdBy       User       @relation("CreatedRecipes", fields: [userId], references: [id])
+  userId          String     @map("user_id")
+  
+  favoritedBy     User[]     @relation("FavoriteRecipes")
+
+  recipeIngredients RecipeIngredient[]
+  steps            RecipeStep[]
+
+  @@map("recipes")
+}
+
+model RecipeIngredient {
+  id        String  @id @default(cuid())
+  recipeId  String  @map("recipe_id")
+  productId String  @map("product_id")
+  quantity  Decimal @db.Decimal(10, 2)
+  unit      String // Unité de mesure spécifique pour la recette
+
+  recipe  Recipe  @relation(fields: [recipeId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([recipeId, productId])
+  @@map("recipe_ingredients")
+}
+
+model RecipeStep {
+  id          String   @id @default(cuid())
+  recipeId    String   @map("recipe_id")
+  stepNumber  Int
+  description String   @db.Text
+  image       String?
+  duration    Int?
+
+  recipe      Recipe   @relation(fields: [recipeId], references: [id])
+
+  @@unique([recipeId, stepNumber]) // On veut pas de doublons de numéros d'étapes pour une recette
+  @@map("recipe_steps")
+}

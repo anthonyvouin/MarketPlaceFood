@@ -14,7 +14,7 @@ export type ProductWithCategory = Prisma.ProductGetPayload<{
 export async function createProduct(product: ProductDto): Promise<ProductDto> {
 
     if (!product.image) {
-        throw new Error('Image non renseignée');
+        product.image = '/images/default-image.png';
     }
 
     if (!product.name || !product.slug || !product.description || !product.image || product.price == null || !product.categoryId) {
@@ -64,7 +64,7 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
     }
 }
 
-export async function getAllProducts(fields={}): Promise<ProductDto[]> {
+export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise<ProductDto[]> {
     try {
         if (Object.keys(fields).length === 0) {
             fields = {
@@ -94,9 +94,21 @@ export async function getAllProducts(fields={}): Promise<ProductDto[]> {
             },
         });
         return transformProductDto(products);
-    } catch (error) {
+    } catch {
         throw new Error('La récupération des produits a échoué');
     }
+}
+
+export async function getImageFromGoogle(name: string): Promise<string> {
+    // try {
+        const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_API_KEY}&cx=${process.env.GOOGLE_CX}&q=${name}&searchType=image`);
+        const data = await response.json();
+        console.log(data);
+        return data.items[0].link;
+    // } catch (error) {
+    //     console.error("Erreur lors de la récupération de l'image :", error);
+    //     throw new Error('La récupération de l\'image a échoué.');
+    // }
 }
 
 export async function getProductById(id: string): Promise<any> {
