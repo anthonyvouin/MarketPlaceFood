@@ -1,23 +1,20 @@
 "use client"
 
 import { useContext, useState } from "react";
-import { getUserById, UserWithAdress } from "../services/user/user";
 import { useSession } from "next-auth/react";
 import { ToastContext } from "../provider/toastProvider";
 import { Button } from "primereact/button";
 import { createRecipe } from "../services/recipes";
-import { RecipeType } from "@prisma/client";
-import { analysePicture } from "../services/ia-integration/ia";
+import { generateRecipes } from "../services/ia-integration/ia";
 
 export default function RecipesPage() {
 
     const { data: session } = useSession();
-    const [user, setUser] = useState<UserWithAdress | null>(null);
     const { show } = useContext(ToastContext); 
 
     async function generateRecipe() {
-        const recipes = await analysePicture("generate-recipes-from-bdd");
-        const user = await getCurrentUser()
+        const recipes = await generateRecipes("generate-recipes-from-bdd");
+        const user = session?.user.id;
         const generatedRecipes = []
         console.log("user", user)
         console.log("recipes", recipes)
@@ -31,12 +28,6 @@ export default function RecipesPage() {
         } else {
             show("Erreur", "Erreur lors de la génération des recettes", "error");
         }
-    }
-
-    async function getCurrentUser() {
-        console.log(session)
-        console.log(session?.user.id)
-        return session?.user.id;
     }
 
     return (

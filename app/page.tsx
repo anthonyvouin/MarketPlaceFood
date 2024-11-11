@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import ProductCard from "./components/ProductCard";
 import {ProductDto} from "@/app/interface/product/productDto";
 import {getAllProducts} from "@/app/services/products/product";
-import {analysePicture, generateRecipes} from "./services/ia-integration/ia";
+import {generateRecipes} from "./services/ia-integration/ia";
 import {getPageName} from "@/app/utils/utils";
 import { RecipeDto } from "./interface/recipe/RecipeDto";
 import RecipeCard from "./components/OneRecipeCard";
@@ -24,7 +24,7 @@ export default function Home() {
     }, []);
 
     const callGenerateRecipes = async (): Promise<void> => {
-        const recipes = await analysePicture("generate-recipes-from-bdd");
+        const recipes = await generateRecipes("generate-recipes-from-bdd");
         setRecipes(recipes);
         console.log(recipes);
     }
