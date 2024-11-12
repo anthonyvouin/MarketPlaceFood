@@ -60,10 +60,6 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
                 break;
         }
 
-        console.log("recipeData", recipeData)
-        console.log("ingredients", ingredients)
-        console.log("steps", steps)
-        console.log("userId", userId)
 
         const recipe = await prisma.recipe.create({
             data: {
@@ -108,6 +104,31 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
 }
 
 // Récupérer une recette par ID
+export async function getRecipeBySlug(slug: string): Promise<any> {
+    try {
+        const recipe = await prisma.recipe.findUnique({
+            where: { slug: slug },
+            include: {
+                recipeIngredients: {
+                    include: {
+                        product: true
+                    }
+                },
+                steps: {
+                    orderBy: {
+                        stepNumber: 'asc'
+                    }
+                },
+            }
+        });
+
+        return JSON.parse(JSON.stringify(recipe));
+    } catch (error) {
+        console.error("Erreur lors de la récupération de la recette :", error);
+        throw new Error('La récupération de la recette a échoué.');
+    }
+}
+
 export async function getRecipeById(id: string): Promise<any> {
     try {
         const recipe = await prisma.recipe.findUnique({
@@ -134,15 +155,14 @@ export async function getRecipeById(id: string): Promise<any> {
 }
 
 // Récupérer toutes les recettes
-export async function getAllRecipes(page = 1, limit = 10, where: Prisma.RecipeWhereInput = {}): Promise<any> {
+export async function getAllRecipes(page = 1, limit = 10, orderBy): Promise<any> {
     try {
         const skip = (page - 1) * limit;
-
+        console.log(orderBy);
         const [recipes, total] = await Promise.all([
             prisma.recipe.findMany({
                 skip,
                 take: limit,
-                where,
                 include: {
                     recipeIngredients: {
                         include: {
@@ -158,10 +178,10 @@ export async function getAllRecipes(page = 1, limit = 10, where: Prisma.RecipeWh
                     }
                 },
                 orderBy: {
-                    createdAt: 'desc'
+                    ...orderBy || { createdAt: 'desc'}
                 }
             }),
-            prisma.recipe.count({ where })
+            prisma.recipe.count()
         ]);
 
         return JSON.parse(JSON.stringify({

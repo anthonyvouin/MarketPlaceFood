@@ -1,3 +1,5 @@
+import { RecipeStepDto } from "./RecipeStepDto";
+
 export interface RecipeDto {
     category: string;
     description: string;
@@ -6,7 +8,7 @@ export interface RecipeDto {
     cookingTime: number;
     servings: number;
     ingredients: string[];
-    // steps: StepDto[];
+    steps: RecipeStepDto[];
     image: string;
     difficulty: string;
     type: RecipeType;
