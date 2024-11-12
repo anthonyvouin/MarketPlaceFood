@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 
 export async function requestEmailVerification(userId: string, email: string): Promise<void> {
-  try {
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { 
@@ -17,7 +17,10 @@ export async function requestEmailVerification(userId: string, email: string): P
         verificationTokenEmail: true, 
         verificationTokenExpiresEmail: true 
       },
-    });
+    }).catch((error) => {
+      console.error("Erreur lors de la recherche de l'utilisateur : ", error);
+      throw new Error("Une erreur est survenue lors de la recherche de l'utilisateur.");
+    })
 
     if (!user) {
       throw new Error("Utilisateur non trouvé.");
@@ -45,23 +48,10 @@ export async function requestEmailVerification(userId: string, email: string): P
       data: verificationData,
     });
 
-    try {
-      await sendVerificationEmail(email, token);
-    } catch (sendEmailError) {
-      console.error("Erreur lors de l'envoi de l'email de vérification : ", sendEmailError);
-      throw new Error("Une erreur est survenue lors de l'envoi de l'email de vérification.");
-    }
+    await sendVerificationEmail(email, token);
 
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Erreur capturée : ", error.message); 
-      throw new Error(error.message); 
-    }
+  } 
 
-    console.error('Erreur inconnue:', error); 
-    throw new Error("Une erreur est survenue lors de la demande de vérification de l'email.");
-  }
-}
 
 
 
