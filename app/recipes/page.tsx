@@ -40,9 +40,8 @@ export default function RecipesPage() {
     }, []);
 
     async function getLastRecipes() {
-        const lastRecipes = await getAllRecipes(1, 10, { createdAt: 'desc' });
+        const lastRecipes = await getAllRecipes(1, 12, {}, { createdAt: 'desc' });
         setRecipes(lastRecipes.recipes);
-        console.log(lastRecipes);
     }
 
     return (

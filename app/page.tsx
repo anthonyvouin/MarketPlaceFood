@@ -26,11 +26,8 @@ export default function Home() {
     const callGenerateRecipes = async (): Promise<void> => {
         const recipes = await generateRecipes("generate-recipes-from-bdd");
         setRecipes(recipes);
-        console.log(recipes);
     }
     
-    console.log(recipes);
-
     const bgColors: string[] = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
     return (
         <div className="w-full bg-primaryBackgroundColor min-h-[85vh]">

@@ -155,14 +155,14 @@ export async function getRecipeById(id: string): Promise<any> {
 }
 
 // Récupérer toutes les recettes
-export async function getAllRecipes(page = 1, limit = 10, orderBy): Promise<any> {
+export async function getAllRecipes(page = 1, limit = 10, filter = {}, orderBy = {}): Promise<any> {
     try {
         const skip = (page - 1) * limit;
-        console.log(orderBy);
         const [recipes, total] = await Promise.all([
             prisma.recipe.findMany({
                 skip,
                 take: limit,
+                where: filter,
                 include: {
                     recipeIngredients: {
                         include: {
@@ -178,10 +178,10 @@ export async function getAllRecipes(page = 1, limit = 10, orderBy): Promise<any>
                     }
                 },
                 orderBy: {
-                    ...orderBy || { createdAt: 'desc'}
+                    ...orderBy || { createdAt: 'desc' }
                 }
             }),
-            prisma.recipe.count()
+            prisma.recipe.count({ where: filter })
         ]);
 
         return JSON.parse(JSON.stringify({
@@ -338,11 +338,7 @@ export async function getRecipesByType(type: RecipeType, page = 1, limit = 10): 
 // Récupérer les recettes favorites d'un utilisateur
 export async function getUserFavoriteRecipes(userId: string, page = 1, limit = 10): Promise<any> {
     try {
-        return getAllRecipes(page, limit, {
-            favoritedBy: {
-                some: { id: userId }
-            }
-        });
+        return getAllRecipes(page, limit, { favoritedBy: { some: { id: userId } } });
     } catch (error) {
         console.error("Erreur lors de la récupération des recettes favorites :", error);
         throw new Error('La récupération des recettes favorites a échoué.');

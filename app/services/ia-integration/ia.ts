@@ -79,7 +79,6 @@ export async function analysePicture(format: string) {
       ]
     });
 
-    // console.log(response.choices[0].message.content)
     let recipesFormatted;
     try {
       let responseContent = response?.choices[0]?.message?.content;
@@ -90,7 +89,6 @@ export async function analysePicture(format: string) {
       // Essayer de parser la réponse nettoyée
       recipesFormatted = JSON.parse(responseContent);
     } catch (error) {
-      console.log("Réponse brute :", response);
       console.error("Failed to parse JSON response:", error);
       return null;
     }
@@ -133,7 +131,6 @@ export async function generateRecipes(format: string, complement: string = "") {
     const formattedIngredients = JSON.stringify(ingredients)
 
     let prompt = ""
-    console.log("format", format)
     // return
     switch (format) {
       case "generate-steps":
@@ -163,7 +160,6 @@ export async function generateRecipes(format: string, complement: string = "") {
     // ]
     // });
 
-    console.log("ici", prompt)
 
     const message = []
     message.push({
@@ -195,7 +191,6 @@ export async function generateRecipes(format: string, complement: string = "") {
     let recipesFormatted;
     try {
       let responseContent = response?.choices[0]?.message?.content;
-      console.log("responseContent", responseContent)
 
       // Nettoyer la réponse pour supprimer les balises Markdown
       responseContent = responseContent.replace(/```json/g, '').replace(/```/g, '').trim();

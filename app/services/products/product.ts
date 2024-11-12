@@ -103,7 +103,6 @@ export async function getImageFromGoogle(name: string): Promise<string> {
     // try {
         const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_API_KEY}&cx=${process.env.GOOGLE_CX}&q=${name}&searchType=image`);
         const data = await response.json();
-        console.log(data);
         return data.items[0].link;
     // } catch (error) {
     //     console.error("Erreur lors de la récupération de l'image :", error);
