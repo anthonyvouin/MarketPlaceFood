@@ -5,9 +5,6 @@ import crypto from 'crypto';
 import { sendVerificationEmail } from '../mail/email';
 const prisma = new PrismaClient();
 
-
-
-
 export async function requestEmailVerification(userId: string, email: string): Promise<void> {
 
     const user = await prisma.user.findUnique({
@@ -56,12 +53,6 @@ export async function requestEmailVerification(userId: string, email: string): P
     }
 
   } 
-
-
-
-
-
-
 
 export async function verifyEmail(token: string): Promise<void> {
   try {
