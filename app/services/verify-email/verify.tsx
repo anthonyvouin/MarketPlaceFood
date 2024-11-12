@@ -48,7 +48,12 @@ export async function requestEmailVerification(userId: string, email: string): P
       data: verificationData,
     });
 
-    await sendVerificationEmail(email, token);
+    try {
+      await sendVerificationEmail(email, token);
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de l'e-mail de vérification : ", error);
+      throw new Error("Une erreur est survenue lors de l'envoi de l'e-mail de vérification.");
+    }
 
   } 
 
