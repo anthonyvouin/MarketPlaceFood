@@ -38,7 +38,7 @@ export async function requestEmailVerification(userId: string, email: string): P
     const token: string = crypto.randomBytes(32).toString('hex');
     const tokenExpiration: Date = new Date(Date.now() + 60 * 60 * 1000); 
 
-    const verificationData = {
+    const verificationData: { verificationTokenEmail: string, verificationTokenExpiresEmail: Date } = {
       verificationTokenEmail: token,
       verificationTokenExpiresEmail: tokenExpiration,
     };
