@@ -68,34 +68,38 @@ export async function updateUser(user: UserDto): Promise<UserDto> {
 }
 
 export async function createUser(email: string, name: string, password: string): Promise<UserRegisterDto> {
-    try {
-        const hashedPassword: string = await bcrypt.hash(password, 10);
+  try {
+      const hashedPassword: string = await bcrypt.hash(password, 10);
 
-        const user = await prisma.user.create({
-            data: {
-                email,
-                name,
-                password: hashedPassword,
-                role: "USER"
-            },
-        });
+      const token = crypto.randomBytes(32).toString('hex');
+      const tokenExpiration = new Date(Date.now() + 60 * 60 * 1000); 
 
+      const user = await prisma.user.create({
+          data: {
+              email,
+              name,
+              password: hashedPassword,
+              role: "USER",
+              verificationTokenEmail: token,              
+              verificationTokenExpiresEmail: tokenExpiration 
+          },
+      });
 
-        await sendWelcomeEmail(user.email!, user.name!);
+      await sendWelcomeEmail(user.email!, user.name!, token);
 
-        return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            password: "",
-            emailVerified: user.emailVerified,
-            image: user.image,
-            role: user.role,
-        };
-
-    } catch (error) {
-        throw new Error("Erreur lors de la création de l'utilisateur.");
-    }
+      return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          password: "", 
+          emailVerified: user.emailVerified,
+          image: user.image,
+          role: user.role,
+      };
+  } catch (error) {
+      console.error("Erreur lors de la création de l'utilisateur : ", error);
+      throw new Error("Erreur lors de la création de l'utilisateur.");
+  }
 }
 
 export async function updatePassword({userId, oldPassword, newPassword}: UpdatePasswordDto) {

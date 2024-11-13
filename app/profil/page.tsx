@@ -6,7 +6,6 @@ import { getUserById, updateUser, UserWithAdress } from "@/app/services/user/use
 import { UserDto } from "@/app/interface/user/userDto";
 import { useRouter } from 'next/navigation';
 import { ToastContext } from "@/app/provider/toastProvider";
-import VerifyEmailButton from '@/app/components/verifyEmailButton/verifyEmailButton';
 
 const Profile = () => {
     const { data: session } = useSession();
@@ -112,7 +111,6 @@ const Profile = () => {
                                 <p className="text-sm text-gray-600">Vous n'avez pas encore configuré d'adresse par défaut</p>
                             )}
                                                          
-                            <VerifyEmailButton userId={session.user.id} email={user.email} />
 
                             <button 
                                 type="submit"
