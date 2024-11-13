@@ -1,33 +1,29 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter"; 
-import CredentialsProvider from "next-auth/providers/credentials"; 
-import GoogleProvider from "next-auth/providers/google"; 
-import { prisma } from "./db"; 
-import bcrypt from "bcrypt"; 
-import { SignJWT } from "jose"; 
-import { sendWelcomeEmail } from "@/app/services/mail/email"; 
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import { prisma } from "./db";
+import bcrypt from "bcrypt";
+import { SignJWT } from "jose";
+import { sendWelcomeEmail } from "@/app/services/mail/email";
 
-const JWT_SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET);
+const JWT_SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'votre_secret_de_test');
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
-  
   pages: {
-    signIn: "/login", 
+    signIn: "/login",
   },
-
   providers: [
     CredentialsProvider({
-      name: "Credentials", 
+      name: "Credentials",
       credentials: {
         email: {
-          label: "Email", 
-          type: "text", 
+          label: "Email",
+          type: "text",
           placeholder: "email@example.com",
         },
-        password: { label: "Password", type: "password" }, 
+        password: { label: "Password", type: "password" },
       },
-      
-      // Fonction d'autorisation qui vérifie si l'email et le mot de passe sont valides
       async authorize(credentials) {
         const user = await prisma.user.findUnique({
           where: { email: credentials?.email },
@@ -35,9 +31,9 @@ export const authOptions = {
 
         if (
           user &&
-          user.password && 
+          user.password &&
           credentials &&
-          (await bcrypt.compare(credentials.password, user.password)) 
+          (await bcrypt.compare(credentials.password, user.password))
         ) {
           const jwtToken = await new SignJWT({
             id: user.id,
@@ -47,76 +43,45 @@ export const authOptions = {
             isGoogleUser: false, 
           })
             .setProtectedHeader({ alg: "HS256" })
-            .setExpirationTime("1h") 
-            .sign(JWT_SECRET); 
+            .setExpirationTime("1h")
+            .sign(JWT_SECRET);
 
-          return { ...user, jwt: jwtToken }; 
+          return { ...user, jwt: jwtToken };
         }
-
         return null; 
       },
     }),
 
-    // Provider d'authentification via Google
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string, 
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
   ],
-
-  // Configuration de la session JWT
   session: {
-    strategy: "jwt" as const, 
+    strategy: "jwt" as const,
     maxAge: 24 * 60 * 60, 
   },
-
-  // Callback pour manipuler les tokens JWT et les sessions
   callbacks: {
     async jwt({ token, user, account }) {
       if (user) {
-        if (account?.provider === "google") {
-          const googleUser = await prisma.user.findUnique({
-            where: { email: user.email },
-          });
+        token.isGoogleUser = account.provider === "google" ? true : false;
 
-          if (googleUser) {
-            token.id = googleUser.id;
-            token.email = googleUser.email;
-            token.role = googleUser.role;
-            token.emailVerified = null; 
-            token.isGoogleUser = true; 
-            token.jwt = await new SignJWT({
-              id: googleUser.id,
-              email: googleUser.email,
-              role: googleUser.role,
-              emailVerified: true,
-              isGoogleUser: true,
-            })
-              .setProtectedHeader({ alg: "HS256" })
-              .setExpirationTime("1h")
-              .sign(JWT_SECRET);
-          }
-        } else {
-          token.id = user.id;
-          token.email = user.email;
-          token.role = user.role;
-          token.emailVerified = user.emailVerified; 
-          token.isGoogleUser = false; 
-
-          token.jwt = await new SignJWT({
-            id: user.id,
-            email: user.email,
-            role: user.role,
-            emailVerified: user.emailVerified,
-            isGoogleUser: false,
-          })
-            .setProtectedHeader({ alg: "HS256" })
-            .setExpirationTime("1h")
-            .sign(JWT_SECRET);
-        }
+        token.id = user.id;
+        token.email = user.email;
+        token.role = user.role;
+        token.emailVerified = user.emailVerified;
+        token.jwt = await new SignJWT({
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          emailVerified: user.emailVerified,
+          isGoogleUser: token.isGoogleUser, 
+        })
+          .setProtectedHeader({ alg: "HS256" })
+          .setExpirationTime("1h")
+          .sign(JWT_SECRET);
       }
-
-      return token; 
+      return token;
     },
 
     async session({ session, token }) {
@@ -126,8 +91,8 @@ export const authOptions = {
       session.user.emailVerified = token.emailVerified;
       session.user.isGoogleUser = token.isGoogleUser;
       session.user.jwt = token.jwt; 
-      console.log("Session:", session); 
-      return session; 
+      console.log(session);
+      return session;
     },
 
     async signIn({ user, account }) {
@@ -137,9 +102,9 @@ export const authOptions = {
         });
 
         if (!existingUser) {
-          await sendWelcomeEmail(user.email, user.name, "", true); 
+          await sendWelcomeEmail(user.email, user.name, user.token || "Utilisateur", true);
         }
-      } else {
+      } else if (account?.provider === "credentials") {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email },
         });
@@ -148,8 +113,7 @@ export const authOptions = {
           await sendWelcomeEmail(user.email, user.name, user.token || "Utilisateur", false);
         }
       }
-
-      return true; 
+      return true;
     },
   },
 };
