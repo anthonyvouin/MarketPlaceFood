@@ -1,6 +1,8 @@
 "use server";
 
 import { PrismaClient } from '@prisma/client';
+import crypto from 'crypto';
+import { sendWelcomeEmail } from '../mail/email';
 const prisma = new PrismaClient();
 
 
@@ -35,3 +37,29 @@ export async function verifyEmail(token: string): Promise<void> {
       console.log("Email vérifié avec succès pour l'utilisateur:", user.email);
 
   } 
+
+
+  export async function resendVerificationEmail(email: string): Promise<void> {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+  
+    if (!user) {
+      throw new Error("Utilisateur non trouvé.");
+    }
+  
+    const token = crypto.randomBytes(32).toString('hex');
+    const tokenExpiration = new Date(Date.now() + 60 * 60 * 1000); 
+  
+    await prisma.user.update({
+      where: { email },
+      data: {
+        verificationTokenEmail: token,
+        verificationTokenExpiresEmail: tokenExpiration,
+      },
+    });
+  
+    await sendWelcomeEmail(email, user.name || "Utilisateur", token, false);
+  
+    console.log(`Email de vérification envoyé à ${email}`);
+  }
