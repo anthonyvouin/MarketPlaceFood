@@ -28,6 +28,9 @@ export default function SignInPage() {
 
             if (result?.error) {
                 console.error("Erreur lors de la connexion :", result.error);
+                if (result.error === "Veuillez vérifier votre email pour vous connecter.") {
+                    router.push("/resend-email");
+                }
             } else {
                 router.push("/profil");
             }

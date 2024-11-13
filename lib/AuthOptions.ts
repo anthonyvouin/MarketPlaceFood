@@ -33,8 +33,14 @@ export const authOptions = {
           user &&
           user.password &&
           credentials &&
-          (await bcrypt.compare(credentials.password, user.password))
+          (await bcrypt.compare(credentials.password, user.password) ) 
+
         ) {
+        
+        if(!user.emailVerified) {
+          throw new Error("Veuillez vérifier votre email pour vous connecter.");
+          
+        }
           const jwtToken = await new SignJWT({
             id: user.id,
             email: user.email,

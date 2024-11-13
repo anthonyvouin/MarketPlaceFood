@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { verifyEmail } from "@/app/services/verify-email/verify";
 
@@ -11,7 +11,13 @@ const VerifyEmailPage = ({ searchParams }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const router = useRouter();
 
+    const hasRun = useRef(false);
+
     useEffect(() => {
+        if (hasRun.current) return;
+
+        hasRun.current = true;
+
         if (!token) {
             setLoading(false);
             setErrorMessage('Token de vérification manquant.');
@@ -60,10 +66,10 @@ const VerifyEmailPage = ({ searchParams }) => {
                 )}
 
                 <button
-                    onClick={() => router.push('/profil')}
+                    onClick={() => router.push('/login')}
                     className="w-full py-3 bg-actionColor hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md transition ease-in-out duration-150 mt-6"
                 >
-                    Retour à la page profil
+                   Se connecter
                 </button>
             </div>
         </div>

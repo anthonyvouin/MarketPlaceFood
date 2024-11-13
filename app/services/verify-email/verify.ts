@@ -21,6 +21,7 @@ export async function verifyEmail(token: string): Promise<void> {
       })
   ;
 
+  console.log("Utilisateur trouvé :", user);
       if (!user) {
           throw new Error("Token invalide ou expiré.");
       }

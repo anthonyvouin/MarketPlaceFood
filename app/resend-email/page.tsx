@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useState, useContext } from 'react';
-import { resendVerificationEmail } from '@/app/services/verify-email/verify'; // Appel direct à la fonction serveur
-import { ToastContext } from '@/app/provider/toastProvider'; // Importer ToastContext
+import { resendVerificationEmail } from '@/app/services/verify-email/verify'; 
+import { ToastContext } from '@/app/provider/toastProvider'; 
 
 const ResendVerificationEmailPage = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const { show } = useContext(ToastContext); // Accéder à la fonction show du ToastContext
+  const { show } = useContext(ToastContext); 
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -22,10 +22,8 @@ const ResendVerificationEmailPage = () => {
 
     try {
       await resendVerificationEmail(email);
-      // Affichage d'un toast de succès
       show('Succès', "Un email de vérification a été renvoyé avec succès. Veuillez vérifier votre boîte de réception.", 'success');
     } catch (error) {
-      // Affichage d'un toast d'erreur
       show('Erreur', "Une erreur est survenue. Veuillez réessayer plus tard.", 'error');
     } finally {
       setLoading(false);
