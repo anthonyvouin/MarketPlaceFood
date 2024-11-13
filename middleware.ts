@@ -31,7 +31,7 @@ export async function middleware(req: NextRequest) {
         }
 
         if (isProfilePage && !emailVerified && !isGoogleUser) {
-            return NextResponse.redirect(new URL('/', req.url)); 
+            return NextResponse.redirect(new URL('/resend-email', req.url)); 
         }
 
         return NextResponse.next();
