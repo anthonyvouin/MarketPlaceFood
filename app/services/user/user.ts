@@ -85,7 +85,7 @@ export async function createUser(email: string, name: string, password: string):
           },
       });
 
-      await sendWelcomeEmail(user.email!, user.name!, token);
+      await sendWelcomeEmail(user.email!, user.name!, token, false); // Ajout du token de vérification ici
 
       return {
           id: user.id,
