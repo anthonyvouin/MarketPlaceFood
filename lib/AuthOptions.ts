@@ -83,7 +83,7 @@ export const authOptions = {
             token.id = googleUser.id;
             token.email = googleUser.email;
             token.role = googleUser.role;
-            token.emailVerified = true; 
+            token.emailVerified = null; 
             token.isGoogleUser = true; 
             token.jwt = await new SignJWT({
               id: googleUser.id,
