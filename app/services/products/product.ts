@@ -151,7 +151,7 @@ export async function changeDiscount(product: ProductDto | null, discount: Disco
                 },
 
                 data: {
-                    ...findProduct, discountId: discount?.id
+                    ...findProduct, discountId: discount ? discount.id : null
                 },
 
                 include: {

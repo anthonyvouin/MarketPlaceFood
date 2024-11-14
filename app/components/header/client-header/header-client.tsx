@@ -13,7 +13,6 @@ export default function HeaderClient() {
     const {data: session, status} = useSession()
     const {basketState, updateProductList} = useBasket();
     const {toggleBasketList} = useSideBarBasket();
-    console.log("basketLength:", basketState);
     useEffect(() => {
         if (session && session.user && session.user.name) {
             setName((session.user.name[0]).toUpperCase());

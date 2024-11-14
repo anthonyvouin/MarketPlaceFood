@@ -65,10 +65,10 @@ export default function ProductPage() {
 
     const actionBody = (product: ProductDto) => {
         if (product.discount) {
-            return <p>{product.discount.rate} %</p>
+            return <p onClick={(e) => showTemplate(e, product)}>{product.discount.rate} %</p>
         } else {
             return <div>
-                <ConfirmPopup group="templating"/>
+                <ConfirmPopup/>
                 <p onClick={(e) => showTemplate(e, product)}>+ ajouter une remise</p>
             </div>
         }
@@ -100,25 +100,29 @@ export default function ProductPage() {
                 });
                 if (indexDiscount !== -1) {
                     selectedDiscountLocal = discounts[indexDiscount]
+                } else {
+                    selectedDiscountLocal = null;
                 }
             }
         }
 
         confirmPopup({
             target: event.currentTarget,
-            group: 'templating',
             message: ((
                     <PopupAddDiscount
                         discounts={discounts}
                         onChangeDiscount={handleChangeDiscount}
+                        selectedDiscount={product && product.discount ? product.discount?.id : ''}
                     />
                 )
             )
             ,
             acceptIcon: 'pi pi-check',
             rejectIcon: 'pi pi-times',
-            rejectClassName: 'p-button-sm',
-            acceptClassName: 'p-button-outlined p-button-sm',
+            rejectClassName: 'p-button-sm mr-3 p-1',
+            acceptLabel: 'Enregistrer',
+            rejectLabel: 'Annuler',
+            acceptClassName: 'p-button-outlined p-button-sm bg-actionColor text-white p-1',
             accept: () => acceptDiscount(selectedDiscountLocal, product),
         });
     }
