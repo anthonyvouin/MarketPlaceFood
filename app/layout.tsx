@@ -6,8 +6,7 @@ import LayoutWrapper from "./components/layoutWrapper/LayoutWrapper";
 import {Metadata} from "next";
 import React from "react";
 import {PrimeReactProvider} from "primereact/api";
-import {ToastProvider} from "@/app/provider/toastProvider";
-import {DialogProvider} from "@/app/provider/DialogProvider";
+import {ConfirmDialog} from "primereact/confirmdialog";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
@@ -44,6 +43,7 @@ export default function RootLayout({
         <SessionWrapper>
             <PrimeReactProvider>
                 <LayoutWrapper>
+                    <ConfirmDialog />
                     {children}
                 </LayoutWrapper>
             </PrimeReactProvider>

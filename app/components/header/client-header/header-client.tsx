@@ -11,9 +11,9 @@ import {useSideBarBasket} from "@/app/provider/sideBar-basket-provider";
 export default function HeaderClient() {
     const [name, setName] = useState('');
     const {data: session, status} = useSession()
-    const {basketLength, updateProductList} = useBasket();
+    const {basketState, updateProductList} = useBasket();
     const {toggleBasketList} = useSideBarBasket();
-    console.log("basketLength:", basketLength);
+    console.log("basketLength:", basketState);
     useEffect(() => {
         if (session && session.user && session.user.name) {
             setName((session.user.name[0]).toUpperCase());
@@ -21,7 +21,7 @@ export default function HeaderClient() {
     }, [session]);
 
     return (
-        <header className="flex items-center justify-between px-20 h-[15vh] bg-primaryBackgroundColor fixed full-width">
+        <header className="flex items-center justify-between px-20 h-[15vh] bg-primaryBackgroundColor fixed full-width z-50">
             <h1 className="font-manrope font-bold">Accueil 🙂</h1>
             <input type='text'
                    placeholder='&#128269; Rechercher un produit'
@@ -44,7 +44,7 @@ export default function HeaderClient() {
                         className="bg-actionColor text-white w-8 h-8 text-xs"
                         onClick={toggleBasketList}
                     />
-                    <span className="absolute bg-primaryColor px-1 rounded-full ft-10px badge-shop text-white">{basketLength}</span>
+                    <span className="absolute bg-primaryColor px-1 rounded-full ft-10px badge-shop text-white">{basketState.total}</span>
                 </div>
 
 

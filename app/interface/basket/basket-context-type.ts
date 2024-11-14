@@ -1,4 +1,6 @@
+import {BasketDto} from "@/app/interface/basket/basketDto";
+
 export interface BasketContextType {
-    basketLength: number,
-    updateProductList: () => void;
+    basketState: { basket: BasketDto[], total: number },
+    updateProductList: (basket: BasketDto[]) => Promise<string | void>
 }

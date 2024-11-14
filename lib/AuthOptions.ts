@@ -85,7 +85,7 @@ export const authOptions = {
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.role = user.role; 
+        token.role = user.role;
         token.jwt =
           account && account?.provider === "google" ? newTokenGoogle : user.jwt;
       }

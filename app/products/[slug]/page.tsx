@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import {useParams, useRouter} from 'next/navigation'
 import {ProductDto} from "@/app/interface/product/productDto";
 import Image from "next/image";
-import {formatPrice} from "@/app/pipe/format";
+import {formatPriceEuro} from "@/app/pipe/format";
 import {Button} from "primereact/button";
 
 export default function Product() {
@@ -16,7 +16,6 @@ export default function Product() {
     useEffect((): void => {
         const fetchProduct = async () => {
             const product = await getProductBySlug(slug);
-            console.log(product);
             return setProduct(product);
         }
         fetchProduct();
@@ -40,7 +39,7 @@ export default function Product() {
                                 <h2>{product?.name}</h2>
                                 <p>{product?.description}</p>
                             </div>
-                            {product?.price && <p className="font-semibold">{formatPrice(product?.price)} €</p>}
+                            {product?.price && <p className="font-semibold">{formatPriceEuro(product?.price)} €</p>}
 
                         </div>
                         <hr className="border-2 border-black rounded-full"/>
