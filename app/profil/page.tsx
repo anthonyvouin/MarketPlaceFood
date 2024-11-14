@@ -15,7 +15,7 @@ const Profile = () => {
     const router = useRouter();
 
     useEffect(() => {
-        if (session) {
+        if (session && session.user) {
             const fetchUser = async (): Promise<void> => {
                 await getUserById(session.user.id)
                     .then((e: UserWithAdress | null) => setUser(e))
@@ -49,6 +49,23 @@ const Profile = () => {
             });
         }
     };
+
+    if (!session || !session.user) {
+        return (
+            <div className="h-screen flex items-center justify-center bg-primaryBackgroundColor">
+                <div className="bg-white shadow-lg rounded-lg max-w-md mx-4 p-6">
+                    <h1 className="text-2xl font-semibold text-darkActionColor mb-4">Erreur</h1>
+                    <p className="text-red-600">Vous devez être connecté pour accéder à cette page.</p>
+                    <button
+                        onClick={() => router.push('/login')}
+                        className="w-full py-2 bg-actionColor hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md transition ease-in-out duration-150 mt-4"
+                    >
+                        Retour à la connexion
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="h-[85vh] flex items-center justify-center bg-primaryBackgroundColor overflow-hidden">
@@ -93,6 +110,7 @@ const Profile = () => {
                             ) : (
                                 <p className="text-sm text-gray-600">Vous n'avez pas encore configuré d'adresse par défaut</p>
                             )}
+                                                         
 
                             <button 
                                 type="submit"

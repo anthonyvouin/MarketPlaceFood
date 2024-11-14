@@ -44,6 +44,8 @@ model User {
   addresses         Address[]
   resetToken        String?
   resetTokenExpires DateTime?
+  verificationTokenEmail String?   
+  verificationTokenExpiresEmail DateTime? 
 
   @@map("users")
 }

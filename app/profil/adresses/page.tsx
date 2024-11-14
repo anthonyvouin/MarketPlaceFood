@@ -1,50 +1,84 @@
 'use client';
 
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import {useSession} from "next-auth/react";
 import {getUserById, UserWithAdress} from "@/app/services/user/user";
 import Link from "next/link";
-import {AddressDto} from "@/app/interface/address/addressDto";
-import {deleteAdress} from "@/app/services/addresses/addresses";
+import { AddressDto } from "@/app/interface/address/addressDto";
+import {  deleteAdress, updateAdress} from "@/app/services/addresses/addresses";
 import {getPageName} from "@/app/utils/utils";
 import {Badge} from "primereact/badge";
 import {confirmDialog} from "primereact/confirmdialog";
 
 const Adresses = () => {
-        const {data: session, status} = useSession()
+        const { data: session, status } = useSession();
         const [user, setUser] = useState<UserWithAdress | null>(null);
-        // const {showDialog} = useContext(DialogContext);
+        // const { showDialog } = useContext(DialogContext);
 
-        useEffect((): void => {
+        useEffect(() => {
             if (session) {
                 const fetchUser = async () => {
                     const getUser: UserWithAdress | null = await getUserById(session.user.id);
                     if (getUser) {
                         setUser(getUser);
                     }
-                }
+                };
                 fetchUser();
-
             }
         }, [session]);
 
-        useEffect((): void => {
+        useEffect(() => {
             getPageName();
         }, []);
 
-        const handleDelete = (address: AddressDto) => {
+        const handleDelete = async(address: AddressDto) => {
             if (address.id) {
-                deleteAdress(address.id).then(() => {
+                if (address.isPrincipal) {
+                    const newPrincipalAddress = user?.addresses.find((addr) => addr.id !== address.id);
 
-                    setUser((prevUser) => {
-                        if (!prevUser) return prevUser;
+                    if (newPrincipalAddress) {
+                        try {
+                            await updateAdress({
+                                ...newPrincipalAddress,
+                                isPrincipal: true,
+                            });
 
-                        return {
-                            ...prevUser,
-                            addresses: prevUser.addresses.filter((element) => element.id !== address.id),
-                        };
-                    });
-                })
+                            await deleteAdress(address.id);
+
+                            setUser((prevUser) => {
+                                if (!prevUser) return prevUser;
+
+                                const updatedAddresses = prevUser.addresses.filter((addr) => addr.id !== address.id);
+                                const updatedUser = {
+                                    ...prevUser,
+                                    addresses: updatedAddresses.map((addr) =>
+                                        addr.id === newPrincipalAddress.id
+                                            ? { ...addr, isPrincipal: true }
+                                            : addr
+                                    ),
+                                };
+
+                                return updatedUser;
+                            });
+                        } catch (error) {
+                            console.error("Erreur lors de la mise à jour de l'adresse principale ou de la suppression", error);
+                        }
+                    }
+                } else {
+                    try {
+                        await deleteAdress(address.id);
+
+                        setUser((prevUser) => {
+                            if (!prevUser) return prevUser;
+                            return {
+                                ...prevUser,
+                                addresses: prevUser.addresses.filter((addr) => addr.id !== address.id),
+                            };
+                        });
+                    } catch (error) {
+                        console.error("Erreur lors de la suppression de l'adresse", error);
+                    }
+                }
             }
         }
 
@@ -60,6 +94,36 @@ const Adresses = () => {
                 accept: () => handleDelete(address)
             })
         };
+    const handleSetPrincipal = async (address: AddressDto): Promise<void> => {
+        const oldPrincipalAddress = user?.addresses.find((addr) => addr.isPrincipal);
+
+        if (oldPrincipalAddress && oldPrincipalAddress.id !== address.id) {
+            try {
+                await updateAdress({ ...oldPrincipalAddress, isPrincipal: false });
+
+                await updateAdress({ ...address, isPrincipal: true });
+
+                setUser((prevUser) => {
+                    if (!prevUser) return prevUser;
+
+                    const updatedAddresses = prevUser.addresses.map((addr) =>
+                        addr.id === oldPrincipalAddress.id
+                            ? { ...addr, isPrincipal: false }
+                            : addr.id === address.id
+                            ? { ...addr, isPrincipal: true }
+                            : addr
+                    );
+
+                    return {
+                        ...prevUser,
+                        addresses: updatedAddresses,
+                    };
+                });
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour de l'adresse principale", error);
+            }
+        }
+    };
 
         return (
             <div className="bg-primaryBackgroundColor height-full">
@@ -101,7 +165,11 @@ const Adresses = () => {
                                     {!address.isPrincipal ? (
                                         <div>
                                             <span className="text-sm">&ensp;| &ensp;</span>
-                                            <span className='text-actionColor underline text-sm'>Définir comme addresse principale</span>
+                                            <span
+                                            className='text-actionColor underline text-sm'
+                                            onClick={() => handleSetPrincipal(address)}>
+                                            Définir comme adresse principale
+                                        </span>
                                         </div>) : ('')}
                                     <span className="text-sm">&ensp;|&ensp;</span>
                                     <span className="pi pi-trash" onClick={() => popupDelete(address)}></span>
