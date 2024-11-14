@@ -1,41 +1,33 @@
 'use client';
 
-import {useEffect, useState} from "react";
-import {useRouter} from "next/navigation";
-import {createUser} from "@/app/services/user/user";
-import {signIn} from "next-auth/react";
-import {UserRegisterDto} from "../interface/user/useRegisterDto";
-import {getPageName} from "@/app/utils/utils";
+import { useState, useContext } from "react";
+import { useRouter } from "next/navigation";
+import { createUser } from "@/app/services/user/user";
+import { UserRegisterDto } from "../interface/user/useRegisterDto";
+import { ToastContext } from "@/app/provider/toastProvider";
 import Image from "next/image";
+import { Password } from "primereact/password"; // Importation du composant Password de PrimeReact
 
 export default function SignUpPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
+    const { show } = useContext(ToastContext);
     const router = useRouter();
-
-    useEffect(() => {
-        getPageName();
-    }, []);
 
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
             const user: UserRegisterDto = await createUser(email, name, password);
-            const result = await signIn("credentials", {
-                email: user.email,
-                password: password,
-                redirect: false,
-            });
-
-            if (result?.error) {
-                console.error("Erreur lors de la connexion :", result.error);
+            show("Succès", "Compte créé avec succès. Merci de valider votre mail.", "success");
+            router.push("/");
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                show("Erreur", error.message, "error");
             } else {
-                router.push("/");
+                show("Erreur", "Erreur inconnue lors de la création de l'utilisateur.", "error");
             }
-        } catch (error) {
-            console.error("Erreur lors de l'inscription :", error);
         }
     };
 
@@ -46,7 +38,7 @@ export default function SignUpPage() {
                     <Image src="/images/sign-in.svg" alt='' className="leftDecorationImage" width="500" height="200"/>
                 </div>
                 <div className="w-2/5 p-2.5 bg-white flex flex-col justify-evenly rounded-md">
-                    <h2 className="text-3xl mb-10 font-semibold">Incription</h2>
+                    <h2 className="text-3xl mb-10 font-semibold">Inscription</h2>
                     <form onSubmit={handleSignUp} className="form">
                         <div>
                             <label htmlFor="name"
@@ -83,19 +75,25 @@ export default function SignUpPage() {
                                    className="block text-sm font-medium text-gray-700 mb-1">
                                 Mot de passe
                             </label>
-                            <input
-                                type="password"
+                            <Password
                                 id="password"
-                                className="mt-1 mb-6 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
+                                minLength={8}
+                                promptLabel="Créer un mot de passe"
+                                weakLabel="Faible"
+                                mediumLabel="Moyen"
+                                strongLabel="Fort"
+                                toggleMask
+                                pt={{
+                                  input: { className: "px-3 py-2 w-full border border-gray-300 rounded-md" }
+                                }}
                             />
                         </div>
 
-
                         <button type="submit"
-                                className="w-full py-2 px-4 bg-actionColor transition ease-in-out delay-150 hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                className=" mt-6 w-full py-2 px-4 bg-actionColor transition ease-in-out delay-150 hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                             Sauvegarder
                         </button>
                     </form>

@@ -44,6 +44,8 @@ model User {
   addresses         Address[]
   resetToken        String?
   resetTokenExpires DateTime?
+  verificationTokenEmail String?   
+  verificationTokenExpiresEmail DateTime? 
 
   createdRecipes  Recipe[] @relation("CreatedRecipes") // Recettes créées par l'utilisateur
   favoriteRecipes Recipe[] @relation("FavoriteRecipes") // Recettes favorites de l'utilisateur
