@@ -122,8 +122,10 @@ const Adresses = () => {
     return (
         <div className="bg-primaryBackgroundColor height-full">
             <div className="grid grid-cols-3 gap-4 width-85 mx-auto">
+
                 <div className='bg-white p-2.5 rounded-lg w-96 '>
                     <Link href="adresses/create-update">Ajouter une adresse</Link>
+
                 </div>
                 {user && user.addresses.length > 0 ? (
                     user.addresses.map((address: AddressDto) => (
