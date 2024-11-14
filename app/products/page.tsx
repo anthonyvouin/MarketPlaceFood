@@ -45,7 +45,7 @@ export default function Products() {
     }, []);
 
     const handleFilterChange = (key: keyof ProductDto, value: any): void => {
-            setfilteredProducts(products.filter((element => element.price >= priceRange[0] && element.price <= priceRange[1] && (selectedCategories.length === 0 || selectedCategories.includes(element.categoryId)))))
+        setfilteredProducts(products.filter((element => element.price >= priceRange[0]*100 && element.price <= priceRange[1]*100 && (selectedCategories.length === 0 || selectedCategories.includes(element.categoryId)))))
     };
 
     const handlePriceChange = async (value: SliderChangeEvent): Promise<void> => {

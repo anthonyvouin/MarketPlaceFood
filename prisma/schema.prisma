@@ -33,16 +33,16 @@ enum Role {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  password      String?   
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  role          Role      @default(USER) 
-  accounts      Account[]
-  addresses     Address[]
-  resetToken       String?
+  id                String    @id @default(cuid())
+  name              String?
+  password          String?
+  email             String?   @unique
+  emailVerified     DateTime?
+  image             String?
+  role              Role      @default(USER)
+  accounts          Account[]
+  addresses         Address[]
+  resetToken        String?
   resetTokenExpires DateTime?
   verificationTokenEmail String?   
   verificationTokenExpiresEmail DateTime? 
@@ -85,12 +85,14 @@ model Product {
   slug        String   @unique
   description String   @db.Text
   image       String
-  price       Decimal  @db.Decimal(10, 2)
+  price       Int
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   categoryId  String   @map("category_id")
+  discountId  String?  @map("discount_id")
 
-  category Category @relation(fields: [categoryId], references: [id])
+  category Category  @relation(fields: [categoryId], references: [id])
+  discount Discount? @relation(fields: [discountId], references: [id])
 
   @@map("products")
 }
@@ -103,7 +105,7 @@ model Address {
   zipCode           String
   city              String
   phoneNumber       String
-  note              String?  @db.Text
+  note              String? @db.Text
   isPrincipal       Boolean
   isVisible         Boolean
   userId            String  @map("user_id")
@@ -112,3 +114,12 @@ model Address {
   @@map("address")
 }
 
+model Discount {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  rate     Int
+  visible  Boolean   @default(true)
+  products Product[]
+
+  @@map("discount")
+}

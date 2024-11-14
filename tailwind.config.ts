@@ -14,6 +14,7 @@ const config: Config = {
         light:"#F7EFE9",
         redColor: "#d51c1c",
         primaryColor:'#F54747',
+
         actionColor:'#85BC39',
         darkActionColor:'#294819',
         primaryBackgroundColor: '#EBF2F0',

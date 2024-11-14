@@ -1,6 +1,5 @@
 import {CategoryDto} from "@/app/interface/category/categoryDto";
-import Decimal = Prisma.Decimal;
-import {Prisma} from "@prisma/client";
+import {DiscountDto} from "@/app/interface/discount/discountDto";
 
 export interface ProductDto {
     id?: string;
@@ -8,10 +7,12 @@ export interface ProductDto {
     slug: string;
     description: string;
     image: string;
-    price: number | Decimal;
+    price: number;
     createdAt?: Date;
     updatedAt?: Date;
-    categoryId: string
-    category?: CategoryDto
+    categoryId: string;
+    category?: CategoryDto;
+    discountId: string | null;
+    discount?: DiscountDto | null;
 }
   

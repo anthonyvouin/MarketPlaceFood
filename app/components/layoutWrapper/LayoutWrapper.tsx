@@ -5,55 +5,57 @@ import HeaderClient from "@/app/components/header/client-header/header-client";
 import Sidebar from "@/app/components/sidebar/Sidebar";
 import ProfilSidebar from "@/app/components/sidebar/profil-sidebar";
 import React from "react";
+import {BasketProvider} from "@/app/provider/basket-provider";
+import {SideBarBasketProvider} from "@/app/provider/sideBar-basket-provider";
 import {ToastProvider} from "@/app/provider/toastProvider";
-import {DialogProvider} from "@/app/provider/DialogProvider";
-import {PrimeReactProvider} from "primereact/api";
 
 export default function LayoutWrapper({children}: { children: React.ReactNode }) {
     const pathname: string = usePathname();
 
     if (pathname.startsWith("/admin")) {
         return <>
-            <PrimeReactProvider>
-                {children}
-            </PrimeReactProvider>
+            {children}
         </>;
     }
 
     if (pathname.startsWith("/profil")) {
         return (<>
-                <PrimeReactProvider>
-                    <ToastProvider>
-                        <DialogProvider>
+                <ToastProvider>
+                    <BasketProvider>
+                        <SideBarBasketProvider>
                             <div className="flex">
                                 <ProfilSidebar/>
                                 <div className="w-full">
                                     <HeaderClient/>
-                                    {children}
+                                    <div className="padding-header bg-primaryBackgroundColor">
+                                        {children}
+                                    </div>
                                 </div>
                             </div>
-                        </DialogProvider>
-                    </ToastProvider>
-                </PrimeReactProvider>
+                        </SideBarBasketProvider>
+                    </BasketProvider>
+                </ToastProvider>
             </>
         )
     }
 
     return (
         <>
-            <PrimeReactProvider>
-                <ToastProvider>
-
-                <div className="flex">
-                    <Sidebar/>
-                    <div className="w-full">
-                        <HeaderClient/>
-                        {children}
-                    </div>
-                </div>
-                </ToastProvider>
-
-            </PrimeReactProvider>
+            <ToastProvider>
+                <BasketProvider>
+                    <SideBarBasketProvider>
+                        <div className="flex">
+                            <Sidebar/>
+                            <div className="w-full">
+                                <HeaderClient/>
+                                <div className="padding-header bg-primaryBackgroundColor">
+                                    {children}
+                                </div>
+                            </div>
+                        </div>
+                    </SideBarBasketProvider>
+                </BasketProvider>
+            </ToastProvider>
         </>
     );
 }

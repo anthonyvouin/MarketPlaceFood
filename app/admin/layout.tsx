@@ -2,64 +2,73 @@ import SessionWrapper from "@/lib/SessionWrapper";
 import Link from "next/link";
 import React from "react";
 import Head from "next/head";
+import {ToastProvider} from "@/app/provider/toastProvider";
 
 export default function AdminLayout({children}: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
-      <html lang="en">
+        <html lang="en">
         <Head>
-          <link
-            href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&display=swap"
-            rel="stylesheet"
-          />
+            <link
+                href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&display=swap"
+                rel="stylesheet"
+            />
         </Head>
         <body>
-            <div className="flex  h-screen">
-              <nav className="flex flex-col width-15  bg-light">
+        <div className="flex  h-screen">
+            <nav className="flex flex-col width-15  bg-light">
                 <Link
-                  href="/admin/dashboard"
-                  className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
+                    href="/admin/dashboard"
+                    className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
                 >
-                  Dashboard
+                    Dashboard
                 </Link>
                 <Link
-                  href="/admin/category"
-                  className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
+                    href="/admin/category"
+                    className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
                 >
-                  Categories
+                    Categories
                 </Link>
                 <Link
-                  href="/admin/users"
-                  className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
+                    href="/admin/discount"
+                    className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
                 >
-                  Clients
+                    Remises
                 </Link>
                 <Link
-                  href="/admin/contact"
-                  className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
+                    href="/admin/product"
+                    className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
                 >
-                  Contacts
+                    Produits
                 </Link>
                 <Link
-                  href="/admin/product"
-                  className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
+                    href="/admin/users"
+                    className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
                 >
-                  Produits
+                    Clients
                 </Link>
                 <Link
-                  href="/admin/chart"
-                  className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
+                    href="/admin/contact"
+                    className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
                 >
-                  Graphique
+                    Contacts
                 </Link>
-              </nav>
+                <Link
+                    href="/admin/chart"
+                    className="nav-title text-lg p-2.5 font-semibold text-primaryColor relative underline-animation"
+                >
+                    Graphique
+                </Link>
+            </nav>
 
-              <div className="width-85">
-                <SessionWrapper>{children}</SessionWrapper>
-              </div>
+            <div className="width-85">
+                <ToastProvider>
+                    <SessionWrapper>{children}</SessionWrapper>
+                </ToastProvider>
             </div>
+        </div>
         </body>
-      </html>
+        </html>
     );
 }
