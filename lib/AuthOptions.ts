@@ -6,9 +6,7 @@ import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
 import { sendWelcomeEmail } from "@/app/services/mail/email";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET 
-);
+const JWT_SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'votre_secret_de_test');
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -35,12 +33,20 @@ export const authOptions = {
           user &&
           user.password &&
           credentials &&
-          (await bcrypt.compare(credentials.password, user.password))
+          (await bcrypt.compare(credentials.password, user.password) ) 
+
         ) {
+        
+        if(!user.emailVerified) {
+          throw new Error("Veuillez vérifier votre email pour vous connecter.");
+          
+        }
           const jwtToken = await new SignJWT({
             id: user.id,
             email: user.email,
             role: user.role,
+            emailVerified: user.emailVerified, 
+            isGoogleUser: false, 
           })
             .setProtectedHeader({ alg: "HS256" })
             .setExpirationTime("1h")
@@ -48,7 +54,7 @@ export const authOptions = {
 
           return { ...user, jwt: jwtToken };
         }
-        return null;
+        return null; 
       },
     }),
 
@@ -59,58 +65,60 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt" as const,
-    maxAge: 24 * 60 * 60,
+    maxAge: 24 * 60 * 60, 
   },
   callbacks: {
     async jwt({ token, user, account }) {
-      let newTokenGoogle: string = "";
-
-      if (account && account?.provider === "google" && user) {
-        const googleUser = await prisma.user.findUnique({
-          where: { email: user.email },
-        });
-
-        if (googleUser) {
-          newTokenGoogle = await new SignJWT({
-            id: googleUser.id,
-            email: googleUser.email,
-            role: googleUser.role,
-          })
-            .setProtectedHeader({ alg: "HS256" })
-            .setExpirationTime("1h")
-            .sign(JWT_SECRET);
-        }
-      }
-
       if (user) {
+        token.isGoogleUser = account.provider === "google" ? true : false;
+
         token.id = user.id;
         token.email = user.email;
-        token.role = user.role; 
-        token.jwt =
-          account && account?.provider === "google" ? newTokenGoogle : user.jwt;
+        token.role = user.role;
+        token.emailVerified = user.emailVerified;
+        token.jwt = await new SignJWT({
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          emailVerified: user.emailVerified,
+          isGoogleUser: token.isGoogleUser, 
+        })
+          .setProtectedHeader({ alg: "HS256" })
+          .setExpirationTime("1h")
+          .sign(JWT_SECRET);
       }
-
       return token;
     },
+
     async session({ session, token }) {
       session.user.id = token.id;
       session.user.email = token.email;
-      session.user.role = token.role; 
-      session.user.jwt = token.jwt;
+      session.user.role = token.role;
+      session.user.emailVerified = token.emailVerified;
+      session.user.isGoogleUser = token.isGoogleUser;
+      session.user.jwt = token.jwt; 
+      console.log(session);
       return session;
     },
 
     async signIn({ user, account }) {
-      if (account && account.provider === "google") {
+      if (account?.provider === "google") {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email },
         });
 
         if (!existingUser) {
-          await sendWelcomeEmail(user.email, user.name || "Utilisateur");
+          await sendWelcomeEmail(user.email, user.name, user.token || "Utilisateur", true);
+        }
+      } else if (account?.provider === "credentials") {
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
+
+        if (!existingUser) {
+          await sendWelcomeEmail(user.email, user.name, user.token || "Utilisateur", false);
         }
       }
-
       return true;
     },
   },
