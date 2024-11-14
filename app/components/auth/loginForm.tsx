@@ -1,15 +1,16 @@
 'use client';
 
-import {useState} from "react";
-import {useRouter} from "next/navigation";
-import {signIn} from "next-auth/react";
-import {UserLoginDto} from "@/app/interface/user/userLoginDto";
-
+import { useState, useContext } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { UserLoginDto } from "@/app/interface/user/userLoginDto";
+import { ToastContext } from "@/app/provider/toastProvider";
 
 export default function SignInPage() {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const router = useRouter();
+    const { show } = useContext(ToastContext); 
 
     const handleSignIn = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
@@ -28,23 +29,28 @@ export default function SignInPage() {
 
             if (result?.error) {
                 console.error("Erreur lors de la connexion :", result.error);
+                
                 if (result.error === "Veuillez vérifier votre email pour vous connecter.") {
+                    show("Erreur", "Veuillez vérifier votre email pour vous connecter.", "error");
                     router.push("/resend-email");
+                } else {
+                    show("Erreur", "Identifiants incorrects, veuillez réessayer.", "error");
                 }
             } else {
+                show("Succès", "Connexion réussie.", "success");
                 router.push("/profil");
             }
         } catch (error) {
             console.error("Erreur lors de la connexion :", error);
+            show("Erreur", "Une erreur est survenue lors de la connexion.", "error"); 
         }
     };
 
     return (
-        <form onSubmit={handleSignIn} className="form w-full ">
+        <form onSubmit={handleSignIn} className="form w-full">
 
             <div>
-                <label htmlFor="email"
-                       className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                     Email
                 </label>
                 <input
@@ -58,8 +64,7 @@ export default function SignInPage() {
             </div>
 
             <div className="mt-5">
-                <label htmlFor="password"
-                       className="block text-sm font-medium text-gray-700 mt-1">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mt-1">
                     Mot de passe
                 </label>
                 <input
@@ -70,12 +75,12 @@ export default function SignInPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-
             </div>
 
-
-            <button type="submit"
-                    className="w-full py-2 px-4 bg-actionColor transition ease-in-out delay-150 hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            <button 
+                type="submit"
+                className="w-full py-2 px-4 bg-actionColor transition ease-in-out delay-150 hover:bg-darkActionColor text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
                 Se connecter
             </button>
         </form>

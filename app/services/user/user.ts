@@ -70,9 +70,8 @@ export async function updateUser(user: UserDto): Promise<UserDto> {
 export async function createUser(email: string, name: string, password: string): Promise<UserRegisterDto> {
   try {
       const hashedPassword: string = await bcrypt.hash(password, 10);
-
       const token = crypto.randomBytes(32).toString('hex');
-      const tokenExpiration = new Date(Date.now() + 60 * 60 * 1000); 
+      const tokenExpiration = new Date(Date.now() + 60 * 60 * 1000);
 
       const user = await prisma.user.create({
           data: {
@@ -80,12 +79,12 @@ export async function createUser(email: string, name: string, password: string):
               name,
               password: hashedPassword,
               role: "USER",
-              verificationTokenEmail: token,              
+              verificationTokenEmail: token,
               verificationTokenExpiresEmail: tokenExpiration 
           },
       });
 
-      await sendWelcomeEmail(user.email!, user.name!, token, false); 
+      await sendWelcomeEmail(user.email!, user.name!, token, false);
 
       return {
           id: user.id,
@@ -96,52 +95,61 @@ export async function createUser(email: string, name: string, password: string):
           image: user.image,
           role: user.role,
       };
-  } catch (error) {
-      console.error("Erreur lors de la création de l'utilisateur : ", error);
-      throw new Error("Erreur lors de la création de l'utilisateur.");
-  }
+  } catch (error: unknown) {
+    if (error instanceof Error && (error as any).code === 'P2002' && (error as any).meta?.target?.includes('email')) {
+        throw new Error("Cet email est déjà utilisé.");
+    } else {
+        console.error("Erreur lors de la création de l'utilisateur : ", error);
+        throw new Error("Erreur lors de la création de l'utilisateur. Veuillez réessayer plus tard.");
+    }
+}
 }
 
 export async function updatePassword({userId, oldPassword, newPassword}: UpdatePasswordDto) {
   try {
-      await verifyAuth(["USER", "ADMIN"]);
+    await verifyAuth(["USER", "ADMIN"]);
 
-      if (!userId) {
-          throw new Error("L'ID utilisateur est requis pour mettre à jour le mot de passe.");
-      }
+    if (!userId) {
+      throw new Error("L'ID utilisateur est requis pour mettre à jour le mot de passe.");
+    }
 
-      const user = await prisma.user.findUnique({
-          where: {id: userId},
-      });
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { password: true },
+    });
 
-      if (!user || !user.password) {
-          throw new Error("");
-      }
+    if (!user) {
+      throw new Error("Utilisateur non trouvé.");
+    }
 
-      const isOldPasswordValid: boolean = await bcrypt.compare(oldPassword, user.password);
-      if (!isOldPasswordValid) {
-          throw new Error("L'ancien mot de passe est incorrect.");
-      }
+    if (!user.password) {
+      throw new Error("Ce compte est associé à Google. Veuillez gérer le mot de passe depuis votre compte Google.");
+    }
 
-      const isSameAsOldPassword: boolean = await bcrypt.compare(newPassword, user.password);
-      if (isSameAsOldPassword) {
-          throw new Error("Le nouveau mot de passe doit être différent de l'ancien mot de passe.");
-      }
+    const isOldPasswordValid: boolean = await bcrypt.compare(oldPassword, user.password);
+    if (!isOldPasswordValid) {
+      throw new Error("L'ancien mot de passe est incorrect.");
+    }
 
-      const hashedPassword: string = await bcrypt.hash(newPassword, 10);
+    const isSameAsOldPassword: boolean = await bcrypt.compare(newPassword, user.password);
+    if (isSameAsOldPassword) {
+      throw new Error("Le nouveau mot de passe doit être différent de l'ancien mot de passe.");
+    }
 
-      await prisma.user.update({
-          where: {id: userId},
-          data: {password: hashedPassword},
-      });
+    const hashedPassword: string = await bcrypt.hash(newPassword, 10);
 
-      return {message: "Mot de passe mis à jour avec succès."};
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return { message: "Mot de passe mis à jour avec succès." };
 
   } catch (error: unknown) {
-      if (error instanceof Error) {
-          throw new Error(error.message);
-      }
-      throw new Error("Une erreur est survenue lors de la mise à jour du mot de passe.");
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error("Une erreur est survenue lors de la mise à jour du mot de passe.");
   }
 }
 
@@ -187,7 +195,6 @@ export async function requestPasswordReset(email: string): Promise<void> {
     throw new Error("Une erreur est survenue lors de la demande de réinitialisation.");
   }
 }
-
 
 
 export async function resetPassword(token: string, newPassword: string): Promise<void> {
