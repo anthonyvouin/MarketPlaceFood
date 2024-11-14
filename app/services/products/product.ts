@@ -100,14 +100,45 @@ export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise
 }
 
 export async function getImageFromGoogle(name: string): Promise<string> {
-    // try {
-        const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_API_KEY}&cx=${process.env.GOOGLE_CX}&q=${name}&searchType=image`);
+    if (!name || typeof name !== 'string') {
+        throw new Error('Le paramètre name doit être une chaîne de caractères non vide');
+    }
+
+    if (!process.env.GOOGLE_API_KEY || !process.env.GOOGLE_CX) {
+        throw new Error('Les clés API Google (GOOGLE_API_KEY et GOOGLE_CX) sont requises');
+    }
+
+    try {
+        const encodedQuery = encodeURIComponent(name);
+        const url = `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_API_KEY}&cx=${process.env.GOOGLE_CX}&q=${encodedQuery}&searchType=image`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`Erreur API Google (${response.status}): ${errorData.error?.message || response.statusText}`);
+        }
+
         const data = await response.json();
-        return data.items[0].link;
-    // } catch (error) {
-    //     console.error("Erreur lors de la récupération de l'image :", error);
-    //     throw new Error('La récupération de l\'image a échoué.');
-    // }
+
+        if (!data.items || !data.items.length) {
+            throw new Error('Aucune image trouvée pour cette recherche');
+        }
+
+        const imageUrl = data.items[0].link;
+        if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.match(/^https?:\/\/.+/)) {
+            throw new Error('Le lien de l\'image retourné est invalide');
+        }
+
+        return imageUrl;
+
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Erreur lors de la récupération de l'image : ${error.message}`);
+        } else {
+            throw new Error('Une erreur inconnue est survenue lors de la récupération de l\'image');
+        }
+    }
 }
 
 export async function getProductById(id: string): Promise<any> {

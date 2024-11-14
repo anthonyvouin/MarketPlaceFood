@@ -30,7 +30,7 @@ type CreateRecipeInput = {
 type UpdateRecipeInput = Partial<Omit<CreateRecipeInput, 'userId'>>;
 
 // Créer une recette
-export async function createRecipe(data: CreateRecipeInput, userId: string): Promise<any> {
+export async function createRecipe(data: CreateRecipeInput, userId: string): Promise<any | null> {
     try {
         const { ingredients, steps, ...recipeData } = data;
         switch (data.type) {
@@ -59,7 +59,6 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
                 recipeData.type = RecipeType.MAIN_DISH;
                 break;
         }
-
 
         const recipe = await prisma.recipe.create({
             data: {
@@ -98,7 +97,11 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
 
         return JSON.parse(JSON.stringify(recipe));
     } catch (error) {
-        console.error("Erreur lors de la création de la recette :", error);
+        if (error.code === 'P2002') {
+            console.log("Recipe already exists, skipping:", data.name);
+            return null; // Retourne null pour ne pas interrompre le processus, parce qu'on veut continuer à créer les autres recettes
+        }
+        console.error("Erreur lors de la création de la recette:", error);
         throw new Error('La création de la recette a échoué.');
     }
 }

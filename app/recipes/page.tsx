@@ -8,6 +8,7 @@ import { Card } from "primereact/card";
 import { createRecipe, getAllRecipes } from "../services/recipes";
 import { generateRecipes } from "../services/ia-integration/ia";
 import Link from "next/link";
+import { getImageFromGoogle } from "../services/products/product";
 
 export default function RecipesPage() {
     const { data: session } = useSession();
@@ -19,10 +20,12 @@ export default function RecipesPage() {
             const recipes = await generateRecipes("generate-recipes-from-bdd");
             const user = session?.user.id;
             const generatedRecipes = [];
-
             for (const recipe of recipes) {
+                const generatedImageForRecipe = await getImageFromGoogle(recipe.name);
+                recipe.image = generatedImageForRecipe;
                 const createdRecipe = await createRecipe(recipe, user);
                 generatedRecipes.push(createdRecipe);
+                getLastRecipes();
             }
 
             if (generatedRecipes.length > 0) {

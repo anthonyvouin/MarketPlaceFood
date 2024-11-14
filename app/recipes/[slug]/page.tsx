@@ -1,40 +1,32 @@
 "use client"
 
-import { RecipeDto } from "@/app/interface/recipe/RecipeDto";
-import { generateRecipes } from "@/app/services/ia-integration/ia";
-import { getRecipeBySlug, getUserFavoriteRecipes, toggleRecipeFavorite, updateRecipe } from "@/app/services/recipes";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useSession } from "next-auth/react";
 import { Image } from "primereact/image";
 import { Tag } from "primereact/tag";
 import { Card } from "primereact/card";
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { PrimeIcons } from 'primereact/api';
-import { useSession } from "next-auth/react";
 import { Toast } from 'primereact/toast';
-import { useRef } from 'react';
+import {
+  getRecipeBySlug,
+  getUserFavoriteRecipes,
+  toggleRecipeFavorite,
+  updateRecipe
+} from "@/app/services/recipes";
+import { generateRecipes } from "@/app/services/ia-integration/ia";
+import { RecipeDto } from "@/app/interface/recipe/RecipeDto";
 
-interface RecipeIngredient {
-  product: {
-    name: string;
-    image: string;
-  };
-  quantity: number;
-  unit: string;
-}
 
-interface RecipeStep {
-  description: string;
-}
 
 const RecipeDetailPage = () => {
-  // State
   const [recipeDetails, setRecipeDetails] = useState<RecipeDto | null>(null);
   const [isLoadingSteps, setIsLoadingSteps] = useState(false);
   const [isRecipeFavorite, setIsRecipeFavorite] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [metrics, setMetrics] = useState([] as any[]);
 
-  // Hooks
   const params = useParams();
   const { data: sessionData } = useSession();
   const toastRef = useRef<Toast>(null);
@@ -56,10 +48,22 @@ const RecipeDetailPage = () => {
           return;
         }
 
-        setRecipeDetails(fetchedRecipe); 
-        const userFavoriteRecipes = await getUserFavoriteRecipes(sessionData?.user?.id, 1, 10);
-        setIsRecipeFavorite(userFavoriteRecipes.recipes.some(recipe => recipe.id === fetchedRecipe.id));
-        // Generate steps if needed
+        setRecipeDetails(fetchedRecipe);
+
+        const metrics = [
+          { icon: PrimeIcons.CLOCK, label: "Temps de préparation", value: fetchedRecipe.preparationTime, color: "bg-blue-50 text-blue-600" },
+          { icon: PrimeIcons.CLOCK, label: "Temps de cuisson", value: fetchedRecipe.cookingTime, color: "bg-red-50 text-red-600" },
+          { icon: PrimeIcons.USER, label: "Nombre de parts", value: fetchedRecipe.servings, color: "bg-green-50 text-green-600" },
+          { icon: PrimeIcons.COG, label: "Difficulté", value: fetchedRecipe.difficulty, color: "bg-yellow-50 text-yellow-600" }
+        ];
+
+        setMetrics(metrics);
+        
+        if (sessionData?.user?.id) {
+          const userFavoriteRecipes = await getUserFavoriteRecipes(sessionData.user.id, 1, 10);
+          setIsRecipeFavorite(userFavoriteRecipes.recipes.some(recipe => recipe.id === fetchedRecipe.id));
+        }
+
         if (fetchedRecipe.steps?.length === 0 && !isLoadingSteps) {
           await generateRecipeSteps(fetchedRecipe);
         }
@@ -70,8 +74,9 @@ const RecipeDetailPage = () => {
     };
 
     loadRecipeDetails();
-  }, [params.slug, isLoadingSteps]);
+  }, [params.slug, sessionData?.user?.id, isLoadingSteps]);
 
+  // Step generation function
   const generateRecipeSteps = async (recipe: RecipeDto) => {
     setIsLoadingSteps(true);
     try {
@@ -89,7 +94,6 @@ const RecipeDetailPage = () => {
 
       await updateRecipe(recipe.id, { steps: generatedSteps });
       
-      // Refresh recipe details
       const updatedRecipe = await getRecipeBySlug(params.slug as string);
       setRecipeDetails(updatedRecipe);
     } catch (err) {
@@ -117,6 +121,7 @@ const RecipeDetailPage = () => {
     }
   };
 
+  // Toast functions
   const showErrorToast = (message: string) => {
     toastRef.current?.show({
       severity: 'error',
@@ -135,11 +140,13 @@ const RecipeDetailPage = () => {
     });
   };
 
+  // Loading and error states
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-full max-w-md">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <Card className="w-full max-w-md shadow-lg">
           <div className="text-center">
+            <i className="pi pi-exclamation-circle text-5xl text-red-500 mb-4"></i>
             <h2 className="text-2xl font-bold text-red-600 mb-4">Erreur</h2>
             <p className="text-gray-600">{error}</p>
           </div>
@@ -150,209 +157,121 @@ const RecipeDetailPage = () => {
 
   if (!recipeDetails) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <ProgressSpinner />
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <ProgressSpinner strokeWidth="3" />
       </div>
     );
   }
 
+  // Main render
   return (
-    <section className="p-4 bg-primaryBackgroundColor">
+    <div className="min-h-screen bg-primaryBackgroundColor">
       <Toast ref={toastRef} />
       
-      {/* Recipe Header */}
-      <RecipeHeader 
-        recipe={recipeDetails}
-        isFavorite={isRecipeFavorite}
-        onFavoriteToggle={handleFavoriteToggle}
-      />
+      <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        {/* Recipe Header */}
+        <div className=" rounded-2xl overflow-hidden">
+          {recipeDetails.image && (
+            <div className="relative rounded-full h-96 w-full">
+              <Image
+                src={recipeDetails.image}
+                alt={recipeDetails.name}
+                imageClassName="w-full h-full object-cover object-center"
+                // preview
+              />
+              <div className="absolute top-4 right-4">
+                <button
+                  onClick={handleFavoriteToggle}
+                  className={`w-10 h-10 rounded-full transition-all flex items-center justify-center ${
+                    isRecipeFavorite 
+                      ? 'bg-red-500 text-white' 
+                      : 'bg-white text-gray-600 hover:bg-red-50'
+                  }`}
+                >
+                  <i className={`${isRecipeFavorite ? PrimeIcons.HEART_FILL : PrimeIcons.HEART} text-xl`}></i>
+                </button>
+              </div>
+            </div>
+          )}
+          <div className="p-8">
+            <h1 className="text-4xl font-bold mb-4 text-gray-800">{recipeDetails.name}</h1>
+            <p className="text-lg text-gray-600 leading-relaxed">{recipeDetails.description}</p>
+          </div>
+        </div>
 
-      {/* Recipe Metrics */}
-      <RecipeMetrics recipe={recipeDetails} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {metrics.map((metric, index) => (
+            <div
+              key={index}
+              className={`${metric.color} p-6 rounded-xl flex flex-col items-center text-center space-y-2`}
+            >
+              <i className={`${metric.icon} text-2xl`}></i>
+              <span className="text-sm font-medium">{metric.label}</span>
+              <span className="text-lg font-bold">{metric.value}</span>
+            </div>
+          ))}
+        </div>
 
-      {/* Recipe Ingredients */}
-      <RecipeIngredients ingredients={recipeDetails.recipeIngredients} />
+        <div className="p-8">
+          <h2 className="text-2xl font-bold mb-6 text-black">Ingrédients</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {recipeDetails.recipeIngredients.map((ingredient, index) => (
+              <div 
+                key={index}
+                className="group transform transition-transform"
+              >
+                <div className="p-4 flex flex-col items-center text-center space-y-3">
+                  <div className="w-24 h-24 rounded-full overflow-hidden shadow-md p-2 hover:bg-primaryColor">
+                    <Image
+                      src={ingredient.product.image}
+                      alt={ingredient.product.name}
+                      imageClassName="w-full h-full object-cover rounded-full"
+                    />
+                  </div>
+                  <div>
+                    <span className="block text-lg font-bold text-black">
+                      {ingredient.quantity} {ingredient.unit}
+                    </span>
+                    <span className="text-black/75">
+                      {ingredient.product.name}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      {/* Recipe Steps */}
-      <RecipeSteps 
-        steps={recipeDetails.steps} 
-        isLoading={isLoadingSteps}
-      />
-    </section>
+        {/* Recipe Steps */}
+        <div className="p-8">
+          <h2 className="text-2xl font-bold mb-6 text-black">Étapes de préparation</h2>
+          {isLoadingSteps ? (
+            <div className="flex justify-center p-8">
+              <ProgressSpinner strokeWidth="3" />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {recipeDetails.steps.map((step, index) => (
+                <div 
+                  key={index}
+                  className="flex gap-6 p-6 bg-primaryColor/80 rounded-xl hover:bg-primaryColor/65 transition-colors"
+                >
+                  <div className="flex-none">
+                    <div className="w-12 h-12 rounded-full bg-white text-primaryColor flex items-center justify-center text-xl font-bold">
+                      {index + 1}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-white text-lg leading-relaxed">{step.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
   );
 };
-
-// Composant pour l'en-tête de la recette
-const RecipeHeader = ({ 
-  recipe, 
-  isFavorite, 
-  onFavoriteToggle 
-}: { 
-  recipe: RecipeDto; 
-  isFavorite: boolean; 
-  onFavoriteToggle: () => void;
-}) => (
-  <div className="mb-4">
-    <div className="mb-4 flex justify-between items-center">
-      <div>
-        <h1 className="text-4xl font-bold mb-2">{recipe.name}</h1>
-        <p className="text-gray-600">{recipe.description}</p>
-      </div>
-      <Tag
-        icon={isFavorite ? PrimeIcons.HEART_FILL : PrimeIcons.HEART}
-        className={`p-tag-rounded cursor-pointer ${isFavorite ? 'p-tag-success' : 'p-tag-secondary'}`}
-        onClick={onFavoriteToggle}
-        value={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
-      />
-    </div>
-    {recipe.image && (
-      <div className="mb-4">
-        <Image
-          src={recipe.image}
-          alt={recipe.name}
-          width="100%"
-          className="border-round-lg"
-          preview
-        />
-      </div>
-    )}
-  </div>
-);
-
-// Composant pour les métriques de la recette
-const RecipeMetrics = ({ recipe }: { recipe: RecipeDto }) => (
-  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-    <MetricTag
-      severity="info"
-      value={`${recipe.preparationTime} min`}
-      icon={PrimeIcons.CLOCK}
-      label="Préparation"
-    />
-    <MetricTag
-      severity="danger"
-      value={`${recipe.cookingTime} min`}
-      icon="pi-stopwatch"
-      label="Cuisson"
-    />
-    <MetricTag
-      severity="success"
-      value={`${recipe.servings} portions`}
-      icon={PrimeIcons.USERS}
-      label="Parts"
-    />
-    <MetricTag
-      severity="warning"
-      value={recipe.difficulty}
-      icon={PrimeIcons.STAR}
-      label="Difficulté"
-    />
-  </div>
-);
-
-// Composant pour un tag métrique
-const MetricTag = ({ 
-  severity, 
-  value, 
-  icon, 
-  label 
-}: { 
-  severity: string; 
-  value: string; 
-  icon: string; 
-  label: string;
-}) => (
-  <div className="flex flex-col items-center">
-    <span className="text-sm text-gray-600 mb-2">{label}</span>
-    <Tag
-      severity={severity}
-      value={value}
-      icon={icon}
-      className="w-full text-center"
-    />
-  </div>
-);
-
-// Composant pour les ingrédients
-const RecipeIngredients = ({ ingredients }: { ingredients: RecipeIngredient[] }) => (
-  <div className="mb-8">
-    <h2 className="text-xl font-semibold mb-4">Ingrédients</h2>
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
-      {ingredients.map((ingredient, index) => (
-        <IngredientCard key={index} ingredient={ingredient} />
-      ))}
-    </div>
-  </div>
-);
-
-// Composant pour une carte d'ingrédient
-const IngredientCard = ({ ingredient }: { ingredient: RecipeIngredient }) => (
-  <div className="flex flex-col items-center text-center">
-    <div className="bg-white p-3 rounded-full shadow-md mb-3 w-24 h-24">
-      <Image
-        src={ingredient.product.image}
-        alt={ingredient.product.name}
-        width="100%"
-        height="100%"
-        imageClassName="w-full h-full object-cover rounded-full"
-      />
-    </div>
-    <div className="text-lg font-semibold mb-1">
-      {ingredient.quantity} {ingredient.unit}
-    </div>
-    <div className="text-gray-600">
-      {ingredient.product.name}
-    </div>
-  </div>
-);
-
-// Composant pour les étapes
-const RecipeSteps = ({ 
-  steps, 
-  isLoading 
-}: { 
-  steps: RecipeStep[]; 
-  isLoading: boolean;
-}) => (
-  <div className="mb-4">
-    <h2 className="text-xl font-semibold mb-4">Étapes</h2>
-    {isLoading ? (
-      <div className="flex justify-center p-4">
-        <ProgressSpinner />
-      </div>
-    ) : (
-      <div className="p-4">
-        {steps.map((step, index) => (
-          <StepCard key={index} step={step} stepNumber={index + 1} />
-        ))}
-      </div>
-    )}
-  </div>
-);
-
-// Composant pour une carte d'étape
-const StepCard = ({ 
-  step, 
-  stepNumber 
-}: { 
-  step: RecipeStep; 
-  stepNumber: number;
-}) => (
-  <div className="mb-4">
-    <Card>
-      <div className="flex gap-3">
-        <div className="flex-none">
-          <Tag 
-            severity="info" 
-            value={`${stepNumber}`} 
-            className="w-2rem h-2rem flex align-items-center justify-content-center border-circle"
-          />
-        </div>
-        <div className="flex-1">
-          <p>{step.description}</p>
-        </div>
-      </div>
-    </Card>
-  </div>
-);
 
 export default RecipeDetailPage;

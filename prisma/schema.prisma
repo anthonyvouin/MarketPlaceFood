@@ -129,7 +129,7 @@ model Recipe {
   name            String     @unique
   slug            String     @unique
   description     String     @db.Text
-  image           String?
+  image           String?    @db.Text
   preparationTime Int
   cookingTime     Int
   servings        Int
