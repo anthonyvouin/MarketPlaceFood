@@ -81,6 +81,12 @@ export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise
                         id: true,
                         name: true,
                     }
+                },
+                discount: {
+                    select: {
+                        id: true,
+                        rate: true,
+                    }
                 }
             }
         }
