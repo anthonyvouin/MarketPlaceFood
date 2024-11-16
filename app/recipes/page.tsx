@@ -9,16 +9,23 @@ import { createRecipe, getAllRecipes } from "../services/recipes";
 import { generateRecipes } from "../services/ia-integration/ia";
 import Link from "next/link";
 import { getImageFromGoogle } from "../services/products/product";
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 export default function RecipesPage() {
     const { data: session } = useSession();
     const { show } = useContext(ToastContext);
     const [recipes, setRecipes] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     async function generateRecipe() {
         try {
+            if (!session) {
+                show("Erreur", "Vous devez être connecté pour générer des recettes", "error");
+                return;
+            }
+            setLoading(true);
+            const user = session.user.id;
             const recipes = await generateRecipes("generate-recipes-from-bdd");
-            const user = session?.user.id;
             const generatedRecipes = [];
             for (const recipe of recipes) {
                 const generatedImageForRecipe = await getImageFromGoogle(recipe.name);
@@ -35,6 +42,8 @@ export default function RecipesPage() {
             }
         } catch (error) {
             show("Erreur", "Erreur lors de la génération des recettes", "error");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -43,8 +52,10 @@ export default function RecipesPage() {
     }, []);
 
     async function getLastRecipes() {
+        setLoading(true);
         const lastRecipes = await getAllRecipes(1, 12, {}, { createdAt: 'desc' });
         setRecipes(lastRecipes.recipes);
+        setLoading(false);
     }
 
     return (
@@ -58,24 +69,29 @@ export default function RecipesPage() {
                     icon="pi pi-refresh"
                     className="p-button-success"
                     onClick={generateRecipe}
+                    disabled={loading}
                 />
             </Card>
 
-            {recipes && recipes.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                    {recipes.map((recipe, index) => (
-                        <Link href={`/recipes/${recipe.slug}`} passHref key={index}>
-                            <Card key={index} className="shadow-2" title={recipe.name} >
-                                <p className="text-gray-600 mb-4">{recipe.description}</p>
-                                <Button 
-                                    label="Voir plus"
-                                    icon="pi pi-external-link"
-                                    className="p-button-outlined p-button-sm"
-                                />
-                            </Card>
-                        </Link>
-                    ))}
-                </div>
+            {loading ? (
+                <ProgressSpinner />
+            ) : (
+                recipes && recipes.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                        {recipes.map((recipe, index) => (
+                            <Link href={`/recipes/${recipe.slug}`} passHref key={index}>
+                                <Card key={index} className="shadow-2" title={recipe.name} >
+                                    <p className="text-gray-600 mb-4">{recipe.description}</p>
+                                    <Button 
+                                        label="Voir plus"
+                                        icon="pi pi-external-link"
+                                        className="p-button-outlined p-button-sm"
+                                    />
+                                </Card>
+                            </Link>
+                        ))}
+                    </div>
+                )
             )}
         </div>
     );

@@ -1,10 +1,9 @@
 "use client"
 
 import { useParams } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useSession } from "next-auth/react";
 import { Image } from "primereact/image";
-import { Tag } from "primereact/tag";
 import { Card } from "primereact/card";
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { PrimeIcons } from 'primereact/api';
@@ -17,8 +16,7 @@ import {
 } from "@/app/services/recipes";
 import { generateRecipes } from "@/app/services/ia-integration/ia";
 import { RecipeDto } from "@/app/interface/recipe/RecipeDto";
-
-
+import { ToastContext } from "@/app/provider/toastProvider";
 
 const RecipeDetailPage = () => {
   const [recipeDetails, setRecipeDetails] = useState<RecipeDto | null>(null);
@@ -29,7 +27,8 @@ const RecipeDetailPage = () => {
 
   const params = useParams();
   const { data: sessionData } = useSession();
-  const toastRef = useRef<Toast>(null);
+  const { show } = useContext(ToastContext); 
+
 
   useEffect(() => {
     const loadRecipeDetails = async () => {
@@ -117,30 +116,18 @@ const RecipeDetailPage = () => {
         "Recette retirée des favoris"
       );
     } catch (err) {
-      showErrorToast("Erreur lors de la modification des favoris");
+      show("Erreur", "Erreur lors de l'ajout aux favoris", "error");    
     }
   };
 
-  // Toast functions
   const showErrorToast = (message: string) => {
-    toastRef.current?.show({
-      severity: 'error',
-      summary: 'Erreur',
-      detail: message,
-      life: 3000
-    });
+    show("Erreur", message, "error");
   };
 
   const showSuccessToast = (message: string) => {
-    toastRef.current?.show({
-      severity: 'success',
-      summary: 'Succès',
-      detail: message,
-      life: 3000
-    });
+    show("Succès", message, "success");
   };
 
-  // Loading and error states
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -165,9 +152,7 @@ const RecipeDetailPage = () => {
 
   // Main render
   return (
-    <div className="min-h-screen bg-primaryBackgroundColor">
-      <Toast ref={toastRef} />
-      
+    <div className="min-h-screen bg-primaryBackgroundColor">      
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         {/* Recipe Header */}
         <div className=" rounded-2xl overflow-hidden">

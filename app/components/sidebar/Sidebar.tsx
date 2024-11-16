@@ -5,6 +5,7 @@ import {SidebarLinks} from "@/app/interface/sidebar-links/sidebar-links";
 const links: SidebarLinks[] = [
     {name: 'Accueil', href: '/', icon:'pi pi-home'},
     {name: 'Produits', href: '/products', icon: 'pi pi-barcode'},
+    {name: 'Recettes', href: '/recipes', icon: 'pi pi-book'}
 ];
 
 const Sidebar = () => {
