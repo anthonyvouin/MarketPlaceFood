@@ -1,4 +1,4 @@
-import {createProduct} from '@/app/services/products/product';
+import {createProduct} from '../app/services/products/product';
 import {Prisma, PrismaClient, Product,} from '@prisma/client';
 import PrismaClientOptions = Prisma.PrismaClientOptions;
 import {DefaultArgs} from "@prisma/client/runtime/binary";
