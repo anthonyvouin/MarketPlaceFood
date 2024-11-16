@@ -5,6 +5,8 @@ import Head from "next/head";
 import LayoutWrapper from "./components/layoutWrapper/LayoutWrapper";
 import {Metadata} from "next";
 import React from "react";
+import {PrimeReactProvider} from "primereact/api";
+import {ConfirmDialog} from "primereact/confirmdialog";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
@@ -39,9 +41,12 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
         <SessionWrapper>
-            <LayoutWrapper>
-                {children}
-            </LayoutWrapper>
+            <PrimeReactProvider>
+                <LayoutWrapper>
+                    <ConfirmDialog />
+                    {children}
+                </LayoutWrapper>
+            </PrimeReactProvider>
         </SessionWrapper>
         </body>
         </html>

@@ -88,13 +88,15 @@ model Product {
   slug        String   @unique
   description String   @db.Text
   image       String
-  price       Decimal  @db.Decimal(10, 2)
+  price       Int
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   categoryId  String   @map("category_id")
+  discountId  String?  @map("discount_id")
 
-  category          Category           @relation(fields: [categoryId], references: [id])
+  category          Category            @relation(fields: [categoryId], references: [id])
   recipeIngredients RecipeIngredient[]
+  discount Discount? @relation(fields: [discountId], references: [id])
 
   @@map("products")
 }
@@ -177,4 +179,14 @@ model RecipeStep {
 
   @@unique([recipeId, stepNumber]) // On veut pas de doublons de numéros d'étapes pour une recette
   @@map("recipe_steps")
+}
+
+model Discount {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  rate     Int
+  visible  Boolean   @default(true)
+  products Product[]
+
+  @@map("discount")
 }

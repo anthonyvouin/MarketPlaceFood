@@ -8,6 +8,7 @@ import DragAndDrop from "@/app/components/dragAndDrop/dragAndDrop";
 import ImagePreview from "@/app/components/imagePreview/imagePreview";
 import RoundedButton from "@/app/components/ui/rounded-button";
 import {getPageName} from "@/app/utils/utils";
+import {ProductDto} from "@/app/interface/product/productDto";
 
 
 export default function CreateProductPage() {
@@ -18,6 +19,7 @@ export default function CreateProductPage() {
         image: '',
         price: 0,
         categoryId: '',
+        discountId: null
     });
 
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -69,8 +71,8 @@ export default function CreateProductPage() {
                 formData.append('file', imageFile);
                 imagePath = await uploadImage(formData);
             }
-
-            const productWithImage = {...product, image: imagePath};
+            const productFormatted: number = product.price * 100
+            const productWithImage: ProductDto = {...product, image: imagePath, price: productFormatted};
             await createProduct(productWithImage);
             setSuccess("Produit créé avec succès !");
             setProduct({
@@ -80,6 +82,7 @@ export default function CreateProductPage() {
                 image: '',
                 price: 0,
                 categoryId: '',
+                discountId: null
             });
             setImageFile(null);
             if (fileInputRef.current) {

@@ -1,8 +1,8 @@
 export interface ActionButtonProps {
     onClickAction: () => void;
     message: string;
-    positionIcon: 'right' | 'left';
     classes: string;
+    positionIcon?: 'right' | 'left';
     icon?: string;
 
 }

@@ -199,8 +199,6 @@ export async function requestPasswordReset(email: string): Promise<void> {
 
 export async function resetPassword(token: string, newPassword: string): Promise<void> {
   try {
-    console.log("Recherche de l'utilisateur avec le token:", token);
-
     const user = await prisma.user.findFirst({
       where: {
         resetToken: token, 
