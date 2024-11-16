@@ -99,7 +99,6 @@ export const authOptions = {
       session.user.emailVerified = token.emailVerified;
       session.user.isGoogleUser = token.isGoogleUser;
       session.user.jwt = token.jwt;
-      console.log(session);
       return session;
     },
 

@@ -7,7 +7,6 @@ import { Image } from "primereact/image";
 import { Card } from "primereact/card";
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { PrimeIcons } from 'primereact/api';
-import { Toast } from 'primereact/toast';
 import {
   getRecipeBySlug,
   getUserFavoriteRecipes,

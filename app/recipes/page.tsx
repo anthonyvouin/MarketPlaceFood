@@ -26,11 +26,34 @@ export default function RecipesPage() {
             setLoading(true);
             const user = session.user.id;
             const recipes = await generateRecipes("generate-recipes-from-bdd");
+            //! DEBUT
+            // const localStorageBasket: string | null = localStorage.getItem('basketSnapAndShop')
+            // if (!localStorageBasket) {
+            //     show("Erreur", "Votre panier est vide", "error");
+            //     return;
+            // }
+            // const basket = JSON.parse(localStorageBasket);
+            // let products = basket.basket
+            // products = products.map((product: any) => {
+            //     console.log(product)
+            //     return {
+            //         id: product.product.id,
+            //         name: product.product.name,
+            //         price: product.product.price,
+            //     }
+            // });
+
+            // const recipes = await generateRecipes("generate-recipes-from-cart", "", products);
+            //! FIN
+            console.log(recipes)
             const generatedRecipes = [];
             for (const recipe of recipes) {
+                console.log(recipe)
                 const generatedImageForRecipe = await getImageFromGoogle(recipe.name);
+                console.log(generatedImageForRecipe)
                 recipe.image = generatedImageForRecipe;
                 const createdRecipe = await createRecipe(recipe, user);
+                console.log(createdRecipe)
                 generatedRecipes.push(createdRecipe);
                 getLastRecipes();
             }

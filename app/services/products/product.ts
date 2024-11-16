@@ -106,7 +106,9 @@ export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise
 }
 
 export async function getImageFromGoogle(name: string): Promise<string> {
+    console.log(name);
     if (!name || typeof name !== 'string') {
+        console.log("Erreur lors de la récupération de l'image : Le paramètre name doit être une chaîne de caractères non vide");
         throw new Error('Le paramètre name doit être une chaîne de caractères non vide');
     }
 
@@ -122,16 +124,19 @@ export async function getImageFromGoogle(name: string): Promise<string> {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
+            console.log(errorData);
             throw new Error(`Erreur API Google (${response.status}): ${errorData.error?.message || response.statusText}`);
         }
 
         const data = await response.json();
 
         if (!data.items || !data.items.length) {
+            console.log(data);
             throw new Error('Aucune image trouvée pour cette recherche');
         }
 
         const imageUrl = data.items[0].link;
+        console.log(imageUrl);
         if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.match(/^https?:\/\/.+/)) {
             throw new Error('Le lien de l\'image retourné est invalide');
         }
@@ -140,8 +145,10 @@ export async function getImageFromGoogle(name: string): Promise<string> {
 
     } catch (error) {
         if (error instanceof Error) {
+            console.error(`Erreur lors de la récupération de l'image : ${error.message}`);
             throw new Error(`Erreur lors de la récupération de l'image : ${error.message}`);
         } else {
+            console.error('Une erreur inconnue est survenue lors de la récupération de l\'image');
             throw new Error('Une erreur inconnue est survenue lors de la récupération de l\'image');
         }
     }

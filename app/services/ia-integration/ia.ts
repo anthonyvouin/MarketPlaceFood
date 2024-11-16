@@ -1,7 +1,7 @@
 "use server";
 
 import OpenAI from "openai";
-import { getAllProducts } from "../products/product";
+import { getAllProducts, getProductById } from "../products/product";
 import ollama from 'ollama'
 
 const openai = new OpenAI({
@@ -101,7 +101,7 @@ export async function analysePicture(format: string) {
   }
 }
 
-export async function generateRecipes(format: string, complement: string = "") {
+export async function generateRecipes(format: string, complement: string = "", products?: any) {
   try {
     //     response = await ollama.chat( {
     //       "model": "llava",
@@ -126,9 +126,7 @@ export async function generateRecipes(format: string, complement: string = "") {
     // ]
     // });
 
-    const ingredients = await getAllProducts({ id: true, name: true, price: true })
-
-    const formattedIngredients = JSON.stringify(ingredients)
+    let formattedIngredients = null
 
     let prompt = ""
     // return
@@ -140,12 +138,16 @@ export async function generateRecipes(format: string, complement: string = "") {
         prompt = "Je vais te passer une description de réfrigérateur et tu devras me sortir un tableau d'objet (sans nombre) de recettes qui te semblent pertinentes, sans commentaire, chaque recette doit contenir un nom (name), une description (description), une catégorie (category) qui doit être une des propositions suivantes: Apéritif, Entrée, Plat, Dessert, Gourmandise et un tableau d'ingrédients qui contient les id des produits que tu veux utiliser et la quantité associé à chaque produit"
         break;
       case "generate-recipes-from-cart":
-        prompt = "Je vais te passer un tableau d'objet (sans le format JSON) de produits et tu devras me sortir un tableau d'objet (sans le format JSON) de recettes qui te semblent pertinentes, sans commentaire, chaque recette doit contenir un nom (name), une description (description), une catégorie (category) qui doit être une des propositions suivantes: Apéritif, Entrée, Plat, Dessert, Gourmandise et un tableau d'ingrédients qui contient les id des produits que tu veux utiliser et la quantité associé à chaque produit"
-        break;      
+        formattedIngredients = JSON.stringify(products)
+        console.log("formattedIngredients", formattedIngredients)
+        prompt = "Je vais te fournir une liste d'objets représentant des produits. À partir de cette liste, génère un tableau de recettes (maximum 2 recettes) strictement formaté en JSON, structuré comme suit : chaque recette doit inclure un 'name', 'description', 'type' (avec l'une des valeurs suivantes : STARTER, MAIN_DISH, DESSERT, SNACK, SIDE_DISH, BREAKFAST, ou BEVERAGE), 'slug' (généré à partir du nom en minuscules et sans espaces), 'difficulty' (ex: 'Facile'), 'preparationTime' (nombre de minutes, mettre juste le nombre de minutes en int), 'cookingTime' (nombre de minutes, mettre juste le nombre de minutes en int), 'servings', 'image' (chemin de l'image), et un tableau 'ingredients' comprenant pour chaque ingrédient l'id du produit ('productId') et vérifie bien que l'id du produits est bien dans la liste que je vais te passer, la 'quantity', et l'unit. La sortie doit être strictement au format JSON, sans explications ni commentaires.";
+        break;
       default:
         // generate-recipes-from-bdd
+        const ingredients = await getAllProducts({ id: true, name: true, price: true })
+        formattedIngredients = JSON.stringify(ingredients)
         prompt = "Je vais te fournir une liste d'objets représentant des produits. À partir de cette liste, génère un tableau de recettes (maximum 3 recettes) strictement formaté en JSON, structuré comme suit : chaque recette doit inclure un 'name', 'description', 'type' (avec l'une des valeurs suivantes : STARTER, MAIN_DISH, DESSERT, SNACK, SIDE_DISH, BREAKFAST, ou BEVERAGE), 'slug' (généré à partir du nom en minuscules et sans espaces), 'difficulty' (ex: 'Facile'), 'preparationTime' (nombre de minutes, mettre juste le nombre de minutes en int), 'cookingTime' (nombre de minutes, mettre juste le nombre de minutes en int), 'servings', 'image' (chemin de l'image), et un tableau 'ingredients' comprenant pour chaque ingrédient l'id du produit ('productId') et vérifie bien que l'id du produits est bien dans la liste que je vais te passer, la 'quantity', et l'unit. La sortie doit être strictement au format JSON, sans explications ni commentaires.";
-        // prompt = "Je vais te passer un tableau d'objet (sans le format JSON) de produits et tu devras me sortir un tableau d'objet (sans le format JSON) de recettes qui te semblent pertinentes, sans commentaire, chaque recette doit contenir un nom (name), une description (description), une catégorie (category) qui doit être une des propositions suivantes: Apéritif, Entrée, Plat, Dessert, Gourmandise et un tableau d'ingrédients qui contient les id des produits que tu veux utiliser et la quantité associé à chaque produit et pour chaque recette"
+      // prompt = "Je vais te passer un tableau d'objet (sans le format JSON) de produits et tu devras me sortir un tableau d'objet (sans le format JSON) de recettes qui te semblent pertinentes, sans commentaire, chaque recette doit contenir un nom (name), une description (description), une catégorie (category) qui doit être une des propositions suivantes: Apéritif, Entrée, Plat, Dessert, Gourmandise et un tableau d'ingrédients qui contient les id des produits que tu veux utiliser et la quantité associé à chaque produit et pour chaque recette"
     }
     // response = await ollama.chat({
     //   "model": "mistral",
@@ -176,11 +178,13 @@ export async function generateRecipes(format: string, complement: string = "") {
         content: formattedIngredients
       })
     } else {
-      message.push({
-        role: "user",
-        content: JSON.stringify(complement)
-      })
+        message.push({
+          role: "user",
+          content: JSON.stringify(complement)
+        })
+      
     }
+
     //? ça marche bien j'ai l'impression
     const response = await openai.chat.completions.create({
       "model": "gpt-4o-mini",
