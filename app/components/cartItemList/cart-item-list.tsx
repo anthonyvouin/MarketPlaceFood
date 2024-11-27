@@ -1,9 +1,9 @@
 import Image from 'next/image';
-import {BasketItemProps} from "@/app/interface/basket/basket-item-props";
+import {CartItemProps} from "@/app/interface/cart/cart-item-props";
 import React from "react";
-import {calculAndformatPriceWithDiscount, formatPriceEuro} from "@/app/pipe/format";
+import {calculAndformatPriceWithDiscount, formatPriceEuro} from "@/app/pipe/formatPrice";
 
-const BasketItem = ({product, updateProduct}: BasketItemProps) => {
+const CartItemList = ({product, updateProduct}: CartItemProps) => {
     return (
         <div className="border-b border-actionColor p-2.5">
             <div className="flex items-center">
@@ -18,7 +18,7 @@ const BasketItem = ({product, updateProduct}: BasketItemProps) => {
                     <div className="flex justify-between w-full">
                         <p className="max-w-[110px] text-xs font-bold">{product.product.name}</p>
                         <div>
-                            <p className="text-xs">{product.totalPrice}€</p>
+                            <p className="text-xs">{formatPriceEuro(product.totalPrice)}€</p>
                             <p className="text-xs">{product.product.discount ? calculAndformatPriceWithDiscount(product.product.price, product.product.discount.rate) : formatPriceEuro(product.product.price)}€
                                 /U</p>
                         </div>
@@ -34,7 +34,7 @@ const BasketItem = ({product, updateProduct}: BasketItemProps) => {
                                 onClick={() => updateProduct(product, 'add')}>+
                         </button>
                         <button className="w-7 h-7 ml-2.5 pi pi-trash text-primaryColor text-xs"
-                                onClick={() => updateProduct(product, 'delete')}></button>
+                                onClick={() => updateProduct(product, 'deleteProduct')}></button>
                     </div>
 
                     <br/>
@@ -45,4 +45,4 @@ const BasketItem = ({product, updateProduct}: BasketItemProps) => {
     );
 };
 
-export default BasketItem;
+export default CartItemList;
