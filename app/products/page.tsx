@@ -45,7 +45,7 @@ export default function Products() {
     }, []);
 
     const handleFilterChange = (key: keyof ProductDto, value: any): void => {
-        setfilteredProducts(products.filter((element => element.price >= priceRange[0]*100 && element.price <= priceRange[1]*100 && (selectedCategories.length === 0 || selectedCategories.includes(element.categoryId)))))
+        setfilteredProducts(products.filter((element => element.price >= priceRange[0] * 100 && element.price <= priceRange[1] * 100 && (selectedCategories.length === 0 || selectedCategories.includes(element.categoryId)))))
     };
 
     const handlePriceChange = async (value: SliderChangeEvent): Promise<void> => {
@@ -101,15 +101,13 @@ export default function Products() {
             </div>
 
             <div className="grid grid-cols-4 gap-10">
-                {filteredProducts.map((product: ProductDto, index) => (
-                    <>
-                        <ProductCard
-                            productSlug={product.slug}
-                            key={product.id}
-                            product={product}
-                            bgColor={bgColors[index % bgColors.length]}
-                        />
-                    </>
+                {filteredProducts.map((product: ProductDto, index: number) => (
+                    <ProductCard
+                        productSlug={product.slug}
+                        key={product.id}
+                        product={product}
+                        bgColor={bgColors[index % bgColors.length]}
+                    />
                 ))}
             </div>
         </section>

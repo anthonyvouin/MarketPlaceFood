@@ -5,7 +5,7 @@ import HeaderClient from "@/app/components/header/client-header/header-client";
 import Sidebar from "@/app/components/sidebar/Sidebar";
 import ProfilSidebar from "@/app/components/sidebar/profil-sidebar";
 import React from "react";
-import {BasketProvider} from "@/app/provider/basket-provider";
+import {CartProvider} from "@/app/provider/cart-provider";
 import {SideBarBasketProvider} from "@/app/provider/sideBar-basket-provider";
 import {ToastProvider} from "@/app/provider/toastProvider";
 
@@ -21,7 +21,7 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
     if (pathname.startsWith("/profil")) {
         return (<>
                 <ToastProvider>
-                    <BasketProvider>
+                    <CartProvider>
                         <SideBarBasketProvider>
                             <div className="flex">
                                 <ProfilSidebar/>
@@ -33,7 +33,7 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                                 </div>
                             </div>
                         </SideBarBasketProvider>
-                    </BasketProvider>
+                    </CartProvider>
                 </ToastProvider>
             </>
         )
@@ -42,7 +42,7 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
     return (
         <>
             <ToastProvider>
-                <BasketProvider>
+                <CartProvider>
                     <SideBarBasketProvider>
                         <div className="flex">
                             <Sidebar/>
@@ -54,7 +54,7 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                             </div>
                         </div>
                     </SideBarBasketProvider>
-                </BasketProvider>
+                </CartProvider>
             </ToastProvider>
         </>
     );

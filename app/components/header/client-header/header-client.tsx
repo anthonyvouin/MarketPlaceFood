@@ -5,13 +5,13 @@ import Link from "next/link";
 import LogoutButton from "@/app/components/auth/logout";
 import {Avatar} from "primereact/avatar";
 import {Button} from "primereact/button";
-import {useBasket} from "@/app/provider/basket-provider";
+import {useCart} from "@/app/provider/cart-provider";
 import {useSideBarBasket} from "@/app/provider/sideBar-basket-provider";
 
 export default function HeaderClient() {
     const [name, setName] = useState('');
     const {data: session, status} = useSession()
-    const {basketState, updateProductList} = useBasket();
+    const {totalLengthItems, updateProductList} = useCart();
     const {toggleBasketList} = useSideBarBasket();
     useEffect(() => {
         if (session && session.user && session.user.name) {
@@ -36,19 +36,17 @@ export default function HeaderClient() {
                     />
                 </Link>
 
-                <div className="relative">
-                    <Button
-                        rounded
-                        icon="pi pi-shopping-cart"
-                        className="bg-actionColor text-white w-8 h-8 text-xs"
-                        onClick={toggleBasketList}
-                    />
-                    <span className="absolute bg-primaryColor px-1 rounded-full ft-10px badge-shop text-white">{basketState.total}</span>
-                </div>
-
-
                 {status === 'authenticated' ? (
                     <>
+                        <div className="relative">
+                            <Button
+                                rounded
+                                icon="pi pi-shopping-cart"
+                                className="bg-actionColor text-white w-8 h-8 text-xs"
+                                onClick={toggleBasketList}
+                            />
+                            <span className="absolute bg-primaryColor px-1 rounded-full ft-10px badge-shop text-white">{totalLengthItems}</span>
+                        </div>
                         <Button
                             rounded
                             icon="pi pi-bell"

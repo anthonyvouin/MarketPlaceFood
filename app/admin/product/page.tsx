@@ -4,7 +4,7 @@ import {useRouter} from "next/navigation";
 import React, {useContext, useEffect, useState} from "react";
 import {Product} from "@prisma/client";
 import {ProductDto} from "@/app/interface/product/productDto";
-import {formatPriceEuro} from "@/app/pipe/format";
+import {formatPriceEuro} from "@/app/pipe/formatPrice";
 import {changeDiscount, getAllProducts} from "@/app/services/products/product";
 import {getPageName} from "@/app/utils/utils";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
