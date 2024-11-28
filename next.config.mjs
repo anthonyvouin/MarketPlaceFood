@@ -16,7 +16,7 @@ const nextConfig = {
         ignoreDuringBuilds: true, // Désactive ESLint lors du build
     },
     env: {
-        STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY, // Exposez la clé publique Stripe
+        STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY, 
     },
     
 };
