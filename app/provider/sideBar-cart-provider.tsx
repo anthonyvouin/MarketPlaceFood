@@ -12,6 +12,8 @@ import {CartItemDto} from "@/app/interface/cart/cart-item.dto";
 import {createCart, createItemCartIfUserHaveCart, getClientCart, updateItemCart} from "@/app/services/cart/cart";
 import {useSession} from "next-auth/react";
 import {formatPriceEuro} from "@/app/pipe/formatPrice";
+import {useRouter} from "next/navigation";
+import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 
 export const SideBarBasketContext: Context<SideBarBasketContextType> = createContext<SideBarBasketContextType>({
@@ -35,10 +37,13 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
         totalPrice: 0
     });
     const renderCount = useRef(0);
+    const router: AppRouterInstance = useRouter();
+
 
     useEffect(() => {
         renderCount.current += 1;
         if (session) {
+
             const fetchCart = async () => {
                 const clientCart: CartDto | null = await getClientCart(session.user.id);
                 if (clientCart) {
@@ -83,7 +88,7 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
         })
     }
 
-    const handleChangeQuantityProduct = async (ChangeItem: CartItemDto, action: 'add' | 'remove' | 'deleteProduct' = "add"): Promise<void> => {
+   const handleChangeQuantityProduct = async (ChangeItem: CartItemDto, action: 'add' | 'remove' | 'deleteProduct' = "add"): Promise<void> => {
         if (clientCart && clientCart.id) {
             const indexItem: number = clientCart.cartItems.findIndex((itemInCartCart: CartItemDto) => itemInCartCart.product && (itemInCartCart.product.id === ChangeItem.product.id))
 
@@ -112,6 +117,7 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
             }
         }
     }
+    
     const addProduct = async (product: ProductDto, quantity: number): Promise<void> => {
         if (session) {
             const itemExistInCard: boolean = clientCart.cartItems.some((itemCard: CartItemDto) => {
@@ -147,8 +153,10 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
 
     }
 
+
+
     const goToDetailPanier = () => {
-        console.log('detail panier')
+        router.push('/recap-cart')
     }
 
     return (
@@ -161,7 +169,9 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
                      className="relative bg-primaryBackgroundColor"
             >
                 <header className='sticky top-0 right-0 w-full h-20 border-b-actionColor border-b text-center bg-primaryBackgroundColor'>
-                    <RoundedButton onClickAction={goToDetailPanier}
+                    <RoundedButton 
+                                    
+                                    onClickAction={goToDetailPanier}
                                    message={'Voir le detail du panier'}
                                    classes={"border-actionColor text-actionColor"}/>
                 </header>
