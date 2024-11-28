@@ -1,23 +1,23 @@
 'use client'
 
 import React, { useState } from 'react';
-import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
+import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js'; 
 
 interface PaymentFormProps {
-    clientSecret: string;
+    clientSecret: string; 
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ clientSecret }) => {
-    const stripe = useStripe();
-    const elements = useElements();
+    const stripe = useStripe(); 
+    const elements = useElements(); 
     const [error, setError] = useState<string | null>(null);
     const [processing, setProcessing] = useState(false);
-    const [succeeded, setSucceeded] = useState(false);
+    const [succeeded, setSucceeded] = useState(false); 
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setProcessing(true);
-        setError(null);
+        setError(null); 
 
         if (!stripe || !elements) {
             setError("Stripe n'a pas été chargé correctement.");
@@ -25,7 +25,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ clientSecret }) => {
             return;
         }
 
-        const cardElement = elements.getElement(CardElement);
+        const cardElement = elements.getElement(CardElement); 
 
         if (!cardElement) {
             setError("L'élément de la carte de crédit est introuvable.");
@@ -42,20 +42,30 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ clientSecret }) => {
         if (error) {
             setError(error.message || 'Une erreur est survenue lors du paiement.');
         } else if (paymentIntent?.status === 'succeeded') {
-            setSucceeded(true);
+            setSucceeded(true); 
+            await updateOrder(paymentIntent.id); 
         }
 
-        setProcessing(false);
+        setProcessing(false); 
+    };
+
+    const updateOrder = async (paymentIntentId: string) => {
+        try {
+            console.log("Mise à jour de la commande avec le PaymentIntent:", paymentIntentId);
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour de la commande:', error);
+            setError('Erreur lors de la mise à jour de la commande.');
+        }
     };
 
     return (
         <div>
-            {error && <p className="text-red-500 text-lg font-semibold mb-4">{error}</p>}
+            {error && <p className="text-red-500 text-lg font-semibold mb-4">{error}</p>} 
             <form onSubmit={handleSubmit}>
                 <div className="form-group mb-4">
                     <label htmlFor="card-element" className="text-sm font-medium text-gray-700">Carte de crédit</label>
                     <div id="card-element" className="mt-2 p-4 border rounded-md bg-gray-50">
-                        <CardElement />
+                        <CardElement /> 
                     </div>
                 </div>
                 <button 
