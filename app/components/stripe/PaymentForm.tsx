@@ -1,4 +1,3 @@
-// app/payment/components/PaymentForm.tsx
 'use client'
 
 import React, { useState } from 'react';
@@ -51,19 +50,24 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ clientSecret }) => {
 
     return (
         <div>
-            {error && <p className="error-message">{error}</p>}
+            {error && <p className="text-red-500 text-lg font-semibold mb-4">{error}</p>}
             <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="card-element">Carte de crédit</label>
-                    <div id="card-element">
+                <div className="form-group mb-4">
+                    <label htmlFor="card-element" className="text-sm font-medium text-gray-700">Carte de crédit</label>
+                    <div id="card-element" className="mt-2 p-4 border rounded-md bg-gray-50">
                         <CardElement />
                     </div>
                 </div>
-                <button type="submit" disabled={processing || succeeded}>
+                <button 
+                    type="submit" 
+                    disabled={processing || succeeded} 
+                    className={`w-full py-2 px-6 rounded-lg shadow-md transition ease-in-out duration-150 ${
+                        processing || succeeded ? 'bg-gray-300' : 'bg-actionColor hover:bg-darkActionColor'
+                    } text-white font-semibold`}>
                     {processing ? 'Traitement...' : 'Payer'}
                 </button>
 
-                {succeeded && <p>Paiement réussi !</p>}
+                {succeeded && <p className="mt-4 text-green-500 font-semibold">Paiement réussi !</p>}
             </form>
         </div>
     );

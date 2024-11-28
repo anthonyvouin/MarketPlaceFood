@@ -1,5 +1,4 @@
-// app/payment/page.tsx
-'use client'
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
@@ -31,16 +30,25 @@ export default function PaymentPage() {
     }, [session]);
 
     if (!clientSecret) {
-        return <p>Chargement du paiement...</p>;
+        return (
+            <div className="h-[85vh] flex items-center justify-center bg-primaryBackgroundColor">
+                <p className="text-lg font-semibold text-gray-700">Chargement du paiement...</p>
+            </div>
+        );
     }
 
     return (
-        <div className="payment-page">
-            {error && <p className="error-message">{error}</p>}
-            <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <h2>Paiement</h2>
-                <PaymentForm clientSecret={clientSecret} />  {/* Utilisation du composant PaymentForm */}
-            </Elements>
+        <div className="h-[85vh] bg-primaryBackgroundColor flex items-center justify-center">
+            <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 md:p-10">
+                {error && <p className="text-lg text-red-500 font-semibold">{error}</p>}
+                <h2 className="text-2xl font-bold text-darkActionColor mb-6">Récapitulatif de votre paiement</h2>
+
+                <div className="space-y-4">
+                    <Elements stripe={stripePromise} options={{ clientSecret }}>
+                        <PaymentForm clientSecret={clientSecret} />
+                    </Elements>
+                </div>
+            </div>
         </div>
     );
 }
