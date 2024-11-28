@@ -33,19 +33,20 @@ enum Role {
 }
 
 model User {
-  id                String    @id @default(cuid())
-  name              String?
-  password          String?
-  email             String?   @unique
-  emailVerified     DateTime?
-  image             String?
-  role              Role      @default(USER)
-  accounts          Account[]
-  addresses         Address[]
-  resetToken        String?
-  resetTokenExpires DateTime?
-  verificationTokenEmail String?   
-  verificationTokenExpiresEmail DateTime? 
+  id                            String    @id @default(cuid())
+  name                          String?
+  password                      String?
+  email                         String?   @unique
+  emailVerified                 DateTime?
+  image                         String?
+  role                          Role      @default(USER)
+  accounts                      Account[]
+  addresses                     Address[]
+  resetToken                    String?
+  resetTokenExpires             DateTime?
+  verificationTokenEmail        String?
+  verificationTokenExpiresEmail DateTime?
+  Cart                          Cart[]
 
   createdRecipes  Recipe[] @relation("CreatedRecipes") // Recettes créées par l'utilisateur
   favoriteRecipes Recipe[] @relation("FavoriteRecipes") // Recettes favorites de l'utilisateur
@@ -65,6 +66,7 @@ model VerificationToken {
 model Category {
   id       String    @id @default(cuid())
   name     String    @unique
+  visible  Boolean   @default(true)
   products Product[]
 
   @@map("categories")
@@ -89,14 +91,15 @@ model Product {
   description String   @db.Text
   image       String
   price       Int
+  visible     Boolean  @default(true)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   categoryId  String   @map("category_id")
   discountId  String?  @map("discount_id")
 
-  category          Category            @relation(fields: [categoryId], references: [id])
-  recipeIngredients RecipeIngredient[]
-  discount Discount? @relation(fields: [discountId], references: [id])
+  category  Category   @relation(fields: [categoryId], references: [id])
+  discount  Discount?  @relation(fields: [discountId], references: [id])
+  cartItems CartItem[]
 
   @@map("products")
 }
@@ -189,4 +192,29 @@ model Discount {
   products Product[]
 
   @@map("discount")
+}
+
+model Cart {
+  id                 String     @id @default(cuid())
+  creationDate       DateTime   @default(now()) @map("created_at")
+  updatedAt          DateTime   @default(now()) @map("updated_at")
+  userId             String     @map("user_id")
+  isConvertedToOrder Boolean
+  user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cartItems          CartItem[]
+  totalPrice         Int
+
+  @@map("cart")
+}
+
+model CartItem {
+  id         String  @id @default(cuid())
+  quantity   Int
+  cartId     String?
+  totalPrice Int
+  productId  String  @map("product_id")
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cart       Cart?   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  @@map("cart_item")
 }

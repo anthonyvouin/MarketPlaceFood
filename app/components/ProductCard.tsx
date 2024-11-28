@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import {ProductCardProps} from '@/app/interface/product/productCardProps';
-import {calculAndformatPriceWithDiscount, formatPriceEuro} from "@/app/pipe/format";
+import {calculAndformatPriceWithDiscount, formatPriceEuro} from "@/app/pipe/formatPrice";
 import Link from 'next/link';
 import {useSideBarBasket} from "@/app/provider/sideBar-basket-provider";
 

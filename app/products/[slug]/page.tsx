@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import {useParams, useRouter} from 'next/navigation'
 import {ProductDto} from "@/app/interface/product/productDto";
 import Image from "next/image";
-import {formatPriceEuro} from "@/app/pipe/format";
+import {formatPriceEuro} from "@/app/pipe/formatPrice";
 import {Button} from "primereact/button";
 
 export default function Product() {

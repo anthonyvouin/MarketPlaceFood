@@ -17,9 +17,9 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
         product.image = '/images/default-image.png';
     }
 
-    if (!product.name || !product.slug || !product.description || !product.image || product.price == null || !product.categoryId) {
-        throw new Error('Tous les champs (nom, slug, description, image, prix, identifiant de catégorie) sont requis.');
-    }
+    // if (!product.name || !product.slug || !product.description || !product.image || product.price == null || !product.categoryId) {
+    //     throw new Error('Tous les champs (nom, slug, description, image, prix, identifiant de catégorie) sont requis.');
+    // }
 
     const existingName: Product | null = await prisma.product.findUnique({
         where: {name: product.name}
@@ -48,11 +48,11 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
 
         return await prisma.product.create({
             data: {
-                name: product.name,
-                slug: product.slug,
-                description: product.description,
-                image: product.image,
-                price: product.price,
+                name: product.name ? product.name : 'pas de nom',
+                slug: product.slug ? product.slug : 'pas de slug',
+                description: product.description?product.description:'pas de descriptions',
+                image: product.image ? product.image : 'https://images.openfoodfacts.org/images/products/544/900/013/1805/front_en.602.400.jpg',
+                price: product.price ? product.price : 500,
                 categoryId: product.categoryId,
                 discountId: null,
             },
