@@ -31,7 +31,7 @@ export default function PaymentPage() {
 
             fetchClientSecret();
         }
-    }, [session]); // Dépendance sur `session`
+    }, [session]); 
 
     if (!clientSecret) {
         return (
