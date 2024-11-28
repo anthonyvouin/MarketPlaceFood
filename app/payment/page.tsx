@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { useSession } from 'next-auth/react';
@@ -14,8 +14,12 @@ export default function PaymentPage() {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
+    const renderCount = useRef(0); 
+
     useEffect(() => {
-        if (session?.user?.id) {
+        renderCount.current += 1; 
+
+        if (session && renderCount.current === 1) {
             const fetchClientSecret = async () => {
                 try {
                     const secret = await createPaymentIntent(session.user.id);
@@ -27,7 +31,7 @@ export default function PaymentPage() {
 
             fetchClientSecret();
         }
-    }, [session]);
+    }, [session]); // Dépendance sur `session`
 
     if (!clientSecret) {
         return (
