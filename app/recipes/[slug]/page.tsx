@@ -90,7 +90,7 @@ const RecipeDetailPage = () => {
         ingredients: ingredients,
       });
 
-      await updateRecipe(recipe.id, { steps: generatedSteps });
+      await updateRecipe(recipe.id, { steps: generatedSteps.steps });
       
       const updatedRecipe = await getRecipeBySlug(params.slug as string);
       setRecipeDetails(updatedRecipe);
@@ -158,7 +158,7 @@ const RecipeDetailPage = () => {
           {recipeDetails.image && (
             <div className="relative rounded-full h-96 w-full">
               <Image
-                src={recipeDetails.image}
+                src={recipeDetails.image !== "" ? recipeDetails.image : "/images/default-image.png"}
                 alt={recipeDetails.name}
                 imageClassName="w-full h-full object-cover object-center"
                 // preview
@@ -238,15 +238,15 @@ const RecipeDetailPage = () => {
               {recipeDetails.steps.map((step, index) => (
                 <div 
                   key={index}
-                  className="flex gap-6 p-6 bg-primaryColor/80 rounded-xl hover:bg-primaryColor/65 transition-colors"
+                  className="flex gap-6 p-6 bg-white text-black hover:text-white rounded-xl hover:bg-primaryColor/65 transition-colors"
                 >
                   <div className="flex-none">
-                    <div className="w-12 h-12 rounded-full bg-white text-primaryColor flex items-center justify-center text-xl font-bold">
+                    <div className="w-12 h-12 rounded-full bg-gray-100  text-primaryColor  flex items-center justify-center text-xl font-bold">
                       {index + 1}
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-white text-lg leading-relaxed">{step.description}</p>
+                  <div className="flex-1 items-center justify-center">
+                    <p className="text-lg leading-relaxed">{step.description}</p>
                   </div>
                 </div>
               ))}

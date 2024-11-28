@@ -97,8 +97,13 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
 
         return JSON.parse(JSON.stringify(recipe));
     } catch (error) {
+        console.log(error);
         if (error.code === 'P2002') {
             console.log("Recipe already exists, skipping:", data.name);
+            return null; // Retourne null pour ne pas interrompre le processus, parce qu'on veut continuer à créer les autres recettes
+        }
+        if (error.code === 'P2025') {
+            console.log("One of the product of the recipes not found, skipping:", JSON.stringify(data.ingredients));
             return null; // Retourne null pour ne pas interrompre le processus, parce qu'on veut continuer à créer les autres recettes
         }
         console.error("Erreur lors de la création de la recette:", error);

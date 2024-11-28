@@ -106,7 +106,6 @@ export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise
 }
 
 export async function getImageFromGoogle(name: string): Promise<string> {
-    console.log(name);
     if (!name || typeof name !== 'string') {
         console.log("Erreur lors de la récupération de l'image : Le paramètre name doit être une chaîne de caractères non vide");
         throw new Error('Le paramètre name doit être une chaîne de caractères non vide');
@@ -131,7 +130,6 @@ export async function getImageFromGoogle(name: string): Promise<string> {
         const data = await response.json();
 
         if (!data.items || !data.items.length) {
-            console.log(data);
             throw new Error('Aucune image trouvée pour cette recherche');
         }
 
@@ -151,6 +149,24 @@ export async function getImageFromGoogle(name: string): Promise<string> {
             console.error('Une erreur inconnue est survenue lors de la récupération de l\'image');
             throw new Error('Une erreur inconnue est survenue lors de la récupération de l\'image');
         }
+    }
+}
+
+export async function searchProduct(name: string): Promise<ProductDto | null> {
+    try {
+        //? Insensible à la casse par défaut avec MySQL
+        //? https://www.prisma.io/docs/orm/prisma-client/queries/case-sensitivity#mysql-provider
+        return await prisma.product.findFirst({
+            where: {
+                name: {
+                    contains: name,
+                },
+            },
+        });
+        
+    } catch (error) {
+        console.error("Erreur lors de la recherche du produit :", error);
+        throw new Error('La recherche du produit a échoué.');
     }
 }
 
