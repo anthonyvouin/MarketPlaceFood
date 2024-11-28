@@ -47,9 +47,11 @@ model User {
   verificationTokenEmail        String?
   verificationTokenExpiresEmail DateTime?
   Cart                          Cart[]
+  orders                        Order[] 
 
   @@map("users")
 }
+
 
 model VerificationToken {
   identifier String
@@ -94,12 +96,14 @@ model Product {
   categoryId  String   @map("category_id")
   discountId  String?  @map("discount_id")
 
-  category  Category   @relation(fields: [categoryId], references: [id])
-  discount  Discount?  @relation(fields: [discountId], references: [id])
-  cartItems CartItem[]
+  category    Category   @relation(fields: [categoryId], references: [id])
+  discount    Discount?  @relation(fields: [discountId], references: [id])
+  cartItems   CartItem[]
+  orderItems  OrderItem[] 
 
   @@map("products")
 }
+
 
 model Address {
   id                String  @id @default(cuid())
@@ -151,4 +155,31 @@ model CartItem {
   cart       Cart?   @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
   @@map("cart_item")
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String      @map("user_id")
+  totalAmount Int         
+  status      String      @default("pending")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        User        @relation(fields: [userId], references: [id])
+  orderItems  OrderItem[] 
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  orderId    String  @map("order_id") 
+  productId  String  @map("product_id") 
+  quantity   Int     
+  unitPrice  Int     
+  totalPrice Int     
+  
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
 }

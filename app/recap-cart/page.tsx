@@ -6,11 +6,18 @@ import { getClientCart } from "@/app/services/cart/cart";
 import { formatPriceEuro } from "@/app/pipe/formatPrice";
 import { CartDto } from "@/app/interface/cart/cartDto";
 import { CartItemDto } from "@/app/interface/cart/cart-item.dto";
+import {useRouter} from "next/navigation";
+import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export default function RecapCart() {
     const { data: session } = useSession();
     const [cart, setCart] = useState<CartDto | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const router: AppRouterInstance = useRouter();
+
+    const goToPayment = () => {
+        router.push('/payment')
+    }
 
     useEffect(() => {
         if (session?.user?.id) {
@@ -58,7 +65,7 @@ export default function RecapCart() {
                     </p>
                     <button
                         className="bg-actionColor hover:bg-darkActionColor text-white font-semibold py-2 px-6 rounded-lg shadow-md transition ease-in-out duration-150"
-                        onClick={() => alert("Passer commande")}
+                        onClick={goToPayment}
                     >
                         Passer commande
                     </button>
