@@ -28,6 +28,9 @@ export async function createPaymentIntent(userId: string) {
 
         await saveOrder(userId, cart.totalPrice, cart.cartItems); 
 
+        await deleteCart(userId);
+
+
         return paymentIntent.client_secret;
     } catch (error) {
         console.error('Erreur lors de la création du PaymentIntent :', error);
@@ -77,5 +80,30 @@ export async function getOrdersByUser(userId: string): Promise<OrderDto[]> {
     } catch (error) {
         console.error('Erreur lors de la récupération des commandes :', error);
         throw new Error('Erreur lors de la récupération des commandes.');
+    }
+}
+
+
+async function deleteCart(userId: string) {
+    try {
+        await prisma.cartItem.deleteMany({
+            where: {
+                cartId: {
+                    in: await prisma.cart.findMany({
+                        where: { userId },
+                        select: { id: true }
+                    }).then(carts => carts.map(cart => cart.id)),
+                }
+            }
+        });
+
+        await prisma.cart.deleteMany({
+            where: {
+                userId: userId,
+            },
+        });
+    } catch (error) {
+        console.error('Erreur lors de la suppression du panier :', error);
+        throw new Error('Erreur lors de la suppression du panier.');
     }
 }

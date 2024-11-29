@@ -11,6 +11,8 @@ const Commandes = () => {
   const [orders, setOrders] = useState<OrderDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3; 
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -30,7 +32,10 @@ const Commandes = () => {
     fetchOrders();
   }, [session]);
 
-  // Fonction pour générer le PDF avec mise en page
+  const indexOfLastOrder = currentPage * itemsPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+
   const generateInvoicePdf = (orderId: string) => {
     const order = orders.find((order) => order.id === orderId);
     if (!order) return;
@@ -74,6 +79,20 @@ const Commandes = () => {
     doc.save(`facture-${orderId}.pdf`);
   };
 
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   if (loading) {
     return <div>Chargement de vos commandes...</div>;
   }
@@ -89,7 +108,7 @@ const Commandes = () => {
         <p>Aucune commande trouvée.</p>
       ) : (
         <div className="space-y-6">
-          {orders.map((order) => (
+          {currentOrders.map((order) => (
             <div key={order.id} className="border rounded-lg p-4 shadow-md bg-white">
               <p className="font-bold text-lg">Commande #{order.id}</p>
               <p>Status : <span className="text-blue-500">{order.status}</span></p>
@@ -106,12 +125,30 @@ const Commandes = () => {
 
               <button
                 onClick={() => generateInvoicePdf(order.id)}
-                className="mt-4 bg-actionColor  text-white py-2 px-4 rounded"
+                className="mt-4 bg-actionColor text-white py-2 px-4 rounded"
               >
                 Télécharger la facture
               </button>
             </div>
           ))}
+
+          <div className="flex justify-between items-center mt-6">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+            >
+              Précédent
+            </button>
+            <span>Page {currentPage} sur {totalPages}</span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
+            >
+              Suivant
+            </button>
+          </div>
         </div>
       )}
     </div>
