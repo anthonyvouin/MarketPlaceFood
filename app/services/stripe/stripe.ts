@@ -4,7 +4,7 @@ import Stripe from 'stripe';
 import { PrismaClient } from '@prisma/client';
 import { getClientCart } from '@/app/services/cart/cart';
 import { CartDto, CartItemDto } from '@/app/interface/cart/cartDto';
-
+import { OrderDto } from '@/app/interface/order/orderDto';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2022-11-15' as any,
 });
@@ -18,7 +18,7 @@ export async function createPaymentIntent(userId: string) {
     }
 
     try {
-        const paymentIntent = await stripe.paymentIntents.create({
+        const paymentIntent: Stripe.PaymentIntent = await stripe.paymentIntents.create({
             amount: cart.totalPrice, 
             currency: 'eur',
             metadata: {
@@ -55,5 +55,27 @@ async function saveOrder(userId: string, totalAmount: number, cartItems: CartIte
     } catch (error) {
         console.error('Erreur lors de la sauvegarde de la commande :', error);
         throw new Error('Erreur lors de la sauvegarde de la commande.');
+    }
+}
+
+
+export async function getOrdersByUser(userId: string): Promise<OrderDto[]> {
+    try {
+        const orders = await prisma.order.findMany({
+            where: { userId }, 
+            include: {
+                orderItems: {
+                    include: {
+                        product: true, 
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' }, 
+        });
+
+        return orders;
+    } catch (error) {
+        console.error('Erreur lors de la récupération des commandes :', error);
+        throw new Error('Erreur lors de la récupération des commandes.');
     }
 }
