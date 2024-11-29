@@ -3,7 +3,8 @@
 import Stripe from 'stripe';
 import { PrismaClient } from '@prisma/client';
 import { getClientCart } from '@/app/services/cart/cart';
-import { CartDto, CartItemDto } from '@/app/interface/cart/cartDto';
+import { CartDto } from '@/app/interface/cart/cartDto';
+import { CartItemDto } from '@/app/interface/cart/cart-item.dto';
 import { OrderDto } from '@/app/interface/order/orderDto';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2022-11-15' as any,
@@ -44,13 +45,15 @@ async function saveOrder(userId: string, totalAmount: number, cartItems: CartIte
             data: {
                 userId: userId,
                 totalAmount: totalAmount,
-                status: 'completed', 
+                status: 'Payed', 
                 orderItems: {
                     create: cartItems.map((item) => ({
-                        productId: item.product.id,
-                        quantity: item.quantity, 
-                        unitPrice: item.product.price, 
-                        totalPrice: item.totalPrice, 
+                        product: {
+                            connect: { id: item.product.id }, 
+                        },
+                        quantity: item.quantity,
+                        unitPrice: item.product.price,
+                        totalPrice: item.totalPrice,
                     })),
                 },
             },
