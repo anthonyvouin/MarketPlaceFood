@@ -6,7 +6,7 @@ import LogoutButton from "@/app/components/auth/logout";
 import {Avatar} from "primereact/avatar";
 import {Button} from "primereact/button";
 import {useCart} from "@/app/provider/cart-provider";
-import {useSideBarBasket} from "@/app/provider/sideBar-basket-provider";
+import {useSideBarBasket} from "@/app/provider/sideBar-cart-provider";
 
 export default function HeaderClient() {
     const [name, setName] = useState('');

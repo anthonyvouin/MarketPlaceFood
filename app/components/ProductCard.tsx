@@ -2,7 +2,7 @@ import Image from 'next/image';
 import {ProductCardProps} from '@/app/interface/product/productCardProps';
 import {calculAndformatPriceWithDiscount, formatPriceEuro} from "@/app/pipe/formatPrice";
 import Link from 'next/link';
-import {useSideBarBasket} from "@/app/provider/sideBar-basket-provider";
+import {useSideBarBasket} from "@/app/provider/sideBar-cart-provider";
 
 
 const ProductCard = ({product, bgColor, productSlug}: ProductCardProps) => {

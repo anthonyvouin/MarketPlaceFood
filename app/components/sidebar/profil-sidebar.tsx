@@ -7,7 +7,7 @@ const links: SidebarLinks[] = [
     {name: 'Compte', href: '/profil', icon: 'pi pi-cog'},
     {name: 'Adresses', href: '/profil/adresses', icon: 'pi pi-home'},
     {name: 'Notifications', href: '/notification', icon: 'pi pi-bell'},
-    {name: 'Commandes', href: '/commandes', icon: 'pi pi-file'},
+    {name: 'Commandes', href: '/profil/commandes', icon: 'pi pi-file'},
 
 ];
 

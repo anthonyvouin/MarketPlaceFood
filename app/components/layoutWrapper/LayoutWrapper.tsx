@@ -6,7 +6,7 @@ import Sidebar from "@/app/components/sidebar/Sidebar";
 import ProfilSidebar from "@/app/components/sidebar/profil-sidebar";
 import React from "react";
 import {CartProvider} from "@/app/provider/cart-provider";
-import {SideBarBasketProvider} from "@/app/provider/sideBar-basket-provider";
+import {SideBarBasketProvider} from "@/app/provider/sideBar-cart-provider";
 import {ToastProvider} from "@/app/provider/toastProvider";
 
 export default function LayoutWrapper({children}: { children: React.ReactNode }) {
