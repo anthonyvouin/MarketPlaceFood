@@ -1,14 +1,15 @@
 "use client";
 
-import React, {SetStateAction, useEffect, useState} from 'react';
-import {createContact} from '@/app/services/contact/contact';
-import {ContactDto} from '@/app/interface/contact/contactDto';
+import React, { SetStateAction, useEffect, useState, useContext } from 'react';
+import { createContact } from '@/app/services/contact/contact';
+import { ContactDto } from '@/app/interface/contact/contactDto';
 import ReCAPTCHA from "react-google-recaptcha";
 import Image from "next/image";
-import {getPageName} from "@/app/utils/utils";
-
+import { getPageName } from "@/app/utils/utils";
+import { ToastContext } from '@/app/provider/toastProvider'; 
 
 const CreateContact = () => {
+    const { show } = useContext(ToastContext); 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -27,10 +28,11 @@ const CreateContact = () => {
 
         if (!captchaValue) {
             setError('Veuillez prouver que vous n\'êtes pas un robot.');
+            show('Erreur', 'Veuillez prouver que vous n\'êtes pas un robot.', 'error'); 
             return;
         }
 
-        const newContact: ContactDto = {firstName, lastName, email, subject, message};
+        const newContact: ContactDto = { firstName, lastName, email, subject, message };
 
         try {
             await createContact(newContact);
@@ -42,9 +44,11 @@ const CreateContact = () => {
             setMessage('');
             setCaptchaValue(null);
             setError(null);
+            show('Succès', 'Votre demande a été envoyée avec succès.', 'success'); 
         } catch (err: unknown) {
             if (err instanceof Error) {
                 setError('Erreur lors de la création du contact.');
+                show('Erreur', 'Erreur lors de la création du contact.', 'error'); 
             }
             setSuccess(null);
         }
@@ -52,22 +56,17 @@ const CreateContact = () => {
 
     return (
         <div className="flex items-center bg-primaryBackgroundColor height-full">
-
             <div className="w-3/6 pl-12">
                 <h1 className="text-2xl mb-2.5 text-darkActionColor font-semibold">Contactez-Nous</h1>
                 <p>Vous avez des questions, des suggestions ou un besoin d&apos;assistance ?
-                    <br/> Nous sommes là pour vous aider !
-                    <br/>N&apos;hésitez pas à nous écrire en utilisant le formulaire.</p> <br/>
-                <Image src="/images/contact.png" width={424} height={327} alt="DriveFood"/>
+                    <br /> Nous sommes là pour vous aider !
+                    <br />N&apos;hésitez pas à nous écrire en utilisant le formulaire.</p> <br />
+                <Image src="/images/contact.png" width={424} height={327} alt="DriveFood" />
             </div>
             <div className="w-3/6  p-6 mr-12 bg-white shadow-md rounded-md">
-                <form onSubmit={handleSubmit}
-                      className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label htmlFor="firstName"
-                        >
-                            Prénom :
-                        </label>
+                        <label htmlFor="firstName">Prénom :</label>
                         <input
                             type="text"
                             id="firstName"
@@ -78,9 +77,7 @@ const CreateContact = () => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                            Nom :
-                        </label>
+                        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Nom :</label>
                         <input
                             type="text"
                             id="lastName"
@@ -91,9 +88,7 @@ const CreateContact = () => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                            Email :
-                        </label>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email :</label>
                         <input
                             type="email"
                             id="email"
@@ -104,9 +99,7 @@ const CreateContact = () => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
-                            Objet :
-                        </label>
+                        <label htmlFor="subject" className="block text-sm font-medium text-gray-700">Objet :</label>
                         <input
                             type="text"
                             id="subject"
@@ -117,9 +110,7 @@ const CreateContact = () => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-                            Message :
-                        </label>
+                        <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message :</label>
                         <textarea
                             id="message"
                             value={message}
@@ -139,11 +130,9 @@ const CreateContact = () => {
                         Envoyer
                     </button>
                 </form>
-                {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
-                {success && <p className="mt-4 text-green-500 text-center">{success}</p>}
+               
             </div>
         </div>
-
     );
 };
 
