@@ -1,6 +1,8 @@
 import SessionWrapper from "@/lib/SessionWrapper";
 import Link from "next/link";
 import React from "react";
+import Image from 'next/image'
+
 import { ToastProvider } from "@/app/provider/toastProvider";
 
 const adminLinks = [
@@ -17,26 +19,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <html lang="en">
             <body>
                 <div className="flex h-screen">
-                    <aside className="w-64 h-screen bg-white p-4">
-                        <div className="fixed top-0 h-full">
+                    <aside className="w-56 h-screen bg-white p-4">
+                        <div className='fixed top-0 h-full'>
                             <Link href="/">
                                 <div className="flex justify-center items-center mb-8 gap-1">
-                                    <img src="/images/logo.svg" alt="Admin Logo" width={60} height={60} />
-                                    <h2 className="text-lg font-black font-manrope text-actionColor uppercase">
-                                        Admin Panel
-                                    </h2>
+                                    <Image src="/images/logo.svg" width={60} height={60} alt="DriveFood" />
+                                    <h2 className="text-lg font-black font-manrope text-actionColor uppercase">DriveFood</h2>
                                 </div>
                             </Link>
                             <nav>
                                 <ul>
                                     {adminLinks.map((link) => (
-                                        <Link
-                                            key={link.href}
-                                            href={link.href}
-                                            className="mb-4 flex items-center gap-4 group font-manrope"
-                                        >
-                                            <span className={`${link.icon} text-xl group-hover:text-actionColor`} />
-                                            <span className="group-hover:text-actionColor">{link.name}</span>
+                                        <Link href={link.href} key={link.href} className="mb-4 flex  justify-start gap-5 group font-manrope">
+                                            <span className='border-l-4 rounded-full border-actionColor opacity-0 group-hover:opacity-100  transition-all'></span>
+                                            <div className='flex gap-3 items-center'>
+                                                <span className={`${link.icon} group-hover:text-actionColor`} />
+                                                <p className='group-hover:text-actionColor'>{link.name}</p>
+                                            </div>
                                         </Link>
                                     ))}
                                 </ul>
