@@ -29,7 +29,7 @@ export default function Discount() {
         createDiscount({ name, rate: rate ? rate : 0, visible: true })
             .then(() => {
                 show('création de remise', `La remise ${name} a bien été créée`, 'success');
-                fetchDiscount(); 
+                fetchDiscount();
             })
             .catch((e: Error) => show('création de remise', e.message, 'error'));
     }
@@ -92,7 +92,7 @@ export default function Discount() {
 
     return (
         <div className="p-6 bg-primaryBackgroundColor h-full">
-                        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Remises</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Remises</h1>
 
             <div className="flex flex-row-reverse mb-6">
                 <RoundedButton onClickAction={openPopup} message="Ajouter un taux" positionIcon="left" classes="border-actionColor text-actionColor"></RoundedButton>

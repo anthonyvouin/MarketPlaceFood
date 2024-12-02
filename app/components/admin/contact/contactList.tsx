@@ -40,7 +40,6 @@ const ContactList: React.FC<{ contacts: ContactDto[] }> = ({ contacts: initialCo
 
     return (
         <div className="p-6 bg-primaryBackgroundColor min-h-[80vh]">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Liste des Contacts</h1>
             {contacts.length === 0 ? (
                 <p className="text-center text-gray-600">Aucun contact disponible.</p>
             ) : (

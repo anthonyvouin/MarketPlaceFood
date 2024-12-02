@@ -28,13 +28,16 @@ const ContactsPage: React.FC = () => {
 
     return (
         <div className=" h-screen bg-primaryBackgroundColor p-10">
-            
+
             {loading ? (
                 <div className="flex items-center justify-center h-full">
+
                     <div className="text-lg font-medium text-gray-600">Chargement des contacts...</div>
                 </div>
             ) : (
                 <div className="">
+                                        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Demande de  contacts</h1>
+
                     {contacts.length > 0 ? (
                         <ContactList contacts={contacts} />
                     ) : (
