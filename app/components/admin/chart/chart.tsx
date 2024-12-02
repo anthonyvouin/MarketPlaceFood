@@ -49,8 +49,9 @@ export default function ChartCategory({ categoriesData }: ChartCategoryProps) {
   }, [categoriesData]);
 
   return (
-    <div>
-      <h1>Nombre de produits par catégorie</h1>
+    <div className="p-6 bg-primaryBackgroundColor h-full">
+        
+                                    <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Graphique</h1>
       {chartData ? <Line data={chartData} /> : <p>Chargement des données...</p>}
     </div>
   );
