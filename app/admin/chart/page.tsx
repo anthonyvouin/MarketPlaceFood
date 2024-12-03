@@ -5,8 +5,7 @@ export default async function Chart() {
   const categoriesData = await getCategoriesData();
 
   return (
-    <div className=" bg-primaryBackgroundColor">
-      <h1 className="text-3xl font-bold mb-6">Page Graphique</h1>
+    <div className=" bg-primaryBackgroundColor h-full">
       <ChartCategory categoriesData={categoriesData} />
     </div>
   );

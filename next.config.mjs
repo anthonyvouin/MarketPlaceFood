@@ -19,6 +19,10 @@ const nextConfig = {
     eslint: {
         ignoreDuringBuilds: true, // Désactive ESLint lors du build
     },
+    env: {
+        STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY, 
+    },
+    
 };
 
 export default nextConfig;
