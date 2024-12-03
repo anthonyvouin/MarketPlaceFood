@@ -34,7 +34,6 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
             footer={foundIngredientsFooter}
             onHide={onHide}
         >
-            {/* Contenu de la boîte de dialogue */}
             {ingredients.products_found.length === 0 && ingredients.products_not_found.length === 0 && (
                 <div>
                     <h3 className="text-red-600">Aucun ingrédient trouvé</h3>

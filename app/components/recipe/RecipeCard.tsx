@@ -1,6 +1,5 @@
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
-import Image from 'next/image';
 import { RecipeDto } from '@/app/interface/recipe/RecipeDto';
 import Link from 'next/link';
 
