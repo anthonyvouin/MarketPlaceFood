@@ -7,7 +7,7 @@ import {getAllProducts} from "@/app/services/products/product";
 import {generateRecipes} from "./services/ia-integration/ia";
 import {getPageName} from "@/app/utils/utils";
 import { RecipeDto } from "./interface/recipe/RecipeDto";
-import RecipeCard from "./components/OneRecipeCard";
+import RecipeCard from "./components/recipe/RecipeCard";
 
 export default function Home() {
 

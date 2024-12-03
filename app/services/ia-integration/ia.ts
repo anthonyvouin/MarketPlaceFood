@@ -20,7 +20,9 @@ export async function analysePicture(format: string = 'recipe') {
     const prompt = prompts[format] || prompts.recipe;
 
     // URL de l'image (vous pouvez la remplacer)
-    const imageUrl = "https://lapetitebette.com/wp-content/uploads/2023/08/IMG_9826-e1693513597226-1200x879.jpg";
+    // const imageUrl = "https://lapetitebette.com/wp-content/uploads/2023/08/IMG_9826-e1693513597226-1200x879.jpg";
+    const imageUrl = "https://img.cuisineaz.com/660x660/2023/11/20/i196570-tiramisu-simple.jpg";
+    //! Image = ['png', 'jpeg', 'gif', 'webp'].
 
     // Télécharger l'image et la convertir en base64
     // const response = await fetch(imageUrl);

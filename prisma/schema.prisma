@@ -102,6 +102,7 @@ model Product {
   cartItems CartItem[]
 
   @@map("products")
+  RecipeIngredient RecipeIngredient[]
 }
 
 model Address {
@@ -217,4 +218,14 @@ model CartItem {
   cart       Cart?   @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
   @@map("cart_item")
+}
+
+model MissingIngredientReport {
+  id          String   @id @default(cuid())
+  name        String
+  count       Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("missing_ingredient_reports")
 }

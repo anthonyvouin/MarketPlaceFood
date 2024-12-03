@@ -1,11 +1,21 @@
 "use server"
 
+import Fuse from 'fuse.js';
 import {Prisma, PrismaClient, Product} from '@prisma/client';
 import {ProductDto} from '@/app/interface/product/productDto';
 import {CategoryDto} from "@/app/interface/category/categoryDto";
 import {DiscountDto} from "@/app/interface/discount/discountDto";
 
 const prisma = new PrismaClient();
+
+const fuseOptions = {
+    includeScore: true,
+    shouldSort: true,
+    threshold: 0.2,
+    keys: ['name'],
+    findAllMatches: false,
+    minMatchCharLength: 2
+};
 
 // export type ProductWithCategory = Prisma.ProductGetPayload<{
 //     include: { category: true };
@@ -107,66 +117,78 @@ export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise
 
 export async function getImageFromGoogle(name: string): Promise<string> {
     if (!name || typeof name !== 'string') {
-        console.log("Erreur lors de la récupération de l'image : Le paramètre name doit être une chaîne de caractères non vide");
         throw new Error('Le paramètre name doit être une chaîne de caractères non vide');
     }
 
-    if (!process.env.GOOGLE_API_KEY || !process.env.GOOGLE_CX) {
+    const apiKey = process.env.GOOGLE_API_KEY;
+    const cx = process.env.GOOGLE_CX;
+
+    if (!apiKey || !cx) {
         throw new Error('Les clés API Google (GOOGLE_API_KEY et GOOGLE_CX) sont requises');
     }
 
     try {
         const encodedQuery = encodeURIComponent(name);
-        const url = `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_API_KEY}&cx=${process.env.GOOGLE_CX}&q=${encodedQuery}&searchType=image`;
-
+        console.log("====================================");
+        console.log(encodedQuery)
+        console.log("====================================");
+        const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodedQuery}&searchType=image&num=1&imgSize=medium&safe=active&excludeTerms=facebook.com,instagram.com,pinterest.com`;
+        console.log('Recherche d\'image pour', name, 'sur Google avec l\'URL', url);
         const response = await fetch(url);
-
+        
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            console.log(errorData);
             throw new Error(`Erreur API Google (${response.status}): ${errorData.error?.message || response.statusText}`);
         }
 
         const data = await response.json();
+        console.log("====================================");
+        console.log(data)
 
         if (!data.items || !data.items.length) {
-            throw new Error('Aucune image trouvée pour cette recherche');
+            return '/images/default-image.png';
         }
 
         const imageUrl = data.items[0].link;
-        console.log(imageUrl);
+        console.log("====================================");
+        console.log('Image trouvée pour', name, ':', imageUrl);
+
         if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.match(/^https?:\/\/.+/)) {
-            throw new Error('Le lien de l\'image retourné est invalide');
+            return '/images/default-image.png';
         }
 
         return imageUrl;
 
     } catch (error) {
-        if (error instanceof Error) {
-            console.error(`Erreur lors de la récupération de l'image : ${error.message}`);
-            throw new Error(`Erreur lors de la récupération de l'image : ${error.message}`);
-        } else {
-            console.error('Une erreur inconnue est survenue lors de la récupération de l\'image');
-            throw new Error('Une erreur inconnue est survenue lors de la récupération de l\'image');
-        }
+        console.error('Erreur lors de la récupération de l\'image :', error);
+        return '/images/default-image.png'; // Return default image in case of any error
     }
 }
 
-export async function searchProduct(name: string): Promise<ProductDto | null> {
+export async function searchProduct(name: string, minScore: number = 0.35): Promise<ProductDto | null> {
     try {
-        //? Insensible à la casse par défaut avec MySQL
-        //? https://www.prisma.io/docs/orm/prisma-client/queries/case-sensitivity#mysql-provider
-        return await prisma.product.findFirst({
-            where: {
-                name: {
-                    contains: name,
-                },
-            },
-        });
+        // Normalisation du nom de l'ingrédient
+        const normalizedName = name
+            .toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .trim();
+
+        const allProducts = await getAllProducts();
+
+        const fuse = new Fuse(allProducts, fuseOptions);
+
+        const results = fuse.search(normalizedName);
+
+        const filteredResults = results.filter(result => result.score && result.score >= minScore);
         
+        console.log(`Recherche pour "${normalizedName}"`, results);
+        console.log(results);
+
+        // Retourne le meilleur résultat
+        return filteredResults.length > 0 ? filteredResults[0].item : null;
     } catch (error) {
-        console.error("Erreur lors de la recherche du produit :", error);
-        throw new Error('La recherche du produit a échoué.');
+        console.error("Erreur lors de la recherche floue du produit :", error);
+        return null;
     }
 }
 
