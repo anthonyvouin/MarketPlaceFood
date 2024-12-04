@@ -21,7 +21,7 @@ export default function ProductPage() {
     const [products, setProducts] = useState<ProductDto[]>([]);
     const [discounts, setDiscounts] = useState<DiscountDto[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(11);
+    const [rowsPerPage, setRowsPerPage] = useState(9);
     useEffect(() => {
         const fetchCategories = async () => {
             const categoriesData: ProductDto[] = await getAllProducts();

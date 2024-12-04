@@ -22,11 +22,10 @@ export async function getUserById(id: string): Promise<UserWithAdress | null> {
       return await prisma.user.findUnique({
           where: { id },
           include: {
-              addresses: {
-                  where: { isVisible: true },
-              },
+              addresses: true,
+                    },
           },
-      });
+      );
   } catch (e: any) {
       throw new Error(`La récupération de l'utilisateur a échoué : ${e.message}`);
   }

@@ -61,18 +61,8 @@ export async function updateAdress(address: AddressDto): Promise<AddressDto> {
     });
 }
 
-
 export async function deleteAdress(id: string): Promise<AddressDto> {
-    try {
-        return await prisma.address.update({
-            where: { id },
-            data: {
-                isVisible: false, 
-            },
-        });
-    } catch (error: any) {
-        throw new Error(`Erreur lors de la suppression (masquage) de l'adresse : ${error.message}`);
-    }
+    return prisma.address.delete({
+        where: {id}
+    })
 }
-
-

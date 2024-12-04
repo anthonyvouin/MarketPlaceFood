@@ -34,7 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                             <span className='border-l-4 rounded-full border-actionColor opacity-0 group-hover:opacity-100  transition-all'></span>
                                             <div className='flex gap-3 items-center'>
                                                 <span className={`${link.icon} group-hover:text-actionColor`} />
-                                                <p className='group-hover:text-actionColor'>{link.name}</p>
+                                                <p className='group-hover: '>{link.name}</p>
                                             </div>
                                         </Link>
                                     ))}

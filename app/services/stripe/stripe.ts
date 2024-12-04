@@ -47,7 +47,7 @@ export async function createPaymentIntent(userId: string) {
         const paymentIntent: Stripe.PaymentIntent = await stripe.paymentIntents.create({
             amount: cart.totalPrice,
             currency: 'eur',
-            customer: stripeCustomerId, // 
+            customer: stripeCustomerId, 
             metadata: {
                 integration_check: 'accept_a_payment',
             },
