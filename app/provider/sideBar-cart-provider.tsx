@@ -64,11 +64,7 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
         }, [session]);
 
         useEffect(() => {
-            if (clientCart) {
-                updateProductList(clientCart.cartItems)
-            } else {
-
-            }
+            updateProductList(clientCart ? clientCart.cartItems : null)
         }, [clientCart]);
 
         const toggleBasketList = (): void => {
