@@ -2,7 +2,6 @@
 import RoundedButton from "@/app/components/ui/rounded-button";
 import { useRouter } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
-import { Product } from "@prisma/client";
 import { ProductDto } from "@/app/interface/product/productDto";
 import { formatPriceEuro } from "@/app/pipe/formatPrice";
 import { changeDiscount, getAllProducts } from "@/app/services/products/product";
@@ -15,14 +14,14 @@ import { DiscountDto } from "@/app/interface/discount/discountDto";
 import { getAllDiscount } from "@/app/services/discount/discount";
 import { PopupAddDiscount } from "@/app/admin/product/popup-add-discount/popup-add-discount";
 import { ToastContext } from "@/app/provider/toastProvider";
-
-
+import { toggleProductVisibility } from "@/app/services/products/product";
+import { InputSwitch } from "primereact/inputswitch";
 export default function ProductPage() {
     const { show } = useContext(ToastContext);
     const [products, setProducts] = useState<ProductDto[]>([]);
     const [discounts, setDiscounts] = useState<DiscountDto[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(11);  
+    const [rowsPerPage, setRowsPerPage] = useState(11);
     useEffect(() => {
         const fetchCategories = async () => {
             const categoriesData: ProductDto[] = await getAllProducts();
@@ -38,30 +37,43 @@ export default function ProductPage() {
         fetchCategories();
     }, []);
 
+
+    const onVisibilityToggle = async (productId: string, newValue: boolean) => {
+        try {
+            await toggleProductVisibility(productId, newValue); 
+            setProducts((prevProducts) =>
+                prevProducts.map((product) =>
+                    product.id === productId ? { ...product, visible: newValue } : product
+                )
+            );
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour de la visibilité :', error);
+        }
+    };
+
+    const visibilityTemplate = (product: ProductDto) => {
+        return (
+            <InputSwitch
+                checked ={product.visible!}
+                onChange={(e) => onVisibilityToggle(product.id!, e.value)}
+            />
+        );
+    };
+
+
     const router: AppRouterInstance = useRouter();
 
     const navigateToRoute = (): void => {
         router.push("product/create-product");
     }
 
-    const handleDelete = (id: Product['id']): void => {
-        console.log(id);
-    }
+ 
 
     const priceFormated = (product: ProductDto) => {
         return formatPriceEuro(product.price);
     }
 
-    const deleteAction = (product: ProductDto) => {
-        return <button
-            onClick={() => handleDelete(product.id!)}
-            className="text-red-600 hover:text-red-800"
-            title="Supprimer cette catégorie"
-        >
-            ❌
-        </button>
-    }
-
+ 
     const actionBody = (product: ProductDto) => {
         if (product.discount) {
             return <p onClick={(e) => showTemplate(e, product)}>{product.discount.rate} %</p>;
@@ -127,9 +139,9 @@ export default function ProductPage() {
     };
 
     return (
-             <div className="p-6 bg-primaryBackgroundColor h-full">
-        
-                                    <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Produits</h1>
+        <div className="p-6 bg-primaryBackgroundColor h-full">
+
+            <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Produits</h1>
 
             <div className="flex flex-row-reverse pt-1 pb-2.5">
                 <RoundedButton onClickAction={() => navigateToRoute()} message="Créer un produit" icon="pi pi-plus" positionIcon='left' classes="border-actionColor text-actionColor" />
@@ -152,7 +164,7 @@ export default function ProductPage() {
                         <Column field="price" header="Prix" body={priceFormated} />
                         <Column field="name" header="Categorie" />
                         <Column header="Remise" body={actionBody} />
-                        <Column header="Action" body={deleteAction} />
+                        <Column header="Visible" body={visibilityTemplate} />
                     </DataTable>
                 </div>
             )}

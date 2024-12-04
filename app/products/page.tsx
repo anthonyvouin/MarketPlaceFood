@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from 'react';
 import {filterProduct} from '../services/products/product';
-import ProductCard from '../components/ProductCard';
+import ProductCard from '../components/ProductCard/ProductCard';
 import {getAllCategories} from '../services/category/category';
 import {ProductDto} from '../interface/product/productDto';
 import {CategoryDto} from '../interface/category/categoryDto';
