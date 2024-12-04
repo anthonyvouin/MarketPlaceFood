@@ -13,7 +13,6 @@ import {confirmDialog} from "primereact/confirmdialog";
 const Adresses = () => {
         const { data: session, status } = useSession();
         const [user, setUser] = useState<UserWithAdress | null>(null);
-        // const { showDialog } = useContext(DialogContext);
 
         useEffect(() => {
             if (session) {

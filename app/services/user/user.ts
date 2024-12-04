@@ -17,19 +17,21 @@ export type UserWithAdress = Prisma.UserGetPayload<{
 
 
 export async function getUserById(id: string): Promise<UserWithAdress | null> {
-
-    try {
-        await verifyAuth();
-        return await prisma.user.findUnique({
-            where: {id},
-            include: {addresses: true}
-        });
-
-    } catch (e) {
-        throw new Error(`La récupération de l'utilisateur a échoué`);
-    }
-
+  try {
+      await verifyAuth();
+      return await prisma.user.findUnique({
+          where: { id },
+          include: {
+              addresses: {
+                  where: { isVisible: true },
+              },
+          },
+      });
+  } catch (e: any) {
+      throw new Error(`La récupération de l'utilisateur a échoué : ${e.message}`);
+  }
 }
+
 
 export async function updateUser(user: UserDto): Promise<UserDto> {
     if (!user.id) {
