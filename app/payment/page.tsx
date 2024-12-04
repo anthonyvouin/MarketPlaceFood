@@ -10,28 +10,39 @@ import PaymentForm from '@/app/components/stripe/PaymentForm';
 const stripePromise = loadStripe(process.env.STRIPE_PUBLIC_KEY!);
 
 export default function PaymentPage() {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
-
     const renderCount = useRef(0); 
 
     useEffect(() => {
         renderCount.current += 1; 
-
-        if (session && renderCount.current === 1) {
+            
+    
+        if (status === 'authenticated' && renderCount.current === 1 && session && session.user && !clientSecret) {
             const fetchClientSecret = async () => {
                 try {
                     const secret = await createPaymentIntent(session.user.id);
-                    setClientSecret(secret);
+                    setClientSecret(secret);  
                 } catch (err) {
                     setError('Erreur lors de la récupération du secret de paiement.');
                 }
             };
-
-            fetchClientSecret();
+    
+            fetchClientSecret(); 
+        } else if (status === 'unauthenticated') {
+            setError("Veuillez vous connecter pour effectuer un paiement.");
         }
-    }, [session]); 
+    
+    }, [status, session, clientSecret]);  
+
+    if (error) {
+        return (
+            <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor">
+                <p className="text-lg font-semibold text-red-500">{error}</p>
+            </div>
+        );
+    }
 
     if (!clientSecret) {
         return (
@@ -41,15 +52,21 @@ export default function PaymentPage() {
         );
     }
 
+    if (!session || !session.user) {
+        return (
+            <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor">
+                <p className="text-lg font-semibold text-gray-700">Veuillez vous connecter pour effectuer un paiement.</p>
+            </div>
+        );
+    }
+
     return (
         <div className="h-[84vh] bg-primaryBackgroundColor flex items-center justify-center">
             <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 md:p-10">
-                {error && <p className="text-lg text-red-500 font-semibold">{error}</p>}
                 <h2 className="text-2xl font-bold text-darkActionColor mb-6">Récapitulatif de votre paiement</h2>
-
                 <div className="space-y-4">
                     <Elements stripe={stripePromise} options={{ clientSecret }}>
-                        <PaymentForm clientSecret={clientSecret} />
+                        <PaymentForm clientSecret={clientSecret} userId={session.user.id} />
                     </Elements>
                 </div>
             </div>
