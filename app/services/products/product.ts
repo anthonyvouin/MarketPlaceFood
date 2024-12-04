@@ -188,7 +188,7 @@ export async function toggleProductVisibility(productId: string, visible: boolea
 try {
 
     
-    const product  = await prisma.product.findUnique({where: {id: productId}});
+    const product: Product | null  = await prisma.product.findUnique({where: {id: productId}});
 
     if (!product) {
         throw new Error('Le produit n\'existe pas.');
