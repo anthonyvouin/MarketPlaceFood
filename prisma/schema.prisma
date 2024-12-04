@@ -48,7 +48,7 @@ model User {
   verificationTokenExpiresEmail DateTime?
   Cart                          Cart[]
   orders                        Order[] 
-  stripeCustomerId String?  // Ajoutez ce champ pour stocker l'ID Stripe
+  stripeCustomerId              String?  
 
 
   @@map("users")
