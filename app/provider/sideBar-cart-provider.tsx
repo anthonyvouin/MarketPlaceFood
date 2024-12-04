@@ -202,7 +202,8 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
                         </div>
                     ) : (
                         <div>
-                            <p>Pas de produits</p>
+                            <p className="mt-4 text-center">Pas de produits dans le panier</p>
+
                         </div>
                     )}
                 </Sidebar>
