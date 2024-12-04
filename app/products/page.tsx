@@ -34,7 +34,7 @@ export default function Products() {
         if (selectedCategories.length > 0) {
             handleFilterChange('categoryId', {in: selectedCategories});
         } else {
-            handleFilterChange('categoryId', undefined); // Si aucune catégorie sélectionnée, pas de filtre sur la catégorie
+            handleFilterChange('categoryId', undefined);
         }
         handleFilterChange('price', {gte: priceRange[0], lte: priceRange[1]});
     }, [priceRange, selectedCategories]);
@@ -61,7 +61,7 @@ export default function Products() {
     };
 
     return (
-        <section className="px-20 py-10 w-full">
+        <section className="  px-20 py-10 w-full">
             <div className="mb-8">
                 <h2 className="text-xl font-bold mb-4">Filtres</h2>
                 <div className="mb-6">
@@ -100,16 +100,22 @@ export default function Products() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-10">
-                {filteredProducts.map((product: ProductDto, index: number) => (
-                    <ProductCard
-                        productSlug={product.slug}
-                        key={product.id}
-                        product={product}
-                        bgColor={bgColors[index % bgColors.length]}
-                    />
-                ))}
-            </div>
+            {filteredProducts.length > 0 ? (
+                <div className=" h-full grid grid-cols-4 gap-10">
+                    {filteredProducts.map((product: ProductDto, index: number) => (
+                        <ProductCard
+                            productSlug={product.slug}
+                            key={product.id}
+                            product={product}
+                            bgColor={bgColors[index % bgColors.length]}
+                        />
+                    ))}
+                </div>
+            ) : (
+                <div className="h-[30vh] text-center text-gray-500 mt-20">
+                    <p>Aucun produit ne correspond aux critères sélectionnés.</p>
+                </div>
+            )}
         </section>
     );
 }
