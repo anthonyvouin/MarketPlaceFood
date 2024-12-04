@@ -26,14 +26,19 @@ export const CartProvider = ({children}: { children: ReactNode }) => {
         }
     }, [session]);
 
-    const updateProductList = (itemCartList: CartItemDto[]): void => {
-        const totalProduct: number = itemCartList.reduce((acc: number, item: CartItemDto) => {
-            if (item.quantity > 0) {
-                acc += item.quantity;
-            }
-            return acc;
-        }, 0);
-        setTotalLengthItems(totalProduct)
+    const updateProductList = (itemCartList: CartItemDto[] | null): void => {
+        if(itemCartList){
+            const totalProduct: number = itemCartList.reduce((acc: number, item: CartItemDto) => {
+                if (item.quantity > 0) {
+                    acc += item.quantity;
+                }
+                return acc;
+            }, 0);
+            setTotalLengthItems(totalProduct)
+        }else{
+            setTotalLengthItems(0)
+        }
+
     }
 
     return (

@@ -14,6 +14,7 @@ import {useSession} from "next-auth/react";
 import {formatPriceEuro} from "@/app/pipe/formatPrice";
 import {useRouter} from "next/navigation";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
+import {addQuantityToProductInCart, removeQuantityToProductInCart} from "@/app/services/cart/functions-front";
 
 
 export const SideBarBasketContext: Context<SideBarBasketContextType> = createContext<SideBarBasketContextType>({
@@ -22,181 +23,191 @@ export const SideBarBasketContext: Context<SideBarBasketContextType> = createCon
     addProduct: async (): Promise<void> => {
         return Promise.resolve();
     },
+    setSideBarCart: (): void => {
+    },
+
+    clientSideBartCart: null
 });
 
 export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
-    const {updateProductList} = useCart();
-    const {data: session, status} = useSession();
-    const [visibility, setVisibility] = useState<boolean>(false);
-    const [clientCart, setClientCart] = useState<CartDto>({
-        creationDate: new Date(),
-        updatedAt: new Date(),
-        userId: session ? session.user.id : '',
-        isConvertedToOrder: false,
-        cartItems: [],
-        totalPrice: 0
-    });
-    const renderCount = useRef(0);
-    const router: AppRouterInstance = useRouter();
-
-
-    useEffect(() => {
-        renderCount.current += 1;
-        if (session) {
-
-            const fetchCart = async () => {
-                const clientCart: CartDto | null = await getClientCart(session.user.id);
-                if (clientCart) {
-                    setClientCart(clientCart)
-                }
-
-            };
-            fetchCart()
+        const {data: session} = useSession();
+        const defaultClientCart = {
+            creationDate: new Date(),
+            updatedAt: new Date(),
+            userId: session ? session.user.id : '',
+            isConvertedToOrder: false,
+            cartItems: [],
+            totalPrice: 0
         }
-    }, [session]);
+        const {updateProductList} = useCart();
+        const [visibility, setVisibility] = useState<boolean>(false);
+        const [clientCart, setClientCart] = useState<CartDto | null>(defaultClientCart);
 
-    useEffect(() => {
-        updateProductList(clientCart.cartItems)
-    }, [clientCart]);
 
-    const toggleBasketList = (): void => {
-        setVisibility(!visibility)
-    }
+        const renderCount = useRef(0);
+        const router: AppRouterInstance = useRouter();
 
-    const deleteProduct = (product: CartItemDto, productInList: CartItemDto, rejectQuantity: number) => {
-          confirmDialog({
-            message: <div>
-                <p>Êtes vous sure de vouloir retirer {productInList.product.name} de votre panier?</p>
-            </div>
-            ,
-            header: 'Suppression de produit',
-            acceptLabel: 'Oui',
-            rejectLabel: 'Non',
-            rejectClassName: 'mr-2.5 p-1.5 text-redColor',
-            acceptClassName: 'bg-actionColor text-white p-1.5',
-            async accept(): Promise<void> {
-                productInList.quantity = 0
-                if (product.cartId) {
-                    const changeProduct: CartDto = await updateItemCart(product, product.cartId, true)
-                    setClientCart(changeProduct)
-                    updateProductList(clientCart.cartItems)
-                }
-            },
-            reject(): void {
-                productInList.quantity = rejectQuantity;
-            }
-        })
-    }
 
-   const handleChangeQuantityProduct = async (ChangeItem: CartItemDto, action: 'add' | 'remove' | 'deleteProduct' = "add"): Promise<void> => {
-        if (clientCart && clientCart.id) {
-            const indexItem: number = clientCart.cartItems.findIndex((itemInCartCart: CartItemDto) => itemInCartCart.product && (itemInCartCart.product.id === ChangeItem.product.id))
+        useEffect(() => {
+            renderCount.current += 1;
+            if (session) {
 
-            if (indexItem !== -1) {
-                const findItem: CartItemDto | null = clientCart.cartItems[indexItem]
-                let updatedItem: CartDto;
-
-                if (action === 'add') {
-                    findItem.quantity += 1;
-                    updatedItem = await updateItemCart(findItem, clientCart.id)
-                } else if (action === 'remove') {
-                    findItem.quantity -= 1;
-                    if (findItem.quantity < 1) {
-                        deleteProduct(ChangeItem, findItem, 1)
-                        return
+                const fetchCart = async () => {
+                    const clientCart: CartDto | null = await getClientCart(session.user.id);
+                    if (clientCart) {
+                        setClientCart(clientCart)
                     }
-                    updatedItem = await updateItemCart(findItem, clientCart.id)
-                } else if (action === 'deleteProduct') {
-                    deleteProduct(ChangeItem, findItem, findItem.quantity)
-                }
 
-                if (action !== 'deleteProduct' && findItem.quantity !== 0) {
-                    setClientCart(() => updatedItem);
-                    updateProductList(clientCart.cartItems)
-                }
+                };
+                fetchCart()
             }
+        }, [session]);
+
+        useEffect(() => {
+            updateProductList(clientCart ? clientCart.cartItems : null)
+        }, [clientCart]);
+
+        const toggleBasketList = (): void => {
+            setVisibility(!visibility)
         }
-    }
-    
-    const addProduct = async (product: ProductDto, quantity: number): Promise<void> => {
-        if (session) {
-            const itemExistInCard: boolean = clientCart.cartItems.some((itemCard: CartItemDto) => {
-                if (itemCard.product) {
-                    return itemCard.product.id === product.id
+
+        const setSideBarCart = (cart: CartDto | null) => {
+            setClientCart(cart)
+        }
+
+        const deleteProduct = (cartItem: CartItemDto, rejectQuantity: number) => {
+            confirmDialog({
+                message: <div>
+                    <p>Êtes vous sure de vouloir retirer {cartItem.product.name} de votre panier?</p>
+                </div>
+                ,
+                header: 'Suppression de produit',
+                acceptLabel: 'Oui',
+                rejectLabel: 'Non',
+                rejectClassName: 'mr-2.5 p-1.5 text-redColor',
+                acceptClassName: 'bg-actionColor text-white p-1.5',
+                async accept(): Promise<void> {
+                    cartItem.quantity = 0
+                    if (cartItem.cartId && cartItem.id) {
+                        const changeProduct: CartDto = await updateItemCart(cartItem.id, 0, true)
+                        setClientCart(changeProduct)
+                        if (clientCart) {
+                            updateProductList(clientCart.cartItems)
+                        }
+
+                    }
+                },
+                reject(): void {
+                    cartItem.quantity = rejectQuantity;
                 }
-                return false;
             })
+        }
 
-            if (product && clientCart && !itemExistInCard) {
-                if (clientCart.id) {
-                    const newProduct: CartItemDto = await createItemCartIfUserHaveCart(product, clientCart.id, quantity);
-                    const listItem: CartItemDto[] = clientCart.cartItems
-                    listItem.push(newProduct)
-                    setClientCart((prevCart) => ({
-                        ...prevCart,
-                        cartItems: listItem,
-                    }));
-                } else {
-                    const cart: CartDto = await createCart(product, session.user.id)
-                    setClientCart(cart)
+        const handleChangeQuantityProduct = async (changeItem: CartItemDto, action: 'add' | 'remove' | 'deleteProduct' = "add"): Promise<void> => {
+            if (clientCart && clientCart.id) {
+                let updateCart: CartDto;
+                if (action === 'add') {
+                    updateCart = await addQuantityToProductInCart(changeItem)
+                } else if (action === 'remove') {
+
+                    if (changeItem.quantity - 1 < 1) {
+                        return deleteProduct(changeItem, 1);
+                    } else {
+                        updateCart = await removeQuantityToProductInCart(changeItem)
+                    }
+
+                } else if (action === 'deleteProduct') {
+                    deleteProduct(changeItem, changeItem.quantity);
+                    return
                 }
-            } else {
-                if (clientCart.id) {
-                    const indexProduct: number = clientCart.cartItems.findIndex((itemCart: CartItemDto) => itemCart.product.id === product.id)
-                    const changeProduct: CartItemDto = clientCart.cartItems[indexProduct];
-                    changeProduct.quantity += quantity;
-                    const updatedItem: CartDto = await updateItemCart(changeProduct, clientCart.id)
-                    setClientCart(() => updatedItem);
-                }
+                setClientCart(() => updateCart);
+                updateProductList(clientCart.cartItems)
             }
         }
 
-    }
+
+        const addProduct = async (product: ProductDto, quantity: number): Promise<void> => {
+            if (session) {
+                let itemExistInCard: boolean = false;
+                if (clientCart) {
+                    itemExistInCard = clientCart.cartItems.some((itemCard: CartItemDto) => {
+                        if (itemCard.product) {
+                            return itemCard.product.id === product.id
+                        }
+                        return false;
+                    })
+                }
+
+                if (!clientCart) {
+                    setClientCart(defaultClientCart)
+                }
+                if (product && clientCart && !itemExistInCard) {
+                    if (clientCart.id) {
+                        const newProduct: CartDto = await createItemCartIfUserHaveCart(product, clientCart.id, quantity);
+                        setClientCart(() => (newProduct));
+                    } else {
+                        const cart: CartDto = await createCart(product, session.user.id)
+                        setClientCart(cart)
+                    }
+                } else {
+                    if (clientCart && clientCart.id) {
+                        const indexProduct: number = clientCart.cartItems.findIndex((itemCart: CartItemDto) => itemCart.product.id === product.id)
+                        const changeProduct: CartItemDto = clientCart.cartItems[indexProduct];
+                        changeProduct.quantity += quantity;
+                        if (changeProduct.id) {
+                            const updatedItem: CartDto = await updateItemCart(changeProduct.id, changeProduct.quantity)
+                            setClientCart(() => updatedItem);
+                        }
+                    }
+                }
+            }
+
+        }
 
 
+        const goToDetailPanier = () => {
+            router.push('/recap-cart')
+        }
 
-    const goToDetailPanier = () => {
-        router.push('/recap-cart')
-    }
-
-    return (
-        <SideBarBasketContext.Provider value={{toggleBasketList, addProduct}}>
-            <Sidebar visible={visibility}
-                     position="right"
-                     onHide={() => setVisibility(false)}
-                     header={`Panier ${formatPriceEuro(clientCart.totalPrice)}€`}
-                     blockScroll={true}
-                     className="relative bg-primaryBackgroundColor"
-            >
-                <header className='sticky top-0 right-0 w-full h-20 border-b-actionColor border-b text-center bg-primaryBackgroundColor'>
-                    <RoundedButton 
-                                    
-                                    onClickAction={goToDetailPanier}
-                                   message={'Voir le detail du panier'}
-                                   classes={"border-actionColor text-actionColor"}/>
-                </header>
-                {clientCart.cartItems.length > 0 ? (
-                    <div className="mt-2.5">
-                        <div className="product-basket-height">
-                            {clientCart.cartItems.map((item: CartItemDto) => (
-                                <CartItemList
-                                    key={item.product.id}
-                                    product={item}
-                                    updateProduct={handleChangeQuantityProduct}
-                                />
-                            ))}
+        return (
+            <SideBarBasketContext.Provider value={{toggleBasketList, addProduct, clientSideBartCart: clientCart, setSideBarCart}}>
+                <Sidebar visible={visibility}
+                         position="right"
+                         onHide={() => setVisibility(false)}
+                         header={`Panier ${formatPriceEuro(clientCart ? clientCart.totalPrice : 0)}€`}
+                         blockScroll={true}
+                         className="relative bg-primaryBackgroundColor"
+                >
+                    <header className='sticky top-2.5 right-0 w-full h-20 border-b-actionColor border-b text-center bg-primaryBackgroundColor'>
+                        <RoundedButton
+                            onClickAction={goToDetailPanier}
+                            message={'Voir le detail du panier'}
+                            classes={"border-actionColor text-actionColor"}/>
+                    </header>
+                    {clientCart && clientCart.cartItems.length > 0 ? (
+                        <div className="mt-2.5">
+                            <div className="product-basket-height">
+                                {clientCart.cartItems.map((item: CartItemDto) => (
+                                    <CartItemList
+                                        key={item.product.id}
+                                        product={item}
+                                        updateProduct={handleChangeQuantityProduct}
+                                    />
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                ) : (
-                    <div>
-                        <p>Pas de produits</p>
-                    </div>
-                )}
-            </Sidebar>
-            {children}
-        </SideBarBasketContext.Provider>
-    );
-};
+                    ) : (
+                        <div>
+                            <p className="mt-4 text-center">Pas de produits dans le panier</p>
+
+                        </div>
+                    )}
+                </Sidebar>
+                {children}
+            </SideBarBasketContext.Provider>
+        );
+    }
+;
 
 export const useSideBarBasket = () => {
     const context: SideBarBasketContextType = useContext(SideBarBasketContext);
