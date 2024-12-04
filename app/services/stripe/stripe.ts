@@ -6,6 +6,7 @@ import { getClientCart } from '@/app/services/cart/cart';
 import { CartDto } from '@/app/interface/cart/cartDto';
 import { CartItemDto } from '@/app/interface/cart/cart-item.dto';
 import { OrderDto } from '@/app/interface/order/orderDto';
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2022-11-15' as any,
 });
@@ -19,18 +20,41 @@ export async function createPaymentIntent(userId: string) {
     }
 
     try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!user) {
+            throw new Error('Utilisateur introuvable.');
+        }
+
+        let stripeCustomerId = user.stripeCustomerId;
+
+        if (!stripeCustomerId) {
+            const customer = await stripe.customers.create({
+                email: user.email, 
+                name: user.name,   
+            }as Stripe.CustomerCreateParams);
+
+            stripeCustomerId = customer.id;
+
+            await prisma.user.update({
+                where: { id: userId },
+                data: { stripeCustomerId },
+            });
+        }
+
         const paymentIntent: Stripe.PaymentIntent = await stripe.paymentIntents.create({
-            amount: cart.totalPrice, 
+            amount: cart.totalPrice,
             currency: 'eur',
+            customer: stripeCustomerId, 
             metadata: {
                 integration_check: 'accept_a_payment',
             },
         });
 
-        await saveOrder(userId, cart.totalPrice, cart.cartItems); 
-
+        await saveOrder(userId, cart.totalPrice, cart.cartItems);
         await deleteCart(userId);
-
 
         return paymentIntent.client_secret;
     } catch (error) {
@@ -38,6 +62,7 @@ export async function createPaymentIntent(userId: string) {
         throw new Error('Erreur lors de la création du paiement.');
     }
 }
+
 
 async function saveOrder(userId: string, totalAmount: number, cartItems: CartItemDto[]) {
     try {

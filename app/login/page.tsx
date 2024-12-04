@@ -24,7 +24,7 @@ export default function Login() {
 
     return (
 
-        <div className="height-full bg-primaryBackgroundColor pt-20">
+        <div className="h-[84vh] bg-primaryBackgroundColor pt-20">
             <div className="flex w-full pl-2.5 pr-2.5 ">
                 <div className="w-3/6 flex items-center justify-center">
                     <Image src="/images/connexion.svg" alt='' className="leftDecorationImage" width="500" height="200"/>
