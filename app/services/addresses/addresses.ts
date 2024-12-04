@@ -30,7 +30,8 @@ export async function getAdressById(addressId: string, userId: string): Promise<
     const address: AddressDto | null = await prisma.address.findFirst({
         where: {
             userId,
-            id: addressId
+            id: addressId,
+            
         },
     });
 
@@ -45,6 +46,7 @@ export async function updateAdress(address: AddressDto): Promise<AddressDto> {
     return prisma.address.update({
         where: {
             id: address.id, 
+            
         },
         data: {
             isPrincipal: address.isPrincipal, 
@@ -59,11 +61,8 @@ export async function updateAdress(address: AddressDto): Promise<AddressDto> {
     });
 }
 
-
 export async function deleteAdress(id: string): Promise<AddressDto> {
     return prisma.address.delete({
         where: {id}
     })
 }
-
-

@@ -35,14 +35,14 @@ export default function PaymentPage() {
 
     if (!clientSecret) {
         return (
-            <div className="h-[85vh] flex items-center justify-center bg-primaryBackgroundColor">
+            <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor">
                 <p className="text-lg font-semibold text-gray-700">Chargement du paiement...</p>
             </div>
         );
     }
 
     return (
-        <div className="h-[85vh] bg-primaryBackgroundColor flex items-center justify-center">
+        <div className="h-[84vh] bg-primaryBackgroundColor flex items-center justify-center">
             <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 md:p-10">
                 {error && <p className="text-lg text-red-500 font-semibold">{error}</p>}
                 <h2 className="text-2xl font-bold text-darkActionColor mb-6">Récapitulatif de votre paiement</h2>

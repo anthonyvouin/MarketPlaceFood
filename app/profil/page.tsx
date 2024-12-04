@@ -52,7 +52,7 @@ const Profile = () => {
 
     if (!session || !session.user) {
         return (
-            <div className="h-screen flex items-center justify-center bg-primaryBackgroundColor">
+            <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor">
                 <div className="bg-white shadow-lg rounded-lg max-w-md mx-4 p-6">
                     <h1 className="text-2xl font-semibold text-darkActionColor mb-4">Erreur</h1>
                     <p className="text-red-600">Vous devez être connecté pour accéder à cette page.</p>
@@ -68,7 +68,7 @@ const Profile = () => {
     }
 
     return (
-        <div className="h-[85vh] flex items-center justify-center bg-primaryBackgroundColor overflow-hidden">
+        <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor overflow-hidden">
             <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg max-w-4xl mx-4 p-6 md:p-10 space-y-6 md:space-y-0 md:space-x-10">
                 <div className="md:w-1/2 flex flex-col justify-center">
                     <h1 className="text-2xl font-semibold text-darkActionColor mb-4">Mon Profil</h1>

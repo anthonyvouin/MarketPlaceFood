@@ -48,6 +48,8 @@ model User {
   verificationTokenExpiresEmail DateTime?
   Cart                          Cart[]
   orders                        Order[] 
+  stripeCustomerId              String?  
+
 
   @@map("users")
 }
@@ -115,7 +117,6 @@ model Address {
   phoneNumber       String
   note              String? @db.Text
   isPrincipal       Boolean
-  isVisible         Boolean
   userId            String  @map("user_id")
   user              User    @relation(fields: [userId], references: [id])
 

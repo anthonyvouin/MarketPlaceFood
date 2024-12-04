@@ -103,7 +103,7 @@ export default function RecapCart() {
 
     if (loading) {
         return (
-            <div className="h-[85vh] flex items-center justify-center bg-primaryBackgroundColor">
+            <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor">
                 <p className="text-lg font-semibold text-gray-700">Chargement du panier...</p>
             </div>
         );
@@ -111,14 +111,14 @@ export default function RecapCart() {
 
     if (!cart || cart.cartItems.length === 0) {
         return (
-            <div className="h-[85vh] flex items-center justify-center bg-primaryBackgroundColor">
+            <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor">
                 <p className="text-lg font-semibold text-gray-700">Votre panier est vide.</p>
             </div>
         );
     }
 
     return (
-        <div className="h-[85vh] bg-primaryBackgroundColor  flex items-center justify-center ">
+        <div className="h-[84vh] bg-primaryBackgroundColor  flex items-center justify-center ">
             <div className="w-full max-w-[90%] bg-white shadow-md rounded-lg p-6 md:p-10">
                 <h1 className="text-2xl font-bold text-darkActionColor mb-6">Récapitulatif de votre panier</h1>
 

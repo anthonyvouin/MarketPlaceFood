@@ -31,7 +31,6 @@ const CreateUpdatePage = () => {
                 phoneNumber: '',
                 note: '',
                 isPrincipal: false,
-                isVisible: true,
                 userId: session.user.id
             }
 
