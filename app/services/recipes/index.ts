@@ -162,6 +162,38 @@ export async function getRecipeById(id: string): Promise<any> {
     }
 }
 
+export async function getRandomRecipes(limit): Promise<any> {
+    try {
+        const recipes = await prisma.recipe.findMany({
+            orderBy: {
+                createdAt: 'desc'
+            },
+            include: {
+                recipeIngredients: {
+                    include: {
+                        product: true
+                    }
+                },
+                createdBy: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true
+                    }
+                }
+            }
+        });
+
+        recipes.sort(() => Math.random() - 0.5);
+        recipes.length = Math.min(limit, recipes.length);
+
+        return JSON.parse(JSON.stringify(recipes));
+    } catch (error) {
+        console.error("Erreur lors de la récupération des recettes aléatoires :", error);
+        throw new Error('La récupération des recettes aléatoires a échoué.');
+    }
+}
+
 // Récupérer toutes les recettes
 export async function getAllRecipes(page = 1, limit = 10, filter = {}, orderBy = {}): Promise<any> {
     try {
