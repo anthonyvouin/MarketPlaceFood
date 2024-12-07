@@ -8,6 +8,5 @@ export interface AddressDto {
     note: string | null;
     phoneNumber: string;
     isPrincipal: boolean;
-    isVisible: boolean;
     userId: string;
 }

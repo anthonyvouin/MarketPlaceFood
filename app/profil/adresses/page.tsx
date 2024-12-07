@@ -13,7 +13,6 @@ import {confirmDialog} from "primereact/confirmdialog";
 const Adresses = () => {
         const { data: session, status } = useSession();
         const [user, setUser] = useState<UserWithAdress | null>(null);
-        // const { showDialog } = useContext(DialogContext);
 
         useEffect(() => {
             if (session) {
@@ -126,7 +125,7 @@ const Adresses = () => {
     };
 
         return (
-            <div className="bg-primaryBackgroundColor height-full">
+            <div className="bg-primaryBackgroundColor h-[84vh]">
                 <div className="grid grid-cols-3 gap-4 width-85 mx-auto">
                     <div className='bg-white p-2.5 rounded-lg w-96 '>
                         <Link href="adresses/create-update">Ajouter une adresse</Link>

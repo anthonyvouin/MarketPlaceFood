@@ -22,7 +22,7 @@ export default function Product() {
     }, [slug]);
 
     return (
-        <section className="bg-primaryBackgroundColor font-manrope h-[85vh] w-full px-40">
+        <section className="bg-primaryBackgroundColor font-manrope h-[84vh] w-full px-40">
             <div className="flex flex-col h-full">
                 <div className="flex flex-col gap-5">
                     <div className="flex gap-5">

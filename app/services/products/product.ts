@@ -17,10 +17,6 @@ const fuseOptions = {
     minMatchCharLength: 2
 };
 
-// export type ProductWithCategory = Prisma.ProductGetPayload<{
-//     include: { category: true };
-// }>;
-
 export async function createProduct(product: ProductDto): Promise<ProductDto> {
 
     if (!product.image) {
@@ -72,6 +68,7 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
     }
 }
 
+
 export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise<ProductDto[]> {
     try {
         if (Object.keys(fields).length === 0) {
@@ -107,6 +104,26 @@ export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise
             },
             orderBy: {
                 name: 'asc',
+            },
+        });
+    } catch (error) {
+        throw new Error('La récupération des produits a échoué');
+    }
+}
+
+export async function getAllProductsVisible(): Promise<ProductDto[]> {
+    try {
+        return await prisma.product.findMany({
+            where: {
+                visible: true
+            },
+
+            orderBy: {
+                name: 'asc',
+            },
+            include: {
+                category: true,
+                discount: true,
             },
         });
     } catch (error) {
@@ -207,7 +224,7 @@ export async function getProductById(id: string): Promise<ProductDto | null> {
 export async function getProductBySlug(slug: string): Promise<ProductDto | null> {
     try {
         return await prisma.product.findUnique({
-            where: {slug: slug},
+            where: {slug: slug, visible: true},
             include: {category: true, discount: true},
         });
     } catch (error) {
@@ -237,8 +254,14 @@ export async function filterProduct(filters: {
         }
 
         return await prisma.product.findMany({
-            where: customFilters.length > 0 ? {AND: customFilters} : {},
-            include: {category: true, discount: true}
+            where: {
+                AND: [
+                {visible: true},
+                ...(customFilters.length > 0 ?  customFilters: []),
+
+            ],
+        },
+            include: {category: true, discount: true},
         });
 
     } catch (error) {
@@ -278,4 +301,23 @@ export async function changeDiscount(product: ProductDto | null, discount: Disco
         throw Error('produit non trouvé')
     }
 
+}
+
+export async function toggleProductVisibility(productId: string, visible: boolean): Promise<void> {
+try {
+
+    
+    const product: Product | null  = await prisma.product.findUnique({where: {id: productId}});
+
+    if (!product) {
+        throw new Error('Le produit n\'existe pas.');
+    }
+    await prisma.product.update({
+        where: {id: productId},
+        data: {visible: visible},
+    });
+} catch (error) {
+    console.error("Erreur lors du changement de visibilité du produit :", error);
+    throw new Error('Le changement de visibilité du produit a échoué.');
+}
 }

@@ -1,9 +1,7 @@
 'use client';
 
 import {useEffect, useState} from "react";
-import ProductCard from "./components/ProductCard";
 import {ProductDto} from "@/app/interface/product/productDto";
-import {getAllProducts} from "@/app/services/products/product";
 import {generateRecipes} from "./services/ia-integration/ia";
 import {getPageName} from "@/app/utils/utils";
 import { RecipeDto } from "./interface/recipe/RecipeDto";
@@ -16,7 +14,7 @@ export default function Home() {
 
     useEffect((): void => {
         const fetchProducts = async (): Promise<void> => {
-            const products: ProductDto[] = await getAllProducts()
+            const products: ProductDto[] = await getAllProductsVisible()
             return setProducts(products);
         }
         getPageName();
@@ -48,12 +46,12 @@ export default function Home() {
             <section className="px-20 py-10 w-full">
                 <div className="mb-10 flex flex-col gap-2">
                     <h2 className="font-manrope font-bold text-2xl text-gray-900">Notre sélection de produit</h2>
-                    <hr className="border-2 w-40 border-gray-900 rounded-full"/>
+                    <hr className="border-2 w-40 border-gray-900 rounded-full" />
                 </div>
 
                 <div className="grid grid-cols-4 gap-10 ">
                     {products.map((product, index) => (
-                        <ProductCard productSlug={product.slug} key={product.id} product={product} bgColor={bgColors[index % bgColors.length]}/>
+                        <ProductCard productSlug={product.slug} key={product.id} product={product} bgColor={bgColors[index % bgColors.length]} />
                     ))}
                 </div>
             </section>

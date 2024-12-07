@@ -1,11 +1,12 @@
 'use server';
 
 import Stripe from 'stripe';
-import { PrismaClient } from '@prisma/client';
-import { getClientCart } from '@/app/services/cart/cart';
-import { CartDto } from '@/app/interface/cart/cartDto';
-import { CartItemDto } from '@/app/interface/cart/cart-item.dto';
-import { OrderDto } from '@/app/interface/order/orderDto';
+import {PrismaClient} from '@prisma/client';
+import {getClientCart} from '@/app/services/cart/cart';
+import {CartDto} from '@/app/interface/cart/cartDto';
+import {CartItemDto} from '@/app/interface/cart/cart-item.dto';
+import {OrderDto} from '@/app/interface/order/orderDto';
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2022-11-15' as any,
 });
@@ -19,25 +20,51 @@ export async function createPaymentIntent(userId: string) {
     }
 
     try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!user) {
+            throw new Error('Utilisateur introuvable.');
+        }
+
+        let stripeCustomerId = user.stripeCustomerId;
+
+        if (!stripeCustomerId) {
+            const customer = await stripe.customers.create({
+                email: user.email,
+                name: user.name,
+            }as Stripe.CustomerCreateParams);
+
+            stripeCustomerId = customer.id;
+
+            await prisma.user.update({
+                where: { id: userId },
+                data: { stripeCustomerId },
+            });
+        }
+
         const paymentIntent: Stripe.PaymentIntent = await stripe.paymentIntents.create({
             amount: cart.totalPrice, 
             currency: 'eur',
+            customer: stripeCustomerId,
             metadata: {
                 integration_check: 'accept_a_payment',
             },
         });
 
-        await saveOrder(userId, cart.totalPrice, cart.cartItems); 
-
-        await deleteCart(userId);
-
-
+        await saveOrder(userId, cart.totalPrice, cart.cartItems);
+        if (cart.id) {
+            await convertCart(cart.id);
+        }
         return paymentIntent.client_secret;
+
     } catch (error) {
         console.error('Erreur lors de la création du PaymentIntent :', error);
         throw new Error('Erreur lors de la création du paiement.');
     }
 }
+
 
 async function saveOrder(userId: string, totalAmount: number, cartItems: CartItemDto[]) {
     try {
@@ -45,11 +72,11 @@ async function saveOrder(userId: string, totalAmount: number, cartItems: CartIte
             data: {
                 userId: userId,
                 totalAmount: totalAmount,
-                status: 'Payed', 
+                status: 'Payed',
                 orderItems: {
                     create: cartItems.map((item) => ({
                         product: {
-                            connect: { id: item.product.id }, 
+                            connect: {id: item.product.id},
                         },
                         quantity: item.quantity,
                         unitPrice: item.product.price,
@@ -68,15 +95,15 @@ async function saveOrder(userId: string, totalAmount: number, cartItems: CartIte
 export async function getOrdersByUser(userId: string): Promise<OrderDto[]> {
     try {
         const orders = await prisma.order.findMany({
-            where: { userId }, 
+            where: {userId},
             include: {
                 orderItems: {
                     include: {
-                        product: true, 
+                        product: true,
                     },
                 },
             },
-            orderBy: { createdAt: 'desc' }, 
+            orderBy: {createdAt: 'desc'},
         });
 
         return orders;
@@ -87,24 +114,18 @@ export async function getOrdersByUser(userId: string): Promise<OrderDto[]> {
 }
 
 
-async function deleteCart(userId: string) {
+async function convertCart(cartId: string) {
     try {
-        await prisma.cartItem.deleteMany({
+        await prisma.cart.update({
             where: {
-                cartId: {
-                    in: await prisma.cart.findMany({
-                        where: { userId },
-                        select: { id: true }
-                    }).then(carts => carts.map(cart => cart.id)),
-                }
-            }
-        });
+                id: cartId,
+            },
 
-        await prisma.cart.deleteMany({
-            where: {
-                userId: userId,
+            data: {
+                isConvertedToOrder: true,
             },
         });
+
     } catch (error) {
         console.error('Erreur lors de la suppression du panier :', error);
         throw new Error('Erreur lors de la suppression du panier.');
