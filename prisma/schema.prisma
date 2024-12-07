@@ -165,7 +165,8 @@ model Recipe {
 model RecipeIngredient {
   id        String  @id @default(cuid())
   recipeId  String  @map("recipe_id")
-  productId String  @map("product_id")
+  productId String @map("product_id")
+  missingIngredientReportId String? @map("missing_ingredient_report_id")
   quantity  Decimal @db.Decimal(10, 2)
   unit      String // Unité de mesure spécifique pour la recette
 
