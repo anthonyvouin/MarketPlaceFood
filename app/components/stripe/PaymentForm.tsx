@@ -6,13 +6,11 @@ import { StripeCardElement } from '@stripe/stripe-js';
 import { useSideBarBasket } from '@/app/provider/sideBar-cart-provider';
 import { useCart } from '@/app/provider/cart-provider';
 import { PaymentSuccess } from '@/app/services/stripe/stripe';
+import { PaymentFormPropsDto } from '@/app/interface/stripe/PaymentFormPropsDto';
 
-interface PaymentFormProps {
-    clientSecret: string;
-    userId: string;
-}
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ clientSecret, userId }) => {
+
+const PaymentForm: React.FC<PaymentFormPropsDto> = ({ clientSecret, userId }) => {
     const stripe = useStripe();
     const elements = useElements();
     const [error, setError] = useState<string | null>(null);
