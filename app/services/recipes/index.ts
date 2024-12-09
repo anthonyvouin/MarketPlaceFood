@@ -1,6 +1,8 @@
 "use server"
 
 import { PrismaClient, Prisma, RecipeType } from '@prisma/client';
+import { searchProduct } from '../products/product';
+import { createOrUpdateMissingIngredientReport } from '../missingIngredientReport';
 
 const prisma = new PrismaClient();
 
@@ -19,6 +21,11 @@ type CreateRecipeInput = {
         quantity: number;
         unit: string;
     }[];
+    missingIngredients?: {
+        id: string;
+        quantity: number;
+        unit: string;
+    }[];
     steps?: {
         stepNumber: number;
         description: string;
@@ -33,6 +40,7 @@ type UpdateRecipeInput = Partial<Omit<CreateRecipeInput, 'userId'>>;
 export async function createRecipe(data: CreateRecipeInput, userId: string): Promise<any | null> {
     try {
         const { ingredients, steps, ...recipeData } = data;
+        
         switch (data.type) {
             case "BEVERAGE":
                 recipeData.type = RecipeType.BEVERAGE;
@@ -60,6 +68,24 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
                 break;
         }
 
+        const foundProducts: any[] = [];
+        const notFoundProducts: { id: string; name: string; quantity: number; unit: string }[] = [];
+
+        for (const ingredient of ingredients) {
+            const ingredientInBdd = await searchProduct(ingredient.name)
+            const isIngredientExist = ingredientInBdd ? true : false;
+            if (!isIngredientExist) {
+                const report = await createOrUpdateMissingIngredientReport({ name: ingredient.productId });
+                notFoundProducts.push({
+                    id: report.id,
+                    quantity: ingredient.quantity,
+                    unit: ingredient.unit
+                });
+            } else {
+                foundProducts.push(ingredientInBdd);
+            }
+        }
+
         const recipe = await prisma.recipe.create({
             data: {
                 ...recipeData,
@@ -67,11 +93,20 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
                     connect: { id: userId }
                 },
                 recipeIngredients: {
-                    create: ingredients.map(ing => ({
+                    create: foundProducts.map(ing => ({
                         quantity: new Prisma.Decimal(ing.quantity),
                         unit: ing.unit,
                         product: {
                             connect: { id: ing.productId }
+                        }
+                    }))
+                },
+                recipeMissingIngredientReports: {
+                    create: notFoundProducts.map(ing => ({
+                        quantity: new Prisma.Decimal(ing.quantity),
+                        unit: ing.unit,
+                        missingIngredient: {
+                            connect: { id: ing.id }
                         }
                     }))
                 },
@@ -120,6 +155,11 @@ export async function getRecipeBySlug(slug: string): Promise<any> {
                 recipeIngredients: {
                     include: {
                         product: true
+                    }
+                },
+                recipeMissingIngredientReports: {
+                    include: {
+                        missingIngredient: true
                     }
                 },
                 steps: {

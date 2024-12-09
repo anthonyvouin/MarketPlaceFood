@@ -7,7 +7,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || ""
 });
 
-export async function analysePicture(format: string = 'recipe') {
+export async function analysePicture(format: string = 'recipe', imageUrl: string) {
   try {
     // Définir les prompts en fonction du format
     const data = {
@@ -82,14 +82,9 @@ export async function analysePicture(format: string = 'recipe') {
       }
     };
 
-    console.log('format', format)
     const prompt = data[format].prompt || data.recipe.prompt;
 
-    // URL de l'image (vous pouvez la remplacer)
-    // const imageUrl = "https://lapetitebette.com/wp-content/uploads/2023/08/IMG_9826-e1693513597226-1200x879.jpg";
-    // const imageUrl = "https://img.cuisineaz.com/660x660/2023/11/20/i196570-tiramisu-simple.jpg";
-    const imageUrl = "https://img-4.linternaute.com/UWNKe29Fjwy0kG6Ypwdmiz45Fj8=/1240x/smart/2629c321cc6549859beafb5e3b765ae8/ccmcms-linternaute/17106961.jpg"
-    //! Image = ['png', 'jpeg', 'gif', 'webp'].
+    // const fullImageUrl = `${process.env.NEXT_PUBLIC_APP_URL}${imageUrl}`
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -100,7 +95,7 @@ export async function analysePicture(format: string = 'recipe') {
             { type: "text", text: prompt },
             {
               type: "image_url",
-              image_url: { url: imageUrl },
+              image_url: { url:  imageUrl }
             }
           ]
         },
@@ -126,7 +121,6 @@ export async function generateRecipes(format: string, complement: string = "", p
 
     let prompt = ""
     
-    console.log('format', format)
     switch (format) {
       case "generate-steps":
         prompt = "Je vais te fournir les détails d'une recette comprenant son nom, sa description, son temps de préparation, le nombre de personnes, et ses ingrédients. Tu devras me retourner un tableau d'objets JSON bien formaté représentant chaque étape de la recette.";
@@ -295,7 +289,6 @@ export async function generateRecipes(format: string, complement: string = "", p
       }
     }
 
-
     //? ça marche bien j'ai l'impression
     const response = await openai.chat.completions.create({
       "model": "gpt-4o-mini",
@@ -308,7 +301,6 @@ export async function generateRecipes(format: string, complement: string = "", p
       let responseContent = response?.choices[0]?.message?.content;
 
       recipesFormatted = JSON.parse(responseContent);
-      console.log(recipesFormatted)
       if (recipesFormatted.recipes) {
         recipesFormatted = recipesFormatted.recipes
       }

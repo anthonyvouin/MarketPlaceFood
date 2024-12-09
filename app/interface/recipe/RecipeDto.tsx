@@ -1,6 +1,8 @@
 import { RecipeStepDto } from "./RecipeStepDto";
 
 export interface RecipeDto {
+    recipeIngredients: any;
+    recipeMissingIngredientReports: any;
     category: string;
     description: string;
     name: string;
@@ -12,8 +14,6 @@ export interface RecipeDto {
     image: string;
     difficulty: string;
     type: RecipeType;
-    
-
 }
 
 export enum RecipeType {

@@ -18,6 +18,8 @@ import { useSideBarBasket } from "../provider/sideBar-cart-provider";
 import { CartDto } from "../interface/cart/cartDto";
 import { getClientCart } from "../services/cart/cart";
 import { formatPriceEuro } from "../pipe/formatPrice";
+import ImageUploadDialog from "../components/uploadImageDialog";
+import { uploadImage, uploadTemporaryImageToCloudinary } from "@/lib/uploadImage";
 
 export default function RecipesPage() {
     const { data: session } = useSession();
@@ -32,14 +34,54 @@ export default function RecipesPage() {
     const [loading, setLoading] = useState(false);
     const [ingredientsDialogVisible, setIngredientsDialogVisible] = useState(false);
     const [selectedFormat, setSelectedFormat] = useState("");
+    const [imageUploadVisible, setImageUploadVisible] = useState(false);
+    const [selectedAction, setSelectedAction] = useState(null); // Pour différencier l'action (analyse ou frigo)
 
-    async function analysePictureWithAI(format) {
+    const handleImageUpload = async (formData) => {
+        try {
+            const imagePath = await uploadTemporaryImageToCloudinary(formData);
+
+            if (selectedAction === "analyse-recipe") {
+                analysePictureWithAI("recipe", imagePath);
+            } else if (selectedAction === "fridge") {
+                analysePictureWithAI("fridge", imagePath);
+            }
+
+            return imagePath;
+        } catch (error) {
+            console.error("Erreur lors de l'upload de l'image:", error);
+            throw error;
+        }
+    };
+
+    async function analysePictureWithAI(format, imagePath) {
         try {
             setSelectedFormat(format);
             setLoading(true);
-            const recipe = await analysePicture(selectedFormat);
-            console.log("recipe", recipe);
+            const recipe = await analysePicture(format, imagePath);
             setRecipeName(recipe.name);
+
+            const foundProducts = [];
+            const notFoundProducts = [];
+            const originalIngredients = []
+
+            for (const ingredient of recipe.ingredients) {
+                const ingredientInBdd = await searchProduct(ingredient.name)
+                const isIngredientExist = ingredientInBdd ? true : false;
+                originalIngredients.push(ingredient);
+                if (!isIngredientExist) {
+                    notFoundProducts.push(ingredient.name);
+                    // const report = createOrUpdateMissingIngredientReport({ name: ingredient.name });
+                } else {
+                    foundProducts.push(ingredientInBdd);
+                }
+            }
+
+            setIngredients({
+                original_ingredients: originalIngredients,
+                products_not_found: notFoundProducts,
+                products_found: foundProducts,
+            });
 
             setIngredientsDialogVisible(true);
             setLoading(false);
@@ -74,7 +116,6 @@ export default function RecipesPage() {
             const user = session.user.id;
             let recipes = [];
             const localStorageBasket: CartDto | null = await getClientCart(session.user.id);
-            console.log("localStorageBasket", localStorageBasket);
             if (localStorageBasket?.cartItems.length === 0) {
                 show("Erreur", "Votre panier est vide", "error");
                 return;
@@ -91,7 +132,6 @@ export default function RecipesPage() {
                     price: formatPriceEuro(product.product.price),
                 }
             });
-            console.log("products", products);
 
             recipes = await generateRecipes(format, "", products);
 
@@ -134,7 +174,7 @@ export default function RecipesPage() {
                     Découvrez nos délicieuses recettes et régalez-vous en famille ou entre amis.
                 </p>
                 <div className="flex gap-5">
-                    <Button
+                <Button
                         label="Pas d'idées ?"
                         icon="pi pi-refresh"
                         className="p-button-success"
@@ -149,23 +189,35 @@ export default function RecipesPage() {
                         onClick={() => generateRecipe("generate-recipes-from-cart")}
                         disabled={loading}
                     />
-
+                    
                     <Button
                         label="Analyser une recette"
                         icon="pi pi-refresh"
                         className="p-button-success"
-                        onClick={() => analysePictureWithAI("recipe")}
+                        onClick={() => {
+                            setSelectedAction("analyse-recipe");
+                            setImageUploadVisible(true);
+                        }}
                         disabled={loading}
                     />
                     <Button
                         label="Générer des recettes depuis votre frigo"
                         icon="pi pi-refresh"
                         className="p-button-success"
-                        onClick={() => analysePictureWithAI("fridge")}
+                        onClick={() => {
+                            setSelectedAction("fridge");
+                            setImageUploadVisible(true);
+                        }}
                         disabled={loading}
                     />
                 </div>
             </Card>
+
+            <ImageUploadDialog
+                visible={imageUploadVisible}
+                onHide={() => setImageUploadVisible(false)}
+                onUpload={handleImageUpload}
+            />
 
             <IngredientsDialog
                 visible={ingredientsDialogVisible}

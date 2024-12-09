@@ -15,17 +15,14 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
 
     async function generateRecipe(format) {
         try {
-            // if (!session) {
-            //     show("Erreur", "Vous devez être connecté pour générer des recettes", "error");
-            //     return;
-            // }
-            // setLoading(true);
+            if (!session) {
+                show("Erreur", "Vous devez être connecté pour générer des recettes", "error");
+                return;
+            }
             const user = session.user.id;
             let recipes = [];
             const ingredientsToUse = selectedIngredients.filter(ingredient => ingredient.mustBeUsed);
-            console.log('ingredientsToUse', ingredientsToUse);
             recipes = await generateRecipes(format, "", ingredientsToUse);
-            console.log('recipes', recipes);
             const generatedRecipes = [];
             for (const recipe of recipes) {
                 const generatedImageForRecipe = await getImageFromGoogle(recipe.name);
@@ -58,7 +55,6 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
     }, [ingredients]);
 
     const toggleIngredientUsage = (index) => {
-        console.log('toggleIngredientUsage', index);
         const updatedIngredients = [...selectedIngredients];
         updatedIngredients[index].mustBeUsed = !updatedIngredients[index].mustBeUsed;
         setSelectedIngredients(updatedIngredients);

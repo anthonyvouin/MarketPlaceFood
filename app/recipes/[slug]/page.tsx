@@ -198,6 +198,7 @@ const RecipeDetailPage = () => {
 
         <div className="p-8">
           <h2 className="text-2xl font-bold mb-6 text-black">Ingrédients</h2>
+          <h3 className="text-lg font-bold mb-4 text-black">Dans notre magasin</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {recipeDetails.recipeIngredients.map((ingredient, index) => (
               <div 
@@ -224,6 +225,34 @@ const RecipeDetailPage = () => {
               </div>
             ))}
           </div>
+          <h3 className="text-lg font-bold mb-4 text-black">Pas encore dans notre magasin, mais c'est pour bientôt</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {recipeDetails.recipeMissingIngredientReports.map((ingredient, index) => (
+              <div 
+                key={index}
+                className="group transform transition-transform"
+              >
+                <div className="p-4 flex flex-col items-center text-center space-y-3">
+                  <div className="w-24 h-24 rounded-full overflow-hidden shadow-md p-2 hover:bg-primaryColor">
+                    {/* <Image
+                      src={ingredient.product.image}
+                      alt={ingredient.product.name}
+                      imageClassName="w-full h-full object-cover rounded-full"
+                    /> */}
+                  </div>
+                  <div>
+                    <span className="block text-lg font-bold text-black">
+                      {ingredient.quantity} {ingredient.unit}
+                    </span>
+                    <span className="text-black/75">
+                      {ingredient.missingIngredient.name}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
         </div>
 
         {/* Recipe Steps */}

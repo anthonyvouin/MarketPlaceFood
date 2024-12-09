@@ -157,16 +157,31 @@ model Recipe {
   favoritedBy     User[]     @relation("FavoriteRecipes")
 
   recipeIngredients RecipeIngredient[]
+  recipeMissingIngredientReports RecipeMissingIngredientReport[]
   steps            RecipeStep[]
 
   @@map("recipes")
+}
+
+
+model RecipeMissingIngredientReport {
+  id          String   @id @default(cuid())
+  recipeId    String   @map("recipe_id")
+  missingIngredientId String @map("missing_ingredient_id")
+  quantity    Decimal  @db.Decimal(10, 2)
+  unit        String   // Unité de mesure spécifique pour la recette
+
+  recipe              Recipe              @relation(fields: [recipeId], references: [id])
+  missingIngredient   MissingIngredientReport   @relation(fields: [missingIngredientId], references: [id])
+
+  @@unique([recipeId, missingIngredientId])
+  @@map("recipe_missing_ingredient_reports")
 }
 
 model RecipeIngredient {
   id        String  @id @default(cuid())
   recipeId  String  @map("recipe_id")
   productId String @map("product_id")
-  missingIngredientReportId String? @map("missing_ingredient_report_id")
   quantity  Decimal @db.Decimal(10, 2)
   unit      String // Unité de mesure spécifique pour la recette
 
@@ -234,6 +249,7 @@ model MissingIngredientReport {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("missing_ingredient_reports")
+  RecipeMissingIngredientReport RecipeMissingIngredientReport[]
 }
 model Order {
   id          String      @id @default(cuid())

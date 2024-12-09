@@ -146,11 +146,7 @@ export async function getImageFromGoogle(name: string): Promise<string> {
 
     try {
         const encodedQuery = encodeURIComponent(name);
-        console.log("====================================");
-        console.log(encodedQuery)
-        console.log("====================================");
         const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodedQuery}&searchType=image&num=1&imgSize=medium&safe=active&excludeTerms=facebook.com,instagram.com,pinterest.com`;
-        console.log('Recherche d\'image pour', name, 'sur Google avec l\'URL', url);
         const response = await fetch(url);
         
         if (!response.ok) {
@@ -159,16 +155,12 @@ export async function getImageFromGoogle(name: string): Promise<string> {
         }
 
         const data = await response.json();
-        console.log("====================================");
-        console.log(data)
 
         if (!data.items || !data.items.length) {
             return '/images/default-image.png';
         }
 
         const imageUrl = data.items[0].link;
-        console.log("====================================");
-        console.log('Image trouvée pour', name, ':', imageUrl);
 
         if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.match(/^https?:\/\/.+/)) {
             return '/images/default-image.png';
@@ -197,9 +189,6 @@ export async function searchProduct(name: string, minScore: number = 0.35): Prom
         const results = fuse.search(normalizedName);
 
         const filteredResults = results.filter(result => result.score && result.score >= minScore);
-        
-        console.log(`Recherche pour "${normalizedName}"`, results);
-        console.log(results);
 
         // Retourne le meilleur résultat
         return filteredResults.length > 0 ? filteredResults[0].item : null;
