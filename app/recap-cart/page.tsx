@@ -182,12 +182,13 @@ export default function RecapCart() {
 
                             <div className="text-center">
                                 <p className="font-medium text-gray-700">Quantité : {item.quantity}</p>
-                                <button className='border p-2.5' onClick={() => addProduct(item)}>+</button>
                                 <button className='border p-2.5' onClick={() => removeProduct(item)}>-</button>
+                                <button className='border p-2.5' onClick={() => addProduct(item)}>+</button>
+
                             </div>
 
                             <div className="text-right">
-                                <p className="text-sm font-semibold text-gray-700">
+                            <p className="text-sm font-semibold text-gray-700">
                                     {formatPriceEuro(item.totalPrice)}€
                                 </p>
                             </div>
