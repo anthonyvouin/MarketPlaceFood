@@ -166,7 +166,8 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
 
 
         const goToDetailPanier = () => {
-            router.push('/recap-cart')
+            router.push('/recap-cart');
+            setVisibility(false);
         }
 
         return (
