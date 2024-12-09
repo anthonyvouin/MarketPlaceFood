@@ -57,7 +57,7 @@ export async function createPaymentIntent(userId: string) {
 
         return paymentIntent.client_secret;
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la création du PaymentIntent :', error);
         throw new Error('Erreur lors de la création du paiement.');
     }
@@ -78,7 +78,7 @@ export async function PaymentSuccess(userId: string) {
         }
 
         return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la finalisation de la commande :', error);
         throw new Error('Erreur lors de la confirmation de paiement.');
     }
@@ -118,7 +118,7 @@ async function saveOrder(userId: string, totalAmount: number, cartItems: CartIte
                 },
             },
         });
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la sauvegarde de la commande :', error);
         throw new Error('Erreur lors de la sauvegarde de la commande.');
     }
@@ -159,7 +159,7 @@ async function convertCart(cartId: string) {
             },
         });
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la suppression du panier :', error);
         throw new Error('Erreur lors de la suppression du panier.');
     }
