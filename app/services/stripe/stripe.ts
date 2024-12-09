@@ -12,8 +12,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 const prisma = new PrismaClient();
 
+
 export async function createPaymentIntent(userId: string) {
-    const cart: CartDto | null = await getClientCart(userId);
+
+    const cart : CartDto  | null = await getClientCart(userId);
 
     if (!cart || cart.cartItems.length === 0) {
         throw new Error('Votre panier est vide.');
@@ -34,7 +36,7 @@ export async function createPaymentIntent(userId: string) {
             const customer = await stripe.customers.create({
                 email: user.email,
                 name: user.name,
-            }as Stripe.CustomerCreateParams);
+            } as Stripe.CustomerCreateParams);
 
             stripeCustomerId = customer.id;
 
@@ -44,8 +46,8 @@ export async function createPaymentIntent(userId: string) {
             });
         }
 
-        const paymentIntent: Stripe.PaymentIntent = await stripe.paymentIntents.create({
-            amount: cart.totalPrice, 
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: cart.totalPrice,
             currency: 'eur',
             customer: stripeCustomerId,
             metadata: {
@@ -53,20 +55,51 @@ export async function createPaymentIntent(userId: string) {
             },
         });
 
-        await saveOrder(userId, cart.totalPrice, cart.cartItems);
-        if (cart.id) {
-            await convertCart(cart.id);
-        }
         return paymentIntent.client_secret;
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la création du PaymentIntent :', error);
         throw new Error('Erreur lors de la création du paiement.');
     }
 }
 
+export async function PaymentSuccess(userId: string) {
+    try {
+        const cart : CartDto  | null = await getClientCart(userId);
+
+        if (!cart || cart.cartItems.length === 0) {
+            throw new Error('Votre panier est vide.');
+        }
+
+        await saveOrder(userId, cart.totalPrice, cart.cartItems);
+
+        if (cart.id) {
+            await convertCart(cart.id);
+        }
+
+        return { success: true };
+    } catch (error: unknown) {
+        console.error('Erreur lors de la finalisation de la commande :', error);
+        throw new Error('Erreur lors de la confirmation de paiement.');
+    }
+}
+
+
+
+
+
 
 async function saveOrder(userId: string, totalAmount: number, cartItems: CartItemDto[]) {
+    if (!userId) {
+        console.error('Erreur : L\'ID utilisateur est manquant.');
+        throw new Error('Erreur : L\'ID utilisateur est requis.');
+    }
+
+    if (!cartItems || cartItems.length === 0) {
+        console.error('Erreur : Aucun article dans le panier.');
+        throw new Error('Erreur : Le panier est vide.');
+    }
+
     try {
         await prisma.order.create({
             data: {
@@ -85,7 +118,7 @@ async function saveOrder(userId: string, totalAmount: number, cartItems: CartIte
                 },
             },
         });
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la sauvegarde de la commande :', error);
         throw new Error('Erreur lors de la sauvegarde de la commande.');
     }
@@ -94,7 +127,7 @@ async function saveOrder(userId: string, totalAmount: number, cartItems: CartIte
 
 export async function getOrdersByUser(userId: string): Promise<OrderDto[]> {
     try {
-        const orders = await prisma.order.findMany({
+        const orders : OrderDto[] = await prisma.order.findMany({
             where: {userId},
             include: {
                 orderItems: {
@@ -126,7 +159,7 @@ async function convertCart(cartId: string) {
             },
         });
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la suppression du panier :', error);
         throw new Error('Erreur lors de la suppression du panier.');
     }
