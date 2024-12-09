@@ -132,7 +132,6 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
 
         return JSON.parse(JSON.stringify(recipe));
     } catch (error) {
-        console.log(error);
         if (error.code === 'P2002') {
             console.log("Recipe already exists, skipping:", data.name);
             return null; // Retourne null pour ne pas interrompre le processus, parce qu'on veut continuer à créer les autres recettes
