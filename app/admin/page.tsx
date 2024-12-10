@@ -1,17 +1,52 @@
 "use client";
-import { useEffect } from "react";
-import { getPageName } from "@/app/utils/utils";
+
+import { useEffect, useState } from "react";
+import { getTotalOrderCount, getTotalUserCount, getTotalMoney } from "@/app/services/kpi/kpi";
 
 export default function Admin() {
+    const [orderCount, setOrderCount] = useState<number | null>(null);
+    const [userCount, setUserCount] = useState<number | null>(null);
+    const [TotalMoney, setTotalMoney] = useState<number | null>(null);
+
+
     useEffect(() => {
-        getPageName();
+        const fetchData = async () => {
+            const orderCountData = await getTotalOrderCount(); 
+            setOrderCount(orderCountData);
+
+            const userCountData = await getTotalUserCount(); 
+            setUserCount(userCountData);
+
+            const totalMoneyData = await getTotalMoney(); 
+            setTotalMoney(totalMoneyData);
+        };
+
+        fetchData();
     }, []);
 
     const kpiData = [
-        { title: "Revenue", value: "$54,321", icon: "pi pi-dollar", bgColor: "bg-green-100", textColor: "text-green-600" },
-        { title: "New Users", value: "1,234", icon: "pi pi-users", bgColor: "bg-blue-100", textColor: "text-blue-600" },
-        { title: "Orders", value: "879", icon: "pi pi-shopping-cart", bgColor: "bg-yellow-100", textColor: "text-yellow-600" },
-        { title: "Feedback", value: "98%", icon: "pi pi-comments", bgColor: "bg-purple-100", textColor: "text-purple-600" },
+        {
+            title: "Orders",
+            value: orderCount !== null ? orderCount.toString() : "Loading...", 
+            icon: "pi pi-shopping-cart",
+            bgColor: "bg-yellow-100",
+            textColor: "text-yellow-600"
+        },
+        {
+            title: "Users",
+            value: userCount !== null ? userCount.toString() : "Loading...", 
+            icon: "pi pi-users",
+            bgColor: "bg-blue-100",
+            textColor: "text-blue-600"
+        },
+        {
+            title: "Total Money",
+            value: TotalMoney !== null ? TotalMoney.toString() : "Loading...",
+            icon: "pi pi-dollar",
+            bgColor: "bg-green-100",
+            textColor: "text-green-600"
+        }
+
     ];
 
     return (
