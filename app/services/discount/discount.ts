@@ -32,3 +32,24 @@ export async function getAllDiscount(): Promise<DiscountDto[]> {
         }
     });
 }
+
+
+export async function deleteDiscount(discountId: string): Promise<string> {
+    if (!discountId || discountId.trim() === '') {
+        throw new Error("L'identifiant de la remise est requis.");
+    }
+
+    try {
+        await prisma.discount.delete({
+            where: {
+                id: discountId,
+            },
+        });
+        return "Remise supprimée avec succès.";
+    } catch (error: any) {
+        if (error.code === 'P2025') {
+            throw new Error("La remise n'existe pas ou a déjà été supprimée.");
+        }
+        throw new Error("La suppression de la remise a échoué.");
+    }
+}

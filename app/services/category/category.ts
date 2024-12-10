@@ -54,6 +54,9 @@ export async function deleteCategoryById(id: CategoryDto['id']): Promise<{ messa
     }
 }
 
+
+
+
 export async function updateCategory(category: CategoryDto): Promise<CategoryDto> {
     if (!category.id) {
         throw new Error(`L'ID de la catégorie est requis pour la mise à jour.`);

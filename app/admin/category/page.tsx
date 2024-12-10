@@ -28,9 +28,13 @@ const CategoryPage = () => {
             await deleteCategoryById(id);
             const filteredCategories: CategoryDto[] = categories.filter((category): boolean => category.id !== id);
             setCategories(filteredCategories)
+            show('Suppression de catégorie', 'La catégorie a été supprimée avec succès.', 'success');
+
         } catch (error) {
 
             console.error('Erreur lors de la suppression de la catégorie:', error);
+            show('Erreur de suppression', 'La categorie est rattachée à des produits.', 'error');
+
         }
     };
 
@@ -51,7 +55,9 @@ const CategoryPage = () => {
                         await deleteCategory(categorie.id);
                     }
                 },
+
             })
+
         }
 
     }

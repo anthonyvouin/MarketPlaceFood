@@ -87,8 +87,6 @@ export async function PaymentSuccess(userId: string) {
 
 
 
-
-
 async function saveOrder(userId: string, totalAmount: number, cartItems: CartItemDto[]) {
     if (!userId) {
         console.error('Erreur : L\'ID utilisateur est manquant.');
