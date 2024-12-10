@@ -3,6 +3,7 @@ export interface OrderDto {
     totalAmount: number;
     status: string;
     createdAt: Date;
+    
     orderItems: {
         quantity: number;
         unitPrice: number;

@@ -12,6 +12,8 @@ const adminLinks = [
     { name: "Produits", href: "/admin/product", icon: "pi pi-box" },
     { name: "Contacts", href: "/admin/contact", icon: "pi pi-envelope" },
     { name: "Graphique", href: "/admin/chart", icon: "pi pi-chart-line" },
+    { name: "Commandes", href: "/admin/order", icon: "pi pi-shopping-bag" },
+
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
