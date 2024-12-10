@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { ContactDto } from '@/app/interface/contact/contactDto';
 import { deleteContactById } from '@/app/services/contact/contact';
-import { Dialog } from 'primereact/dialog';
+import { confirmDialog } from 'primereact/confirmdialog';
+import { ToastContext } from '@/app/provider/toastProvider';
 import { Button } from 'primereact/button';
 
 const ContactList: React.FC<{ contacts: ContactDto[] }> = ({ contacts: initialContacts }) => {
     const [contacts, setContacts] = useState<ContactDto[]>([]);
-    const [contactToDelete, setContactToDelete] = useState<ContactDto | null>(null);
-    const [isDialogVisible, setIsDialogVisible] = useState(false);
+    const { show } = useContext(ToastContext); 
 
     useEffect(() => {
         if (initialContacts && Array.isArray(initialContacts)) {
@@ -17,25 +17,46 @@ const ContactList: React.FC<{ contacts: ContactDto[] }> = ({ contacts: initialCo
         }
     }, [initialContacts]);
 
-    const showConfirmation = (contact: ContactDto) => {
-        setContactToDelete(contact);
-        setIsDialogVisible(true);
-    };
-
-    const handleDelete = async () => {
-        if (!contactToDelete) return;
-
+    const handleDelete = async (contact: ContactDto) => {
         try {
-            await deleteContactById(contactToDelete.id);
+            await deleteContactById(contact.id);
             setContacts((prevContacts) =>
-                prevContacts.filter((contact) => contact.id !== contactToDelete.id)
+                prevContacts.filter((c) => c.id !== contact.id)
+            );
+            show(
+                'Suppression réussie',
+                `Le contact ${contact.firstName} ${contact.lastName} a été supprimé.`,
+                'success'
             );
         } catch (error) {
             console.error('Erreur lors de la suppression du contact:', error);
-        } finally {
-            setIsDialogVisible(false);
-            setContactToDelete(null);
+            show(
+                'Erreur lors de la suppression',
+                `Impossible de supprimer le contact ${contact.firstName} ${contact.lastName}.`,
+                'error'
+            );
         }
+    };
+
+    const openDeleteContactDialog = (contact: ContactDto) => {
+        confirmDialog({
+            message: (
+                <div>
+                    <p>
+                        Êtes-vous sûr de vouloir supprimer le contact{' '}
+                        <strong>{`${contact.firstName} ${contact.lastName}`}</strong> ?
+                    </p>
+                </div>
+            ),
+            header: 'Confirmation de suppression',
+            acceptLabel: 'Supprimer',
+            rejectLabel: 'Annuler',
+            rejectClassName: 'mr-2.5 p-1.5 text-redColor',
+            acceptClassName: 'bg-actionColor text-white p-1.5',
+            accept: async () => {
+                await handleDelete(contact);
+            },
+        });
     };
 
     return (
@@ -62,7 +83,7 @@ const ContactList: React.FC<{ contacts: ContactDto[] }> = ({ contacts: initialCo
                                 <Button
                                     icon="pi pi-trash"
                                     className="p-button-danger"
-                                    onClick={() => showConfirmation(contact)}
+                                    onClick={() => openDeleteContactDialog(contact)}
                                     label="Supprimer"
                                 />
                             </div>
@@ -70,38 +91,6 @@ const ContactList: React.FC<{ contacts: ContactDto[] }> = ({ contacts: initialCo
                     ))}
                 </div>
             )}
-
-            <Dialog
-                header="Confirmation"
-                visible={isDialogVisible}
-                style={{ width: '400px' }}
-                onHide={() => setIsDialogVisible(false)}
-                footer={
-                    <div className="flex justify-end gap-4">
-                        <Button
-                            label="Annuler"
-                            icon="pi pi-times"
-                            onClick={() => setIsDialogVisible(false)}
-                            className="p-button-text"
-                        />
-                        <Button
-                            label="Supprimer"
-                            icon="pi pi-check"
-                            onClick={handleDelete}
-                            className="p-button-danger p-button-text"
-                            style={{ color: 'red' }}
-                        />
-                    </div>
-                }
-            >
-
-                <p>Voulez-vous vraiment supprimer ce contact ?</p>
-                {contactToDelete && (
-                    <p className="text-gray-800 mt-2">
-                        <strong>{`${contactToDelete.firstName} ${contactToDelete.lastName}`}</strong>
-                    </p>
-                )}
-            </Dialog>
         </div>
     );
 };
