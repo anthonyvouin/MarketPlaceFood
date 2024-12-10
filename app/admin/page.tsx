@@ -26,21 +26,21 @@ export default function Admin() {
 
     const kpiData = [
         {
-            title: "Orders",
+            title: "Nombre de commandes",
             value: orderCount !== null ? orderCount.toString() : "Loading...", 
             icon: "pi pi-shopping-cart",
             bgColor: "bg-yellow-100",
             textColor: "text-yellow-600"
         },
         {
-            title: "Users",
+            title: "Nombre d'utilisateurs",
             value: userCount !== null ? userCount.toString() : "Loading...", 
             icon: "pi pi-users",
             bgColor: "bg-blue-100",
             textColor: "text-blue-600"
         },
         {
-            title: "Total Money",
+            title: "Revenu total",
             value: TotalMoney !== null ? TotalMoney.toString() : "Loading...",
             icon: "pi pi-dollar",
             bgColor: "bg-green-100",
@@ -51,7 +51,7 @@ export default function Admin() {
 
     return (
         <div className="h-full bg-primaryBackgroundColor p-10">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Dashboard KPI </h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Données importantes </h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {kpiData.map((kpi, index) => (
                     <div
