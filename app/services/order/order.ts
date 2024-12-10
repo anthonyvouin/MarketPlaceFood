@@ -16,7 +16,6 @@ export async function getAllOrders() {
             },
         });
 
-        console.log("Orders fetched from DB:", orders); 
         return orders;
     } catch (error) {
         console.error('Erreur lors de la récupération des commandes:', error);
