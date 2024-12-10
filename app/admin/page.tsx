@@ -63,7 +63,7 @@ export default function Admin() {
                         </div>
                         <div className="ml-4">
                             <p className="text-lg font-medium text-gray-600">{kpi.title}</p>
-                            <p className={`text-2xl font-bold ${kpi.textColor}`}>{kpi.value}</p>
+                            <p className={`text-2xl font-bold ${kpi.textColor}`}>{kpi.value}  </p>
                         </div>
                     </div>
                 ))}

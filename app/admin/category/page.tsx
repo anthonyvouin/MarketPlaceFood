@@ -33,7 +33,7 @@ const CategoryPage = () => {
         } catch (error) {
 
             console.error('Erreur lors de la suppression de la catégorie:', error);
-            show('Erreur de suppression', 'La category est rattachée à des produits.', 'error');
+            show('Erreur de suppression', 'La categorie est rattachée à des produits.', 'error');
 
         }
     };

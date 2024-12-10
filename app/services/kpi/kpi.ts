@@ -1,5 +1,6 @@
 'use server';
 
+import { formatPriceEuro } from '@/app/pipe/formatPrice';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -27,7 +28,7 @@ export async function getTotalUserCount(): Promise<number> {
 }
 
 
-export async function getTotalMoney(): Promise<number> {
+export async function getTotalMoney(): Promise<string> {
     try {
         const totalRevenue = await prisma.order.aggregate({
             _sum: {
@@ -35,7 +36,10 @@ export async function getTotalMoney(): Promise<number> {
             },
         });
 
-        return totalRevenue._sum.totalAmount ?? 0; 
+        
+        const totalAmount = totalRevenue._sum.totalAmount ?? 0; 
+        return formatPriceEuro(totalAmount);
+
     } catch (error) {
         console.error('Erreur lors du calcul du revenu total :', error);
         throw new Error('Erreur lors du calcul du revenu total.');
