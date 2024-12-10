@@ -6,7 +6,7 @@ import { getTotalOrderCount, getTotalUserCount, getTotalMoney } from "@/app/serv
 export default function Admin() {
     const [orderCount, setOrderCount] = useState<number | null>(null);
     const [userCount, setUserCount] = useState<number | null>(null);
-    const [TotalMoney, setTotalMoney] = useState<number | null>(null);
+    const [TotalMoney, setTotalMoney] = useState<string | null>(null);
 
 
     useEffect(() => {
