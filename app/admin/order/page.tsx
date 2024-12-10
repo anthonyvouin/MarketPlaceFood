@@ -28,9 +28,9 @@ const OrderPage: React.FC = () => {
     fetchOrders();
   }, []);
 
-  const indexOfLastOrder = currentPage * itemsPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
-  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const indexOfLastOrder: number = currentPage * itemsPerPage;
+  const indexOfFirstOrder: number = indexOfLastOrder - itemsPerPage;
+  const currentOrders: OrderDto[] = orders.slice(indexOfFirstOrder, indexOfLastOrder);
 
   const totalPages = Math.ceil(orders.length / itemsPerPage);
 
