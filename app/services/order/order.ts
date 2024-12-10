@@ -1,12 +1,11 @@
 "use server";
 
-import { OrderDto } from '@/app/interface/order/orderDto';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export async function getAllOrders(): Promise<OrderDto[]> {
+export async function getAllOrders() {
     try {
-        const orders: OrderDto[] = await prisma.order.findMany({
+        const orders= await prisma.order.findMany({
             include: {
                 orderItems: {
                     include: {
