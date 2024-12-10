@@ -30,7 +30,7 @@ const OrderPage: React.FC = () => {
 
   const indexOfLastOrder: number = currentPage * itemsPerPage;
   const indexOfFirstOrder: number = indexOfLastOrder - itemsPerPage;
-  const currentOrders: OrderDto[] = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const currentOrders= orders.slice(indexOfFirstOrder, indexOfLastOrder);
 
   const totalPages = Math.ceil(orders.length / itemsPerPage);
 
