@@ -84,6 +84,12 @@ const RecipeDetailPage = () => {
         unit: ingredient.unit,
       }));
 
+      ingredients.push(...recipe.recipeMissingIngredientReports.map(ingredient => ({
+        name: ingredient.missingIngredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+      })));
+
       const generatedSteps = await generateRecipes("generate-steps", {
         name: recipe.name,
         description: recipe.description,
@@ -149,11 +155,9 @@ const RecipeDetailPage = () => {
     );
   }
 
-  // Main render
   return (
     <div className="min-h-screen bg-primaryBackgroundColor">      
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        {/* Recipe Header */}
         <div className=" rounded-2xl overflow-hidden">
           {recipeDetails.image && (
             <div className="relative rounded-full h-96 w-full">
@@ -161,7 +165,6 @@ const RecipeDetailPage = () => {
                 src={recipeDetails.image !== "" ? recipeDetails.image : "/images/default-image.png"}
                 alt={recipeDetails.name}
                 imageClassName="w-full h-full object-cover object-center"
-                // preview
               />
               <div className="absolute top-4 right-4">
                 <button

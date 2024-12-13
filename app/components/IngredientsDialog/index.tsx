@@ -1,17 +1,40 @@
+"use client"
+
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { useState, useEffect, useContext } from "react";
 import { generateRecipes } from "@/app/services/ia-integration/ia";
-import { getImageFromGoogle } from "@/app/services/products/product";
+import { getImageFromGoogle, getImageFromPixabay } from "@/app/services/products/product";
 import { createRecipe } from "@/app/services/recipes";
 import { ToastContext } from "@/app/provider/toastProvider";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function IngredientsDialog({ visible, ingredients, recipeName, onHide, addProduct, format }) {
     const [selectedIngredients, setSelectedIngredients] = useState([]);
     const { show } = useContext(ToastContext);
-
+    const router = useRouter();
     const { data: session } = useSession();
+
+    async function createAnalyzedRecipe(ingredients) {
+        try {
+            const userConnected = session.user.id;
+            const recipes = await generateRecipes("generate-recipe-from-image-of-recipe", "", ingredients.original_ingredients, recipeName);
+
+            for (const recipe of recipes) {
+                const generatedImageForRecipe = await getImageFromPixabay(recipe.englishName);
+                recipe.image = generatedImageForRecipe;
+                delete recipe.englishName;
+                const createdRecipe = await createRecipe(recipe, userConnected);
+                router.push(`/recipes/${createdRecipe.slug}`);
+            }
+
+           
+        } catch (error) {
+            console.error(error);
+            show("Erreur", "Erreur lors de la création de la recette", "error");
+        } 
+    }
 
     async function generateRecipe(format) {
         try {
@@ -19,20 +42,22 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
                 show("Erreur", "Vous devez être connecté pour générer des recettes", "error");
                 return;
             }
+            let recipes: any[] = [];
             const user = session.user.id;
-            let recipes = [];
             const ingredientsToUse = selectedIngredients.filter(ingredient => ingredient.mustBeUsed);
             recipes = await generateRecipes(format, "", ingredientsToUse);
             const generatedRecipes = [];
             for (const recipe of recipes) {
-                const generatedImageForRecipe = await getImageFromGoogle(recipe.name);
+                const generatedImageForRecipe = await getImageFromPixabay(recipe.englishName);
                 recipe.image = generatedImageForRecipe;
+                delete recipe.englishName;
                 const createdRecipe = await createRecipe(recipe, user);
                 generatedRecipes.push(createdRecipe);
             }
 
             if (generatedRecipes.length > 0) {
                 show("Succès", "Recettes générées avec succès", "success");
+                router.push(`/recipes/${generatedRecipes[0].slug}`);
             } else {
                 show("Erreur", "Erreur lors de la génération des recettes", "error");
             }
@@ -76,18 +101,28 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
                     onClick={() => generateRecipe("generate-recipes-from-fridge")}
                 />
             )}
-            {format === 'recipe' && ingredients.products_found.length > 0 && (
-                <Button
-                    label="Tout ajouter au panier"
-                    icon="pi pi-shopping-cart"
-                    onClick={() => {
-                        ingredients.products_found.forEach(ingredient => {
-                            addProduct(ingredient, 1);
-                        });
-                        onHide();
-                    }}
-                    className="p-button-success"
-                />
+            {format === 'recipe' && (
+                <>
+                { ingredients.products_found.length > 0 && (
+                    <Button
+                        label="Tout ajouter au panier"
+                        icon="pi pi-shopping-cart"
+                        onClick={() => {
+                            ingredients.products_found.forEach(ingredient => {
+                                addProduct(ingredient, 1);
+                            });
+                            onHide();
+                        }}
+                        className="p-button-success"
+                    />
+                )}
+
+                    <Button
+                        label="Générer une recette"
+                        icon="pi pi-external-link"
+                        onClick={() => createAnalyzedRecipe(ingredients, session.user.id)}
+                    />
+                </>
             )}
         </div>
     );
@@ -153,16 +188,14 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
                     {selectedIngredients.map((ingredient, index) => (
                         <div
                             key={index}
-                            className={`flex justify-between items-center p-3 border rounded ${
-                                ingredient.mustBeUsed ? 'bg-green-100 border-green-500' : 'bg-red-100 border-red-500'
-                            }`}
+                            className={`flex justify-between items-center p-3 border rounded ${ingredient.mustBeUsed ? 'bg-green-100 border-green-500' : 'bg-red-100 border-red-500'
+                                }`}
                         >
                             <span>{ingredient.name}</span>
                             <Button
                                 icon={ingredient.mustBeUsed ? "pi pi-check" : "pi pi-times"}
-                                className={`p-button-rounded ${
-                                    ingredient.mustBeUsed ? "p-button-success" : "p-button-danger"
-                                } p-button-sm`}
+                                className={`p-button-rounded ${ingredient.mustBeUsed ? "p-button-success" : "p-button-danger"
+                                    } p-button-sm`}
                                 onClick={() => toggleIngredientUsage(index)}
                             />
                         </div>

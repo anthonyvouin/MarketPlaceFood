@@ -18,7 +18,6 @@ export async function getMissingIngredientReportById(id: string): Promise<Missin
 
 export async function createOrUpdateMissingIngredientReport(data: Prisma.MissingIngredientReportCreateInput): Promise<MissingIngredientReportDto> {
     try {
-        // Si le rapport d'ingrédient manquant existe déjà par rapport à son nom, on le met à jour
         const existingReport = await prisma.missingIngredientReport.findFirst({
             where: {
                 name: data.name,
@@ -41,7 +40,7 @@ export async function createOrUpdateMissingIngredientReport(data: Prisma.Missing
             },
         });
     } catch (error) {
-        console.error("Erreur lors de la création ou de la mise à jour du rapport d'ingrédient manquant :", error);
+        console.log("Erreur lors de la création ou de la mise à jour du rapport d'ingrédient manquant :", error);
         throw new Error("La création ou la mise à jour du rapport d'ingrédient manquant a échoué.");
     }
 }

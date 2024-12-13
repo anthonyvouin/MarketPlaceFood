@@ -6,7 +6,7 @@ import Link from 'next/link';
 const RecipeCard = ({ recipe }: { recipe: RecipeDto }) => {
 
     const header = (
-        <img alt="Card" src={recipe.image} width={300} height={150} />
+        <img alt="Card" src={recipe.image} className='w-full h-60 object-cover' />
     );
 
     const footer = (

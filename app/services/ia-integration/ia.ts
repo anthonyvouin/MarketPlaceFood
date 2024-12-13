@@ -115,7 +115,7 @@ export async function analysePicture(format: string = 'recipe', imageUrl: string
   }
 }
 
-export async function generateRecipes(format: string, complement: string = "", products?: any) {
+export async function generateRecipes(format: string, complement: string = "", products?: any, recipeName?: string) {
   try {
     let formattedIngredients = null
 
@@ -127,17 +127,21 @@ export async function generateRecipes(format: string, complement: string = "", p
         break;
       case "generate-recipes-from-fridge":
         formattedIngredients = JSON.stringify(products)
-        prompt = "Je vais te fournir une liste d'ingrédients alimentaires. À partir de cette liste, je vais créer un tableau de recettes (maximum 1 recette) conçues pour impressionner les convives. Chaque recette sera cohérente, délicieuse et réalisable avec les ingrédients fournis. La cohérence entre les ingrédients est essentielle : chaque recette sera construite de manière logique avec des ingrédients qui se marient bien ensemble. J'utiliserai uniquement les ingrédients de la liste, ainsi que du sel et du poivre. De plus, chaque recette inclura tous les produits de la liste.";
+        prompt = "Je vais te fournir une liste d'ingrédients alimentaires. tu devras créer un tableau de recettes (maximum 1 recette). Chaque recette sera cohérente, délicieuse et réalisable avec les ingrédients fournis. La cohérence entre les ingrédients est essentielle : chaque recette sera construite de manière logique avec des ingrédients qui se marient bien ensemble. J'utiliserai uniquement les ingrédients de la liste, ainsi que du sel et du poivre.";
         break;
       case "generate-recipes-from-cart":
         formattedIngredients = JSON.stringify(products)
-        prompt = "Je vais te fournir une liste d'objets représentant des produits. À partir de cette liste, génère un tableau de recettes (maximum 2 recettes)";
+        prompt = "Je vais te fournir une liste d'ingrédients alimentaires. À partir de cette liste, tu devras créer un tableau de recettes (maximum 1 recette). Chaque recette sera cohérente, délicieuse et réalisable avec les ingrédients fournis. La cohérence entre les ingrédients est essentielle : chaque recette sera construite de manière logique avec des ingrédients qui se marient bien ensemble. J'utiliserai uniquement les ingrédients de la liste, ainsi que du sel et du poivre.";
+        break;
+      case "generate-recipe-from-image-of-recipe":
+        formattedIngredients = JSON.stringify(products)
+        prompt = `Génère moi une recette pour le plat suivant : ${recipeName}. Tu devras me retourner un tableau qui contient le nom de la recette que je t'ai donnée et la liste des ingrédients que je t'ai donnée.`
         break;
       default:
         // generate-recipes-from-bdd
         const ingredients = await getAllProducts({ id: true, name: true, price: true })
         formattedIngredients = JSON.stringify(ingredients)
-        prompt = "Je vais te fournir une liste d'ingrédients alimentaires. À partir de cette liste, je vais créer un tableau de recettes (maximum 3 recettes) conçues pour impressionner les convives. Chaque recette sera cohérente, délicieuse et réalisable avec les ingrédients fournis. La cohérence entre les ingrédients est essentielle : chaque recette sera construite de manière logique avec des ingrédients qui se marient bien ensemble. J'utiliserai uniquement les ingrédients de la liste, ainsi que du sel et du poivre. De plus, chaque recette inclura tous les produits de la liste.";
+        prompt = "Je vais te fournir une liste d'ingrédients alimentaires. À partir de cette liste, je vais créer un tableau de recettes (maximum 3 recettes) conçues pour impressionner les convives. Chaque recette sera cohérente, délicieuse et réalisable avec les ingrédients fournis. La cohérence entre les ingrédients est essentielle : chaque recette sera construite de manière logique avec des ingrédients qui se marient bien ensemble. J'utiliserai uniquement les ingrédients de la liste, ainsi que du sel et du poivre.";
       // prompt = "Je vais te passer un tableau d'objet (sans le format JSON) de produits et tu devras me sortir un tableau d'objet (sans le format JSON) de recettes qui te semblent pertinentes, sans commentaire, chaque recette doit contenir un nom (name), une description (description), une catégorie (category) qui doit être une des propositions suivantes: Apéritif, Entrée, Plat, Dessert, Gourmandise et un tableau d'ingrédients qui contient les id des produits que tu veux utiliser et la quantité associé à chaque produit et pour chaque recette"
     }
 
@@ -147,6 +151,9 @@ export async function generateRecipes(format: string, complement: string = "", p
       role: "system",
       content: "Tu es une API utilisée par un site ecommerce de produits alimentaires et un site de recettes de cuisine. Tu as la capacité de générer des recettes de cuisine à partir d'ingrédients donnés. Tu peux créer des recettes de chef culinaire renommé, expert en gastronomie. Ton objectif est de proposer des recettes cohérentes et délicieuses en sélectionnant des ingrédients adaptés à chaque plat tout en respectant les traditions et les associations culinaires appropriées."
     }, {
+      role: "system",
+      content: "Tu dois répondre en français, que ce soit le nom des recettes, les descriptions, les ingrédients, les étapes de préparation, les quantités, les unités de mesure, les temps de préparation et de cuisson, les images, les difficultés"
+    },{
       role: "user",
       content: prompt
     })
@@ -178,11 +185,21 @@ export async function generateRecipes(format: string, complement: string = "", p
                       description: "Nom de la recette",
                       required: ["name", "description", "type", "slug", "difficulty", "preparationTime", "cookingTime", "servings", "image", "ingredients"]
                     },
+                    englishName: {
+                      type: "string",
+                      description: "Nom de la recette en anglais",
+                      required: ["englishName"]
+                    },
                     description: {
                       type: "string",
                       description: "Description de la recette",
                       required: ["description"]
                     },
+                    // image_decoration_url: {
+                    //   type: "string",
+                    //   description: "Chemin de l'image de décoration",
+                    //   required: ["image_decoration_url"]
+                    // },
                     type: {
                       type: "string",
                       description: "Type de la recette (STARTER, MAIN_DISH, DESSERT, SNACK, SIDE_DISH, BREAKFAST, BEVERAGE)",
@@ -223,10 +240,10 @@ export async function generateRecipes(format: string, complement: string = "", p
                       items: {
                         type: "object",
                         properties: {
-                          productId: {
+                          name: {
                             type: "string",
-                            description: "ID du produit",
-                            required: ["productId"]
+                            description: "Nom de l'ingrédient",
+                            required: ["name"]
                           },
                           quantity: {
                             type: "number",
@@ -291,7 +308,7 @@ export async function generateRecipes(format: string, complement: string = "", p
 
     //? ça marche bien j'ai l'impression
     const response = await openai.chat.completions.create({
-      "model": "gpt-4o-mini",
+      "model": "gpt-4o",
       "messages": message,
       response_format: formatOfReturn || undefined
     });

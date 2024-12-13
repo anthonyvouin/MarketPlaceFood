@@ -9,7 +9,7 @@ import { Dialog } from "primereact/dialog";
 import { createRecipe, getAllRecipes, getRandomRecipes } from "../services/recipes";
 import { analysePicture, generateRecipes } from "../services/ia-integration/ia";
 // import Link from "next/link";
-import { getImageFromGoogle, searchProduct } from "../services/products/product";
+import { getImageFromGoogle, getImageFromPixabay, getImageFromUnsplash, searchProduct } from "../services/products/product";
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { createOrUpdateMissingIngredientReport } from "../services/missingIngredientReport";
 import RecipeCard from "../components/recipe/RecipeCard";
@@ -40,11 +40,10 @@ export default function RecipesPage() {
     const handleImageUpload = async (formData) => {
         try {
             const imagePath = await uploadTemporaryImageToCloudinary(formData);
-
             if (selectedAction === "analyse-recipe") {
-                analysePictureWithAI("recipe", imagePath);
+                await analysePictureWithAI("recipe", imagePath);
             } else if (selectedAction === "fridge") {
-                analysePictureWithAI("fridge", imagePath);
+                await analysePictureWithAI("fridge", imagePath);
             }
 
             return imagePath;
@@ -56,6 +55,10 @@ export default function RecipesPage() {
 
     async function analysePictureWithAI(format, imagePath) {
         try {
+            if (!session) {
+                show("Erreur", "Vous devez être connecté pour générer des recettes", "error");
+                return;
+            }
             setSelectedFormat(format);
             setLoading(true);
             const recipe = await analysePicture(format, imagePath);
@@ -71,7 +74,6 @@ export default function RecipesPage() {
                 originalIngredients.push(ingredient);
                 if (!isIngredientExist) {
                     notFoundProducts.push(ingredient.name);
-                    // const report = createOrUpdateMissingIngredientReport({ name: ingredient.name });
                 } else {
                     foundProducts.push(ingredientInBdd);
                 }
@@ -137,8 +139,9 @@ export default function RecipesPage() {
 
             const generatedRecipes = [];
             for (const recipe of recipes) {
-                const generatedImageForRecipe = await getImageFromGoogle(recipe.name);
+                const generatedImageForRecipe = await getImageFromPixabay(recipe.englishName);
                 recipe.image = generatedImageForRecipe;
+                delete recipe.englishName;
                 const createdRecipe = await createRecipe(recipe, user);
                 generatedRecipes.push(createdRecipe);
                 getLastRecipes();

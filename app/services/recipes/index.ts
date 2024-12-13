@@ -1,6 +1,6 @@
 "use server"
 
-import { PrismaClient, Prisma, RecipeType } from '@prisma/client';
+import { PrismaClient, Prisma, RecipeType, Recipe } from '@prisma/client';
 import { searchProduct } from '../products/product';
 import { createOrUpdateMissingIngredientReport } from '../missingIngredientReport';
 
@@ -17,7 +17,7 @@ type CreateRecipeInput = {
     difficulty: string;
     type: RecipeType;
     ingredients: {
-        productId: string;
+        name: string;
         quantity: number;
         unit: string;
     }[];
@@ -37,10 +37,11 @@ type CreateRecipeInput = {
 type UpdateRecipeInput = Partial<Omit<CreateRecipeInput, 'userId'>>;
 
 // Créer une recette
-export async function createRecipe(data: CreateRecipeInput, userId: string): Promise<any | null> {
+export async function createRecipe(data: CreateRecipeInput, userId: string): Promise<unknown | null> {
     try {
+
         const { ingredients, steps, ...recipeData } = data;
-        
+
         switch (data.type) {
             case "BEVERAGE":
                 recipeData.type = RecipeType.BEVERAGE;
@@ -68,46 +69,61 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
                 break;
         }
 
-        const foundProducts: any[] = [];
-        const notFoundProducts: { id: string; name: string; quantity: number; unit: string }[] = [];
+        if (!data.name || !data.slug || !Array.isArray(data.ingredients)) {
+            throw new Error("Les données de la recette sont invalides.");
+        }
+    
+        const existingRecipe = await prisma.recipe.findUnique({
+            where: { slug: data.slug }
+        });
 
+        if (existingRecipe) {
+            return getRecipeById(existingRecipe.id);
+        }
+    
+        const foundProducts: any[] = [];
+        const notFoundProducts: any[] = [];
         for (const ingredient of ingredients) {
-            const ingredientInBdd = await searchProduct(ingredient.name)
-            const isIngredientExist = ingredientInBdd ? true : false;
-            if (!isIngredientExist) {
-                const report = await createOrUpdateMissingIngredientReport({ name: ingredient.productId });
-                notFoundProducts.push({
-                    id: report.id,
-                    quantity: ingredient.quantity,
-                    unit: ingredient.unit
-                });
+            const product = await searchProduct(ingredient.name);
+            if (product) {
+                foundProducts.push({ ...product, quantity: ingredient.quantity, unit: ingredient.unit });
             } else {
-                foundProducts.push(ingredientInBdd);
+                const report = await createOrUpdateMissingIngredientReport({ name: ingredient.name });
+                notFoundProducts.push({ ...report, quantity: ingredient.quantity, unit: ingredient.unit });
             }
         }
+
+        // enlever les doublons
+        foundProducts.forEach((product, index) => {
+            const foundIndex = foundProducts.findIndex(p => p.id === product.id);
+            if (foundIndex !== index) {
+                foundProducts.splice(index, 1);
+            }
+        });
+
+        notFoundProducts.forEach((product, index) => {
+            const foundIndex = notFoundProducts.findIndex(p => p.id === product.id);
+            if (foundIndex !== index) {
+                notFoundProducts.splice(index, 1);
+            }
+        });
 
         const recipe = await prisma.recipe.create({
             data: {
                 ...recipeData,
-                createdBy: {
-                    connect: { id: userId }
-                },
+                createdBy: { connect: { id: userId } },
                 recipeIngredients: {
                     create: foundProducts.map(ing => ({
                         quantity: new Prisma.Decimal(ing.quantity),
                         unit: ing.unit,
-                        product: {
-                            connect: { id: ing.productId }
-                        }
+                        product: { connect: { id: ing.id } }
                     }))
                 },
                 recipeMissingIngredientReports: {
                     create: notFoundProducts.map(ing => ({
                         quantity: new Prisma.Decimal(ing.quantity),
                         unit: ing.unit,
-                        missingIngredient: {
-                            connect: { id: ing.id }
-                        }
+                        missingIngredient: { connect: { id: ing.id } }
                     }))
                 },
                 steps: steps ? {
@@ -118,19 +134,12 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
                         duration: step.duration
                     }))
                 } : undefined
-            },
-            include: {
-                recipeIngredients: {
-                    include: {
-                        product: true
-                    }
-                },
-                steps: true,
-                createdBy: true
             }
         });
 
-        return JSON.parse(JSON.stringify(recipe));
+        const createdRecipe = getRecipeById(recipe.id);
+
+        return createdRecipe
     } catch (error) {
         if (error.code === 'P2002') {
             console.log("Recipe already exists, skipping:", data.name);
@@ -184,6 +193,11 @@ export async function getRecipeById(id: string): Promise<any> {
                 recipeIngredients: {
                     include: {
                         product: true
+                    }
+                },
+                recipeMissingIngredientReports: {
+                    include: {
+                        missingIngredient: true
                     }
                 },
                 steps: {

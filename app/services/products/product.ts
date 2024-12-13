@@ -1,20 +1,23 @@
 "use server"
 
 import Fuse from 'fuse.js';
-import {Prisma, PrismaClient, Product} from '@prisma/client';
-import {ProductDto} from '@/app/interface/product/productDto';
-import {CategoryDto} from "@/app/interface/category/categoryDto";
-import {DiscountDto} from "@/app/interface/discount/discountDto";
+import { Prisma, PrismaClient, Product } from '@prisma/client';
+import { ProductDto } from '@/app/interface/product/productDto';
+import { CategoryDto } from "@/app/interface/category/categoryDto";
+import { DiscountDto } from "@/app/interface/discount/discountDto";
 
 const prisma = new PrismaClient();
 
 const fuseOptions = {
     includeScore: true,
-    shouldSort: true,
-    threshold: 0.2,
-    keys: ['name'],
-    findAllMatches: false,
-    minMatchCharLength: 2
+    threshold: 0.3,
+    keys: ['name'], 
+    minMatchCharLength: 3,
+    findAllMatches: true,
+    shouldSort: false,
+    ignoreLocation: true, // si false, plus c'est au début du mot, plus le score est élevé
+    ignoreFieldNorm: true, // si true, plus le mot est long, plus le score est élevé
+    includeMatches: false,
 };
 
 export async function createProduct(product: ProductDto): Promise<ProductDto> {
@@ -28,7 +31,7 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
     // }
 
     const existingName: Product | null = await prisma.product.findUnique({
-        where: {name: product.name}
+        where: { name: product.name }
     })
 
     if (existingName) {
@@ -36,7 +39,7 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
     }
 
     const existingSlug: Product | null = await prisma.product.findUnique({
-        where: {slug: product.slug}
+        where: { slug: product.slug }
     })
 
     if (existingSlug) {
@@ -45,7 +48,7 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
 
     try {
         const existingCategory: CategoryDto | null = await prisma.category.findUnique({
-            where: {id: product.categoryId},
+            where: { id: product.categoryId },
         });
 
         if (!existingCategory) {
@@ -56,7 +59,7 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
             data: {
                 name: product.name ? product.name : 'pas de nom',
                 slug: product.slug ? product.slug : 'pas de slug',
-                description: product.description?product.description:'pas de descriptions',
+                description: product.description ? product.description : 'pas de descriptions',
                 image: product.image ? product.image : 'https://images.openfoodfacts.org/images/products/544/900/013/1805/front_en.602.400.jpg',
                 price: product.price ? product.price : 500,
                 categoryId: product.categoryId,
@@ -97,7 +100,7 @@ export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise
                 }
             }
         }
-            
+
         return await prisma.product.findMany({
             select: {
                 ...fields
@@ -145,10 +148,11 @@ export async function getImageFromGoogle(name: string): Promise<string> {
     }
 
     try {
-        const encodedQuery = encodeURIComponent(name);
-        const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodedQuery}&searchType=image&num=1&imgSize=medium&safe=active&excludeTerms=facebook.com,instagram.com,pinterest.com`;
+        const encodedQuery = encodeURIComponent(`${name} elegant presentation recipe professional dish`);
+        const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodedQuery}&searchType=image&num=5&imgSize=large&safe=active&excludeTerms=facebook.com,instagram.com,pinterest.com`;
+
         const response = await fetch(url);
-        
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             throw new Error(`Erreur API Google (${response.status}): ${errorData.error?.message || response.statusText}`);
@@ -157,41 +161,113 @@ export async function getImageFromGoogle(name: string): Promise<string> {
         const data = await response.json();
 
         if (!data.items || !data.items.length) {
+            console.warn('Aucune image trouvée, utilisation de l\'image par défaut.');
             return '/images/default-image.png';
         }
 
-        const imageUrl = data.items[0].link;
-
-        if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.match(/^https?:\/\/.+/)) {
-            return '/images/default-image.png';
+        for (const item of data.items) {
+            // const isImageLargeEnough = item.image?.width >= 800 && item.image?.height >= 600; // Taille minimale
+            if (item.link && item.link.match(/^https?:\/\/.+/)) {
+                return item.link;
+            }
         }
 
-        return imageUrl;
+        console.warn('Aucune image pertinente trouvée, utilisation de l\'image par défaut.');
+        return '/images/default-image.png';
 
     } catch (error) {
         console.error('Erreur lors de la récupération de l\'image :', error);
-        return '/images/default-image.png'; // Return default image in case of any error
+        return '/images/default-image.png';
     }
 }
 
-export async function searchProduct(name: string, minScore: number = 0.35): Promise<ProductDto | null> {
-    try {
-        // Normalisation du nom de l'ingrédient
-        const normalizedName = name
-            .toLowerCase()
-            .replace(/[^\w\s]/g, '')
-            .trim();
 
+export async function getImageFromUnsplash(query: string): Promise<string> {
+    const unsplash_api_url = process.env.UNSPLASH_API_URL;
+    const unsplash_access_key = process.env.UNSPLASH_ACCESS_KEY;
+    if (!query) {
+        throw new Error('Le paramètre query doit être une chaîne de caractères non vide.');
+    }
+
+    const url = `${unsplash_api_url}/search/photos?query=${encodeURIComponent(query)}&per_page=1&client_id=${unsplash_access_key}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Erreur API Unsplash (${response.status}): ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        if (data.results && data.results.length > 0) {
+            return data.results[0].urls.regular; // URL de l'image
+        } else {
+            return '/images/default-image.png'; // Image par défaut
+        }
+    } catch (error) {
+        console.error('Erreur lors de la récupération de l\'image depuis Unsplash :', error);
+        return '/images/default-image.png';
+    }
+}
+
+export async function getImageFromPixabay(name: string): Promise<string> {
+    if (!name || typeof name !== 'string') {
+        throw new Error('Le paramètre name doit être une chaîne de caractères non vide');
+    }
+
+    const apiKey = process.env.PIXABAY_API_KEY;
+    console.log(apiKey);
+
+    if (!apiKey) {
+        throw new Error('La clé API Pixabay (PIXABAY_API_KEY) est requise');
+    }
+
+    try {
+        const encodedQuery = encodeURIComponent(`${name} food recipe elegant dish`);
+        const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodedQuery}&image_type=photo&category=food&per_page=5&min_width=800&min_height=600&safesearch=true`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`Erreur API Pixabay (${response.status}): ${errorData.error?.message || response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.hits || !data.hits.length) {
+            console.warn('Aucune image trouvée, utilisation de l\'image par défaut.');
+            return '/images/default-image.png';
+        }
+
+        for (const hit of data.hits) {
+            if (hit.webformatURL && hit.webformatURL.match(/^https?:\/\/.+/)) {
+                return hit.webformatURL;
+            }
+        }
+
+        console.warn('Aucune image pertinente trouvée, utilisation de l\'image par défaut.');
+        return '/images/default-image.png';
+
+    } catch (error) {
+        console.error('Erreur lors de la récupération de l\'image Pixabay :', error);
+        return '/images/default-image.png';
+    }
+}
+
+export async function searchProduct(name: string, minScore: number = 0.36): Promise<ProductDto | null> {
+    try {
         const allProducts = await getAllProducts();
 
         const fuse = new Fuse(allProducts, fuseOptions);
 
-        const results = fuse.search(normalizedName);
+        const results = fuse.search(name);
 
-        const filteredResults = results.filter(result => result.score && result.score >= minScore);
+        const filteredResults = results.filter(result => result.score && result.score <= minScore);
+        if (filteredResults.length === 0) {
+            return null;
+        }
 
-        // Retourne le meilleur résultat
-        return filteredResults.length > 0 ? filteredResults[0].item : null;
+        return filteredResults[0].item;
     } catch (error) {
         console.error("Erreur lors de la recherche floue du produit :", error);
         return null;
@@ -201,8 +277,8 @@ export async function searchProduct(name: string, minScore: number = 0.35): Prom
 export async function getProductById(id: string): Promise<ProductDto | null> {
     try {
         return await prisma.product.findUnique({
-            where: {id},
-            include: {category: true, discount: true},
+            where: { id },
+            include: { category: true, discount: true },
         });
     } catch (error) {
         console.error("Erreur lors de la récupération du produit :", error);
@@ -213,8 +289,8 @@ export async function getProductById(id: string): Promise<ProductDto | null> {
 export async function getProductBySlug(slug: string): Promise<ProductDto | null> {
     try {
         return await prisma.product.findUnique({
-            where: {slug: slug, visible: true},
-            include: {category: true, discount: true},
+            where: { slug: slug, visible: true },
+            include: { category: true, discount: true },
         });
     } catch (error) {
         console.error("Erreur lors de la récupération du produit :", error);
@@ -245,12 +321,12 @@ export async function filterProduct(filters: {
         return await prisma.product.findMany({
             where: {
                 AND: [
-                {visible: true},
-                ...(customFilters.length > 0 ?  customFilters: []),
+                    { visible: true },
+                    ...(customFilters.length > 0 ? customFilters : []),
 
-            ],
-        },
-            include: {category: true, discount: true},
+                ],
+            },
+            include: { category: true, discount: true },
         });
 
     } catch (error) {
@@ -272,19 +348,19 @@ export async function changeDiscount(product: ProductDto | null, discount: Disco
 
     if (findProduct) {
         return prisma.product.update({
-                where: {
-                    id: findProduct.id,
-                },
+            where: {
+                id: findProduct.id,
+            },
 
-                data: {
-                    ...findProduct, discountId: discount ? discount.id : null
-                },
+            data: {
+                ...findProduct, discountId: discount ? discount.id : null
+            },
 
-                include: {
-                    discount: true,
-                    category: true
-                },
-            }
+            include: {
+                discount: true,
+                category: true
+            },
+        }
         )
     } else {
         throw Error('produit non trouvé')
@@ -293,20 +369,20 @@ export async function changeDiscount(product: ProductDto | null, discount: Disco
 }
 
 export async function toggleProductVisibility(productId: string, visible: boolean): Promise<void> {
-try {
+    try {
 
-    
-    const product: Product | null  = await prisma.product.findUnique({where: {id: productId}});
 
-    if (!product) {
-        throw new Error('Le produit n\'existe pas.');
+        const product: Product | null = await prisma.product.findUnique({ where: { id: productId } });
+
+        if (!product) {
+            throw new Error('Le produit n\'existe pas.');
+        }
+        await prisma.product.update({
+            where: { id: productId },
+            data: { visible: visible },
+        });
+    } catch (error) {
+        console.error("Erreur lors du changement de visibilité du produit :", error);
+        throw new Error('Le changement de visibilité du produit a échoué.');
     }
-    await prisma.product.update({
-        where: {id: productId},
-        data: {visible: visible},
-    });
-} catch (error) {
-    console.error("Erreur lors du changement de visibilité du produit :", error);
-    throw new Error('Le changement de visibilité du produit a échoué.');
-}
 }
