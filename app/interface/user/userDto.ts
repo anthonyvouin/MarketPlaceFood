@@ -7,5 +7,6 @@ export interface UserDto {
   emailVerified: Date | null;
   image: string | null;
   addresses: AddressDto[];
-  role?: string; 
+  role?: string | null; 
+  
 }
