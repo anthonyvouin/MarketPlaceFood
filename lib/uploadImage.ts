@@ -2,9 +2,45 @@
 
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
+import cloudinary from 'cloudinary'; 
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; 
 const ALLOWED_FILE_TYPES = ['image/png', 'image/webp', 'image/jpeg'];
+
+
+cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+export async function uploadTemporaryImageToCloudinary(formData: FormData): Promise<string> {
+    const file = formData.get('file') as File;
+    if (!file) {
+        throw new Error('Aucun fichier n\'a été téléchargé');
+    }
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const result = await new Promise<cloudinary.UploadApiResponse>((resolve, reject) => {
+        const uploadStream = cloudinary.v2.uploader.upload_stream({
+            folder: 'temp',
+            resource_type: 'image',
+            type: 'upload',
+            invalidate: true,
+            eager: [{ transformation: { width: 500, crop: 'scale' } }],
+        }, (error, result) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        });
+        uploadStream.end(buffer);
+    });
+
+
+    return result.secure_url;
+}
+
 
 export async function uploadImage(formData: FormData): Promise<string> {
   const file = formData.get('file') as File

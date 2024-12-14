@@ -12,7 +12,7 @@ export interface ProductDto {
     updatedAt?: Date;
     categoryId: string;
     category?: CategoryDto;
-    discountId: string | null;
+    discountId?: string | null;
     discount?: DiscountDto | null;
     visible?: boolean | null;
 }

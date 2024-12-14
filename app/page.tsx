@@ -1,15 +1,18 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
+import {ProductDto} from "@/app/interface/product/productDto";
+import {generateRecipes} from "./services/ia-integration/ia";
+import {getPageName} from "@/app/utils/utils";
+import { RecipeDto } from "./interface/recipe/RecipeDto";
+import RecipeCard from "./components/recipe/RecipeCard";
+import { getAllProductsVisible } from "./services/products/product";
 import ProductCard from "./components/ProductCard/ProductCard";
-import { ProductDto } from "@/app/interface/product/productDto";
-import { getAllProductsVisible } from "@/app/services/products/product";
-import { generateRecipes } from "./services/ia-integration/ia";
-import { getPageName } from "@/app/utils/utils";
 
 export default function Home() {
 
     const [products, setProducts] = useState<ProductDto[]>([]);
+    const [recipes, setRecipes] = useState<RecipeDto[]>([]);
 
     useEffect((): void => {
         const fetchProducts = async (): Promise<void> => {
@@ -21,11 +24,10 @@ export default function Home() {
     }, []);
 
     const callGenerateRecipes = async (): Promise<void> => {
-        const recipes = await generateRecipes();
-        console.log(recipes);
+        const recipes = await generateRecipes("generate-recipes-from-bdd");
+        setRecipes(recipes);
     }
-
-
+    
     const bgColors: string[] = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
     return (
         <div className="w-full bg-primaryBackgroundColor min-h-[85vh]">
@@ -35,6 +37,11 @@ export default function Home() {
                         <h1 className="font-manrope font-bold text-5xl text-gray-900">Bienvenue sur notre site</h1>
                         <p className="font-manrope font-light text-2xl text-gray-900">L&apos;IA c&apos;est trop bien</p>
                         <button onClick={callGenerateRecipes}>Générer des recettes</button>
+                        <div className="grid grid-cols-3 gap-5">
+                            { recipes && recipes.map((recipe, index) => (
+                                <RecipeCard recipe={recipe} key={index}/>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
