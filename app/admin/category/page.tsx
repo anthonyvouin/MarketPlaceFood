@@ -146,7 +146,11 @@ const CategoryPage = () => {
         <div className="p-6 bg-primaryBackgroundColor h-full">
             <h1 className="text-3xl font-bold mb-8 text-center">Gestion des catégories</h1>
             <div className="flex flex-row-reverse mb-6">
-                <RoundedButton onClickAction={openPopupCreateUpdate} message="Ajouter une catégorie" positionIcon="left" classes="border-actionColor text-actionColor"></RoundedButton>
+                <RoundedButton onClickAction={openPopupCreateUpdate}
+                               message="Ajouter une catégorie"
+                               positionIcon="left"
+                               classes="border-actionColor text-actionColor">
+                </RoundedButton>
 
             </div>
             <CategoryList categories={categories} handleUpdate={handleUpdate} handleDelete={handleDelete}/>

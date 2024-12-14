@@ -120,7 +120,11 @@ export default function Discount() {
             <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Remises</h1>
 
             <div className="flex flex-row-reverse mb-6">
-                <RoundedButton onClickAction={openPopup} message="Ajouter un taux" positionIcon="left" classes="border-actionColor text-actionColor"></RoundedButton>
+                <RoundedButton onClickAction={openPopup}
+                               message="Ajouter un taux"
+                               positionIcon="left"
+                               classes="border-actionColor text-actionColor">
+                </RoundedButton>
             </div>
 
             {discounts && discounts.length > 0 ? (

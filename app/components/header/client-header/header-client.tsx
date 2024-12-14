@@ -8,12 +8,13 @@ import {Button} from "primereact/button";
 import {useCart} from "@/app/provider/cart-provider";
 import {useSideBarBasket} from "@/app/provider/sideBar-cart-provider";
 
-export default function HeaderClient() {
+export default function HeaderClient(): JSX.Element {
     const [name, setName] = useState('');
     const {data: session, status} = useSession()
-    const {totalLengthItems, updateProductList} = useCart();
+    const {totalLengthItems} = useCart();
     const {toggleBasketList} = useSideBarBasket();
-    useEffect(() => {
+
+    useEffect((): void => {
         if (session && session.user && session.user.name) {
             setName((session.user.name[0]).toUpperCase());
         }
@@ -28,14 +29,6 @@ export default function HeaderClient() {
                    focus:ring-blue-500 focus:outline-none focus:border-actionColor block p-2.5"/>
 
             <div className="flex gap-5 items-center">
-                <Link href="/contact">
-                    <Button
-                        rounded
-                        icon="pi pi-envelope"
-                        className="bg-actionColor text-white w-8 h-8 text-xs"
-                    />
-                </Link>
-
                 {status === 'authenticated' ? (
                     <>
                         <div className="relative">
@@ -59,12 +52,9 @@ export default function HeaderClient() {
 
                         {session?.user["role"] === "ADMIN" ? (
                             <Link href="/admin">
-                                <Button
-                                    rounded
-                                    icon="pi pi-folder"
-                                    className="bg-info text-white w-8 h-8 text-xs"
-                                >
-                                </Button>
+                                <div className="bg-info text-white w-8 h-8 text-xs rounded-full flex items-center justify-center">
+                                    <span className="pi pi-folder"></span>
+                                </div>
                             </Link>
                         ) : ("")}
 
