@@ -14,6 +14,7 @@ export async function createCategory(category: CategoryDto): Promise<CategoryDto
         return await prisma.category.create({
             data: {
                 name: category.name,
+                visible: true,
             },
         });
     } catch (error: any) {
@@ -53,6 +54,9 @@ export async function deleteCategoryById(id: CategoryDto['id']): Promise<{ messa
     }
 }
 
+
+
+
 export async function updateCategory(category: CategoryDto): Promise<CategoryDto> {
     if (!category.id) {
         throw new Error(`L'ID de la catégorie est requis pour la mise à jour.`);
@@ -69,6 +73,7 @@ export async function updateCategory(category: CategoryDto): Promise<CategoryDto
             },
             data: {
                 name: category.name,
+                visible: category.visible
             },
         });
     } catch (error: any) {
@@ -80,16 +85,16 @@ export async function updateCategory(category: CategoryDto): Promise<CategoryDto
 }
 
 export async function getCategoriesData() {
-  const categories = await prisma.category.findMany({
-    include: {
-      _count: {
-        select: { products: true },
-      },
-    },
-  });
+    const categories = await prisma.category.findMany({
+        include: {
+            _count: {
+                select: {products: true},
+            },
+        },
+    });
 
-  return categories.map((category) => ({
-    name: category.name,
-    productCount: category._count.products,
-  }));
+    return categories.map((category) => ({
+        name: category.name,
+        productCount: category._count.products,
+    }));
 }

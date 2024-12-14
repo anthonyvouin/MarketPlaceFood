@@ -1,4 +1,5 @@
 export interface CategoryDto {
-    id?: string; 
+    id?: string;
     name: string;
-  }
+    visible: boolean;
+}

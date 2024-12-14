@@ -12,7 +12,7 @@ const Commandes = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3; 
+  const itemsPerPage = 2; 
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -108,7 +108,7 @@ const Commandes = () => {
         <p>Aucune commande trouvée.</p>
       ) : (
         <div className="space-y-6">
-          {currentOrders.map((order) => (
+          {currentOrders.map((order: OrderDto) => (
             <div key={order.id} className="border rounded-lg p-4 shadow-md bg-white">
               <p className="font-bold text-lg">Commande #{order.id}</p>
               <p>Status : <span className="text-blue-500">{order.status}</span></p>
