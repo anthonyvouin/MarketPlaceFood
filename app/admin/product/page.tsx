@@ -1,23 +1,24 @@
 "use client"
 import RoundedButton from "@/app/components/ui/rounded-button";
-import { useRouter } from "next/navigation";
-import React, { useContext, useEffect, useState } from "react";
-import { ProductDto } from "@/app/interface/product/productDto";
-import { formatPriceEuro } from "@/app/pipe/formatPrice";
-import { changeDiscount, getAllProducts } from "@/app/services/products/product";
-import { getPageName } from "@/app/utils/utils";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { confirmPopup, ConfirmPopup } from "primereact/confirmpopup";
-import { DiscountDto } from "@/app/interface/discount/discountDto";
-import { getAllDiscount } from "@/app/services/discount/discount";
-import { PopupAddDiscount } from "@/app/admin/product/popup-add-discount/popup-add-discount";
-import { ToastContext } from "@/app/provider/toastProvider";
-import { toggleProductVisibility } from "@/app/services/products/product";
-import { InputSwitch } from "primereact/inputswitch";
+import {useRouter} from "next/navigation";
+import React, {useContext, useEffect, useState} from "react";
+import {ProductDto} from "@/app/interface/product/productDto";
+import {formatPriceEuro} from "@/app/pipe/formatPrice";
+import {changeDiscount, getAllProducts, toggleProductHighlighting} from "@/app/services/products/product";
+import {getPageName} from "@/app/utils/utils";
+import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
+import {DataTable} from "primereact/datatable";
+import {Column} from "primereact/column";
+import {confirmPopup, ConfirmPopup} from "primereact/confirmpopup";
+import {DiscountDto} from "@/app/interface/discount/discountDto";
+import {getAllDiscount} from "@/app/services/discount/discount";
+import {PopupAddDiscount} from "@/app/admin/product/popup-add-discount/popup-add-discount";
+import {ToastContext} from "@/app/provider/toastProvider";
+import {toggleProductVisibility} from "@/app/services/products/product";
+import {InputSwitch} from "primereact/inputswitch";
+
 export default function ProductPage() {
-    const { show } = useContext(ToastContext);
+    const {show} = useContext(ToastContext);
     const [products, setProducts] = useState<ProductDto[]>([]);
     const [discounts, setDiscounts] = useState<DiscountDto[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
@@ -40,10 +41,10 @@ export default function ProductPage() {
 
     const onVisibilityToggle = async (productId: string, newValue: boolean) => {
         try {
-            await toggleProductVisibility(productId, newValue); 
+            await toggleProductVisibility(productId, newValue);
             setProducts((prevProducts) =>
                 prevProducts.map((product) =>
-                    product.id === productId ? { ...product, visible: newValue } : product
+                    product.id === productId ? {...product, visible: newValue} : product
                 )
             );
         } catch (error) {
@@ -54,7 +55,7 @@ export default function ProductPage() {
     const visibilityTemplate = (product: ProductDto) => {
         return (
             <InputSwitch
-                checked ={product.visible!}
+                checked={product.visible!}
                 onChange={(e) => onVisibilityToggle(product.id!, e.value)}
             />
         );
@@ -67,22 +68,36 @@ export default function ProductPage() {
         router.push("product/create-product");
     }
 
- 
-
     const priceFormated = (product: ProductDto) => {
         return formatPriceEuro(product.price);
     }
 
- 
     const actionBody = (product: ProductDto) => {
         if (product.discount) {
             return <p onClick={(e) => showTemplate(e, product)}>{product.discount.rate} %</p>;
         } else {
             return <div>
-                <ConfirmPopup />
                 <p onClick={(e) => showTemplate(e, product)}>+ ajouter une remise</p>
             </div>;
         }
+    }
+
+    const toggleHighlighting = async (product: ProductDto): Promise<void> => {
+        if (product.id) {
+            await toggleProductHighlighting(product.id).then((productChange: ProductDto): void => {
+                setProducts((prevProducts: ProductDto[]) =>
+                    prevProducts.map((product: ProductDto): ProductDto =>
+                        product.id === productChange.id ? {...product, highlighting: productChange.highlighting} : product
+                    )
+                );
+            })
+        }
+    }
+
+    const highlightingBody = (product: ProductDto) => {
+        return <span className={`cursor-pointer pi ${product.highlighting ? 'pi-star-fill text-star' : 'pi-star'}`}
+                     onClick={() => toggleHighlighting(product)}>
+               </span>
     }
 
     const acceptDiscount = async (selectedDiscount: DiscountDto | null, selectedProduct: ProductDto | null): Promise<void> => {
@@ -144,15 +159,16 @@ export default function ProductPage() {
             <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Produits</h1>
 
             <div className="flex flex-row-reverse pt-1 pb-2.5">
-                <RoundedButton onClickAction={() => navigateToRoute()} message="Créer un produit" icon="pi pi-plus" positionIcon='left' classes="border-actionColor text-actionColor" />
+                <RoundedButton onClickAction={() => navigateToRoute()} message="Créer un produit" icon="pi pi-plus" positionIcon='left' classes="border-actionColor text-actionColor"/>
             </div>
             {products.length === 0 ? (
                 <p className="text-center text-gray-500">Aucuns produits disponible.</p>
             ) : (
                 <div>
+                    <ConfirmPopup/>
                     <DataTable
                         value={products}
-                        tableStyle={{ minWidth: '50rem' }}
+                        tableStyle={{minWidth: '50rem'}}
                         paginator
                         rows={rowsPerPage}
                         first={currentPage * rowsPerPage}
@@ -160,11 +176,12 @@ export default function ProductPage() {
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
                         currentPageReportTemplate="Affiche {first} au {last} sur les  produits {totalRecords} "
                     >
-                        <Column field="name" header="Nom" />
-                        <Column field="price" header="Prix" body={priceFormated} />
-                        <Column field="name" header="Categorie" />
-                        <Column header="Remise" body={actionBody} />
-                        <Column header="Visible" body={visibilityTemplate} />
+                        <Column header="Mise en avant" body={highlightingBody}/>
+                        <Column field="name" header="Nom"/>
+                        <Column field="price" header="Prix" body={priceFormated}/>
+                        <Column field="name" header="Categorie"/>
+                        <Column header="Remise" body={actionBody}/>
+                        <Column header="Visible" body={visibilityTemplate}/>
                     </DataTable>
                 </div>
             )}

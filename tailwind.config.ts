@@ -18,7 +18,10 @@ const config: Config = {
         actionColor:'#85BC39',
         darkActionColor:'#294819',
         primaryBackgroundColor: '#EBF2F0',
-        info: '#d7af44'
+        info: '#d7af44',
+        star:'#F6C778',
+        grey: '#b6b7b4',
+        borderGrey: '#858280'
       },
       backgroundColor: {
         tertiaryColorPink: '#FBB6B2',

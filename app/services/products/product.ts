@@ -87,6 +87,7 @@ export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise
                 categoryId: true,
                 discountId: true,
                 visible: true,
+                highlighting: true,
                 category: {
                     select: {
                         id: true,
@@ -134,6 +135,42 @@ export async function getAllProductsVisible(): Promise<ProductDto[]> {
         console.error("Erreur lors de la récupération des produits :", error);
         throw new Error('La récupération des produits a échoué');
     }
+}
+
+export async function getAllProductHighlighting(): Promise<ProductDto[]> {
+    return prisma.product.findMany({
+        where: {
+            highlighting: true,
+            visible: true
+        },
+
+        orderBy: {
+            name: 'asc',
+        },
+        include: {
+            category: true,
+            discount: true,
+        },
+    });
+}
+
+export async function getAllProductDiscount(): Promise<ProductDto[]> {
+    return prisma.product.findMany({
+        where: {
+            discount: {
+                isNot: null
+            },
+            visible: true
+        },
+
+        orderBy: {
+            name: 'asc',
+        },
+        include: {
+            category: true,
+            discount: true,
+        },
+    });
 }
 
 export async function getImageFromGoogle(name: string): Promise<string> {
@@ -386,4 +423,16 @@ export async function toggleProductVisibility(productId: string, visible: boolea
         console.error("Erreur lors du changement de visibilité du produit :", error);
         throw new Error('Le changement de visibilité du produit a échoué.');
     }
+}
+
+export async function toggleProductHighlighting(productId: string): Promise<ProductDto> {
+    const product: Product | null = await prisma.product.findUnique({where: {id: productId}});
+
+    if (!product) {
+        throw new Error('Le produit n\'existe pas.');
+    }
+    return prisma.product.update({
+        where: {id: productId},
+        data: {highlighting: !product.highlighting},
+    });
 }

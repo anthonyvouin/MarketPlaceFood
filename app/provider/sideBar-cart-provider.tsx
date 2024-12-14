@@ -26,7 +26,15 @@ export const SideBarBasketContext: Context<SideBarBasketContextType> = createCon
     setSideBarCart: (): void => {
     },
 
-    clientSideBartCart: null
+    setVisibilityFalse: (): void => {
+    },
+    clientSideBartCart: null,
+    handleChangeQuantityProduct: async (): Promise<void> => {
+        return Promise.resolve();
+    },
+
+    deleteProduct: (): void => {
+    },
 });
 
 export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
@@ -42,7 +50,6 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
         const {updateProductList} = useCart();
         const [visibility, setVisibility] = useState<boolean>(false);
         const [clientCart, setClientCart] = useState<CartDto | null>(defaultClientCart);
-
 
         const renderCount = useRef(0);
         const router: AppRouterInstance = useRouter();
@@ -71,11 +78,15 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
             setVisibility(!visibility)
         }
 
+        const setVisibilityFalse = (): void => {
+            setVisibility(false);
+        }
+
         const setSideBarCart = (cart: CartDto | null) => {
             setClientCart(cart)
         }
 
-        const deleteProduct = (cartItem: CartItemDto, rejectQuantity: number) => {
+        const deleteProduct = (cartItem: CartItemDto, rejectQuantity: number): void => {
             confirmDialog({
                 message: <div>
                     <p>Êtes vous sure de vouloir retirer {cartItem.product.name} de votre panier?</p>
@@ -125,7 +136,6 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
             }
         }
 
-
         const addProduct = async (product: ProductDto, quantity: number): Promise<void> => {
             if (session) {
                 let itemExistInCard: boolean = false;
@@ -161,9 +171,7 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
                     }
                 }
             }
-
         }
-
 
         const goToDetailPanier = () => {
             router.push('/recap-cart');
@@ -171,7 +179,7 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
         }
 
         return (
-            <SideBarBasketContext.Provider value={{toggleBasketList, addProduct, clientSideBartCart: clientCart, setSideBarCart}}>
+            <SideBarBasketContext.Provider value={{toggleBasketList, addProduct, clientSideBartCart: clientCart, setSideBarCart, handleChangeQuantityProduct, deleteProduct, setVisibilityFalse}}>
                 <Sidebar visible={visibility}
                          position="right"
                          onHide={() => setVisibility(false)}

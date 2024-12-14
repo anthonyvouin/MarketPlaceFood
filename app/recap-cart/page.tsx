@@ -2,18 +2,18 @@
 
 import React, {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
-import {getClientCart, updateItemCart} from "@/app/services/cart/cart";
+import {getClientCart} from "@/app/services/cart/cart";
 import {calculAndformatPriceWithDiscount, formatPriceEuro} from "@/app/pipe/formatPrice";
 import {CartDto} from "@/app/interface/cart/cartDto";
 import {CartItemDto} from "@/app/interface/cart/cart-item.dto";
 import {useRouter} from "next/navigation";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
-import {addQuantityToProductInCart, calculeDifferenceBetweenTotalPriceAndTotalPriceWithoutDiscount, removeQuantityToProductInCart} from "@/app/services/cart/functions-front";
-import {confirmDialog} from "primereact/confirmdialog";
+import {calculeDifferenceBetweenTotalPriceAndTotalPriceWithoutDiscount} from "@/app/services/cart/functions-front";
 import {useCart} from "@/app/provider/cart-provider";
 import {useSideBarBasket} from "@/app/provider/sideBar-cart-provider";
 import Image from "next/image";
 import {Tag} from "primereact/tag";
+import Link from "next/link";
 
 export default function RecapCart() {
     const {data: session} = useSession();
@@ -22,7 +22,7 @@ export default function RecapCart() {
     const [totalDiscount, setTotalDiscount] = useState<string | null>(null)
     const router: AppRouterInstance = useRouter();
     const {updateProductList} = useCart();
-    const {setSideBarCart, clientSideBartCart} = useSideBarBasket();
+    const {setSideBarCart, clientSideBartCart, deleteProduct, handleChangeQuantityProduct} = useSideBarBasket();
 
     const goToPayment = () => {
         router.push('/payment')
@@ -62,44 +62,6 @@ export default function RecapCart() {
         }
     }, [cart]);
 
-    const deleteProduct = (cartItem: CartItemDto, rejectQuantity: number): void => {
-        confirmDialog({
-            message: <div>
-                <p>Êtes vous sure de vouloir retirer {cartItem.product.name} de votre panier?</p>
-            </div>
-            ,
-            header: 'Suppression de produit',
-            acceptLabel: 'Oui',
-            rejectLabel: 'Non',
-            rejectClassName: 'mr-2.5 p-1.5 text-redColor',
-            acceptClassName: 'bg-actionColor text-white p-1.5',
-            async accept(): Promise<void> {
-                cartItem.quantity = 0
-                if (cartItem.cartId && cartItem.id) {
-                    const changeProduct: CartDto = await updateItemCart(cartItem.id, 0, true);
-                    setCart(changeProduct);
-                }
-            },
-            reject(): void {
-                cartItem.quantity = rejectQuantity;
-            }
-        })
-
-    }
-
-    const addProduct = async (item: CartItemDto): Promise<void> => {
-        const cartChange: CartDto = await addQuantityToProductInCart(item);
-        setCart(cartChange);
-    }
-
-    const removeProduct = async (item: CartItemDto): Promise<void> => {
-        if (item.quantity - 1 < 1) {
-            return deleteProduct(item, 1);
-        } else {
-            const cartChange: CartDto = await removeQuantityToProductInCart(item);
-            setCart(cartChange);
-        }
-    }
 
     if (loading) {
         return (
@@ -151,17 +113,21 @@ export default function RecapCart() {
                             className="grid grid-cols-4 items-center gap-4 p-4 bg-gray-50 rounded-lg shadow-sm"
                         >
                             <div className="flex justify-center">
-                                <Image
-                                    src={item.product.image}
-                                    alt={item.product.name}
-                                    width={40} height={40}
-                                    className="w-16 h-16 object-contain rounded-md"
-                                />
+                                <Link href={`/products/${item.product.slug}`}>
+                                    <Image
+                                        src={item.product.image}
+                                        alt={item.product.name}
+                                        width={40} height={40}
+                                        className="w-16 h-16 object-contain rounded-md"
+                                    />
+                                </Link>
+
                             </div>
 
                             <div>
-
-                                <p className="text-sm font-medium text-gray-700">{item.product.name}</p>
+                                <Link href={`/products/${item.product.slug}`}>
+                                    <p className="text-sm font-medium text-gray-700">{item.product.name}</p>
+                                </Link>
                                 {item.product.discount ? (
                                     <div>
                                         <div className='flex items-center mb-1'>
@@ -180,15 +146,28 @@ export default function RecapCart() {
 
                             </div>
 
-                            <div className="text-center">
-                                <p className="font-medium text-gray-700">Quantité : {item.quantity}</p>
-                                <button className='border p-2.5' onClick={() => removeProduct(item)}>-</button>
-                                <button className='border p-2.5' onClick={() => addProduct(item)}>+</button>
+                            <div className='flex items-center mt-2.5'>
+                                <div className='bg-white w-10 h-10 flex items-center justify-center border border-t-borderGrey border-l-borderGrey border-b-borderGrey'>
+                                    <p>
+                                        {item.quantity}
+                                    </p>
+                                </div>
+                                <div className='flex flex-col'>
+                                    <button onClick={() => handleChangeQuantityProduct(item, 'add')}
+                                            className="bg-grey text-white border border-borderGrey w-7 h-5 pi pi-angle-up">
 
+                                    </button>
+                                    <button onClick={() => handleChangeQuantityProduct(item, 'remove')}
+                                            className='bg-grey text-white border border-borderGrey w-7 h-5 pi pi-angle-down'>
+                                    </button>
+
+                                </div>
+                                <button className="w-7 h-7 ml-2.5 pi pi-trash text-primaryColor"
+                                        onClick={() => deleteProduct(item, item.quantity)}></button>
                             </div>
 
                             <div className="text-right">
-                            <p className="text-sm font-semibold text-gray-700">
+                                <p className="text-sm font-semibold text-gray-700">
                                     {formatPriceEuro(item.totalPrice)}€
                                 </p>
                             </div>

@@ -15,5 +15,6 @@ export interface ProductDto {
     discountId?: string | null;
     discount?: DiscountDto | null;
     visible?: boolean | null;
+    highlighting?: boolean
 }
   
