@@ -1,17 +1,17 @@
 "use server"
 
 import Fuse from 'fuse.js';
-import { Prisma, PrismaClient, Product } from '@prisma/client';
-import { ProductDto } from '@/app/interface/product/productDto';
-import { CategoryDto } from "@/app/interface/category/categoryDto";
-import { DiscountDto } from "@/app/interface/discount/discountDto";
+import {Prisma, PrismaClient, Product} from '@prisma/client';
+import {ProductDto} from '@/app/interface/product/productDto';
+import {CategoryDto} from "@/app/interface/category/categoryDto";
+import {DiscountDto} from "@/app/interface/discount/discountDto";
 
 const prisma = new PrismaClient();
 
 const fuseOptions = {
     includeScore: true,
     threshold: 0.3,
-    keys: ['name'], 
+    keys: ['name'],
     minMatchCharLength: 3,
     findAllMatches: true,
     shouldSort: false,
@@ -31,7 +31,7 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
     // }
 
     const existingName: Product | null = await prisma.product.findUnique({
-        where: { name: product.name }
+        where: {name: product.name}
     })
 
     if (existingName) {
@@ -39,7 +39,7 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
     }
 
     const existingSlug: Product | null = await prisma.product.findUnique({
-        where: { slug: product.slug }
+        where: {slug: product.slug}
     })
 
     if (existingSlug) {
@@ -48,7 +48,7 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
 
     try {
         const existingCategory: CategoryDto | null = await prisma.category.findUnique({
-            where: { id: product.categoryId },
+            where: {id: product.categoryId},
         });
 
         if (!existingCategory) {
@@ -86,6 +86,7 @@ export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise
                 updatedAt: true,
                 categoryId: true,
                 discountId: true,
+                visible: true,
                 category: {
                     select: {
                         id: true,
@@ -277,8 +278,8 @@ export async function searchProduct(name: string, minScore: number = 0.36): Prom
 export async function getProductById(id: string): Promise<ProductDto | null> {
     try {
         return await prisma.product.findUnique({
-            where: { id },
-            include: { category: true, discount: true },
+            where: {id},
+            include: {category: true, discount: true},
         });
     } catch (error) {
         console.error("Erreur lors de la récupération du produit :", error);
@@ -289,8 +290,8 @@ export async function getProductById(id: string): Promise<ProductDto | null> {
 export async function getProductBySlug(slug: string): Promise<ProductDto | null> {
     try {
         return await prisma.product.findUnique({
-            where: { slug: slug, visible: true },
-            include: { category: true, discount: true },
+            where: {slug: slug, visible: true},
+            include: {category: true, discount: true},
         });
     } catch (error) {
         console.error("Erreur lors de la récupération du produit :", error);
@@ -321,12 +322,12 @@ export async function filterProduct(filters: {
         return await prisma.product.findMany({
             where: {
                 AND: [
-                    { visible: true },
+                    {visible: true},
                     ...(customFilters.length > 0 ? customFilters : []),
 
                 ],
             },
-            include: { category: true, discount: true },
+            include: {category: true, discount: true},
         });
 
     } catch (error) {
@@ -348,19 +349,19 @@ export async function changeDiscount(product: ProductDto | null, discount: Disco
 
     if (findProduct) {
         return prisma.product.update({
-            where: {
-                id: findProduct.id,
-            },
+                where: {
+                    id: findProduct.id,
+                },
 
-            data: {
-                ...findProduct, discountId: discount ? discount.id : null
-            },
+                data: {
+                    ...findProduct, discountId: discount ? discount.id : null
+                },
 
-            include: {
-                discount: true,
-                category: true
-            },
-        }
+                include: {
+                    discount: true,
+                    category: true
+                },
+            }
         )
     } else {
         throw Error('produit non trouvé')
@@ -372,14 +373,14 @@ export async function toggleProductVisibility(productId: string, visible: boolea
     try {
 
 
-        const product: Product | null = await prisma.product.findUnique({ where: { id: productId } });
+        const product: Product | null = await prisma.product.findUnique({where: {id: productId}});
 
         if (!product) {
             throw new Error('Le produit n\'existe pas.');
         }
         await prisma.product.update({
-            where: { id: productId },
-            data: { visible: visible },
+            where: {id: productId},
+            data: {visible: visible},
         });
     } catch (error) {
         console.error("Erreur lors du changement de visibilité du produit :", error);
