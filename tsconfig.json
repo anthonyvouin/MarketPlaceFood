@@ -19,8 +19,17 @@
         "name": "next"
       }
     ],
+    "baseUrl": "./",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@components/*": ["./app/components/*"],
+      "@styles/*": ["./app/styles/*"],
+      "@services/*": ["./app/services/*"],
+      "@utils/*": ["./app/utils/*"],
+      "@pipe/*": ["./app/pipe/*"],
+      "@interface/*": ["./app/interface/*"],
+      "@provider/*": ["./app/provider/*"],
+      "@style/*": ["./app/style/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/components/auth/Logged"],

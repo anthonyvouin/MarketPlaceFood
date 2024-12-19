@@ -1,6 +1,6 @@
 export interface SidebarLinks {
     name: string
     subLinks?: SidebarLinks[]
-    href: string
+    href?: string
     icon: string
 }

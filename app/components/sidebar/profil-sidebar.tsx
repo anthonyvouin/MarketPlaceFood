@@ -3,14 +3,14 @@ import Image from 'next/image';
 import { SidebarLinks } from "@/app/interface/sidebar-links/sidebar-links";
 
 const links: SidebarLinks[] = [
-    { name: 'Compte', href: '/profil', icon: 'pi pi-cog' },
     {
-        name: 'Recette', href: '/profil/recipes', icon: 'pi pi-book', 
+        name: 'Recette', icon: 'pi pi-book', 
         subLinks: [
             { name: 'Favoris', href: '/profil/recipes/favorites', icon: 'pi pi-star' },
             { name: 'Générations', href: '/profil/recipes/generation', icon: 'pi pi-pencil' },
         ]
     },
+    { name: 'Compte', href: '/profil', icon: 'pi pi-cog' },
     { name: 'Adresses', href: '/profil/adresses', icon: 'pi pi-home' },
     { name: 'Notifications', href: '/notification', icon: 'pi pi-bell' },
     { name: 'Commandes', href: '/profil/commandes', icon: 'pi pi-file' },
@@ -30,13 +30,23 @@ const ProfilSidebar = () => {
                     <ul>
                         {links.map((link) => (
                             <li key={link.href} className="mb-4">
-                                <Link href={link.href} className="flex justify-start gap-5 group font-manrope">
-                                    <span className='border-l-4 rounded-full border-actionColor opacity-0 group-hover:opacity-100 transition-all'></span>
-                                    <div className='flex gap-3 items-center'>
-                                        <span className={`${link.icon} group-hover:text-actionColor`} />
-                                        <p className='group-hover:text-actionColor'>{link.name}</p>
+                                {link.href ? (
+                                    <Link href={link.href} className="flex justify-start gap-5 group font-manrope">
+                                        <span className='border-l-4 rounded-full border-actionColor opacity-0 group-hover:opacity-100 transition-all'></span>
+                                        <div className='flex gap-3 items-center'>
+                                            <span className={`${link.icon} group-hover:text-actionColor`} />
+                                            <p className='group-hover:text-actionColor'>{link.name}</p>
+                                        </div>
+                                    </Link>
+                                ) : (
+                                    <div className="flex justify-start gap-5 group font-manrope">
+                                        <span className='border-l-4 rounded-full opacity-0 '></span>
+                                        <div className='flex gap-3 items-center'>
+                                            <span className={`${link.icon}`} />
+                                            <p>{link.name}</p>
+                                        </div>
                                     </div>
-                                </Link>
+                                )}
                                 {link.subLinks && (
                                     <ul className="ml-4 mt-2">
                                         {link.subLinks.map((subLink) => (
