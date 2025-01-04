@@ -1,111 +1,123 @@
 'use client';
 
-import {useEffect, useState} from 'react';
-import {filterProduct} from '../services/products/product';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { filterProduct } from '../services/products/product';
 import ProductCard from '../components/ProductCard/ProductCard';
-import {getAllCategories} from '../services/category/category';
-import {ProductDto} from '../interface/product/productDto';
-import {CategoryDto} from '../interface/category/categoryDto';
-import {getPageName} from "@/app/utils/utils";
-import {Slider, SliderChangeEvent} from "primereact/slider";
-import {Checkbox} from 'primereact/checkbox';
+import { getAllCategories } from '../services/category/category';
+import { ProductDto } from '../interface/product/productDto';
+import { CategoryDto } from '../interface/category/categoryDto';
+import { getPageName } from '@/app/utils/utils';
+import { Slider, SliderChangeEvent } from 'primereact/slider';
+import { Checkbox } from 'primereact/checkbox';
 
 export default function Products() {
     const [products, setProducts] = useState<ProductDto[]>([]);
-    const [filteredProducts, setfilteredProducts] = useState<ProductDto[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<ProductDto[]>([]);
     const [filters, setFilters] = useState<{ [key in keyof ProductDto]?: any }>({});
-    const [priceRange, setPriceRange] = useState<number | [number, number]>([0, 50]);
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 50]);
     const [categories, setCategories] = useState<CategoryDto[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-    const bgColors: string[] = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
+    const bgColors = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
 
-    const fetchProducts = async (filters: any): Promise<void> => {
-        try {
-            const filteredProducts: ProductDto[] = await filterProduct(filters);
-            setCategories(await getAllCategories());
-            setProducts(filteredProducts);
-            setfilteredProducts(filteredProducts);
-        } catch (error) {
-            console.error("Erreur lors de la récupération des produits :", error);
-        }
-    };
-    useEffect((): void => {
-        if (selectedCategories.length > 0) {
-            handleFilterChange('categoryId', {in: selectedCategories});
-        } else {
-            handleFilterChange('categoryId', undefined);
-        }
-        handleFilterChange('price', {gte: priceRange[0], lte: priceRange[1]});
-    }, [priceRange, selectedCategories]);
-
-    useEffect((): void => {
-        fetchProducts(filters);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const allCategories = await getAllCategories();
+                setCategories(allCategories);
+                await fetchProducts(filters);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des données :', error);
+            }
+        };
+        fetchData();
         getPageName();
     }, []);
 
-    const handleFilterChange = (key: keyof ProductDto, value: any): void => {
-        setfilteredProducts(products.filter((element => element.price >= priceRange[0] * 100 && element.price <= priceRange[1] * 100 && (selectedCategories.length === 0 || selectedCategories.includes(element.categoryId)))))
-    };
+    useEffect(() => {
+        handleFilterChange('price', { gte: priceRange[0] * 100, lte: priceRange[1] * 100 });
+        handleFilterChange('categoryId', selectedCategories.length > 0 ? { in: selectedCategories } : undefined);
+    }, [priceRange, selectedCategories]);
 
-    const handlePriceChange = async (value: SliderChangeEvent): Promise<void> => {
-        setPriceRange(value.value);
-    };
-
-    const handleCategoryChange = (categoryId: string): void => {
-        if (selectedCategories.includes(categoryId)) {
-            setSelectedCategories(selectedCategories.filter(id => id !== categoryId));
-        } else {
-            setSelectedCategories([...selectedCategories, categoryId]);
+    const fetchProducts = async (filters: any): Promise<void> => {
+        try {
+            const filteredProducts = await filterProduct(filters);
+            setProducts(filteredProducts);
+            setFilteredProducts(filteredProducts);
+        } catch (error) {
+            console.error('Erreur lors de la récupération des produits :', error);
         }
     };
 
+    const handleFilterChange = (key: keyof ProductDto, value: any): void => {
+        setFilters((prevFilters) => ({ ...prevFilters, [key]: value }));
+        fetchProducts({ ...filters, [key]: value });
+    };
+
+    const handlePriceChange = (e: SliderChangeEvent): void => {
+        setPriceRange(e.value as [number, number]);
+    };
+
+    const handleCategoryChange = (categoryId: string): void => {
+        setSelectedCategories((prev) =>
+            prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]
+        );
+    };
+
     return (
-        <section className="  px-20 py-10 w-full">
-            <div className="mb-8">
+        <section className="w-full">
+            <div className="h-[30vh] md:h-[40vh] lg:h-[85vh]">
+                <Image 
+                    src="/images/hero-banner-product-page.jpg"
+                    alt="Banner"
+                    width={1400}
+                    height={1000}
+                    className="w-full h-full object-cover brightness-50"
+                />
+            </div>
+
+            <div className="mb-8 px-4 md:px-10">
                 <h2 className="text-xl font-bold mb-4">Filtres</h2>
                 <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-2">Prix</h3>
                     {priceRange[0]} - {priceRange[1]} €
-                    <Slider value={priceRange}
-                            onChange={(e: SliderChangeEvent) => handlePriceChange(e)}
-                            range
-                            min={0}
-                            max={50}
-                            step={1}
-                            pt={{
-                                handle: {className: 'bg-actionColor'},
-                                range: {className: 'bg-actionColor'}
-                            }}
+                    <Slider
+                        value={priceRange}
+                        onChange={handlePriceChange}
+                        range
+                        min={0}
+                        max={50}
+                        step={1}
+                        pt={{
+                            handle: { className: 'bg-actionColor' },
+                            range: { className: 'bg-actionColor' },
+                        }}
                     />
                 </div>
 
                 <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-2">Catégories</h3>
-                    <div>
-                        {categories.map(category => (
-                            <div key={category.id} className="flex items-center space-x-2 mt-2">
-                                <Checkbox
-                                    inputId={category.id}
-                                    name={category.name}
-                                    value={category.id}
-                                    onChange={() => handleCategoryChange(category.id!)}
-                                    checked={selectedCategories.includes(category.id!)}
-
-                                />
-                                <label htmlFor={category.id} className="text-sm">{category.name}</label>
-                            </div>
-                        ))}
-                    </div>
+                    {categories.map((category) => (
+                        <div key={category.id} className="flex items-center space-x-2 mt-2">
+                            <Checkbox
+                                inputId={category.id}
+                                value={category.id}
+                                onChange={() => handleCategoryChange(category.id)}
+                                checked={selectedCategories.includes(category.id)}
+                            />
+                            <label htmlFor={category.id} className="text-sm">{category.name}</label>
+                        </div>
+                    ))}
                 </div>
             </div>
 
             {filteredProducts.length > 0 ? (
-                <div className=" h-full grid grid-cols-4 gap-10">
-                    {filteredProducts.map((product: ProductDto, index: number) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-4 md:px-10 gap-6">
+                    {filteredProducts.map((product, index) => (
                         <ProductCard
-                            productSlug={product.slug}
                             key={product.id}
+                            productSlug={product.slug}
                             product={product}
                             bgColor={bgColors[index % bgColors.length]}
                         />

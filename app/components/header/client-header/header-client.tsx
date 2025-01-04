@@ -1,18 +1,24 @@
 "use client"
-import {useSession} from "next-auth/react";
-import {useEffect, useState} from "react";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import LogoutButton from "@/app/components/auth/logout";
-import {Avatar} from "primereact/avatar";
-import {Button} from "primereact/button";
-import {useCart} from "@/app/provider/cart-provider";
-import {useSideBarBasket} from "@/app/provider/sideBar-cart-provider";
+import { Avatar } from "primereact/avatar";
+import { Button } from "primereact/button";
+import { useCart } from "@/app/provider/cart-provider";
+import { useSideBarBasket } from "@/app/provider/sideBar-cart-provider";
+import Sidebar from "../../sidebar/Sidebar";
 
 export default function HeaderClient(): JSX.Element {
     const [name, setName] = useState('');
-    const {data: session, status} = useSession()
-    const {totalLengthItems} = useCart();
-    const {toggleBasketList} = useSideBarBasket();
+    const { data: session, status } = useSession()
+    const { totalLengthItems } = useCart();
+    const { toggleBasketList } = useSideBarBasket();
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggleSidebar = () => {
+        setIsOpen(!isOpen);
+    };
 
     useEffect((): void => {
         if (session && session.user && session.user.name) {
@@ -21,14 +27,25 @@ export default function HeaderClient(): JSX.Element {
     }, [session]);
 
     return (
-        <header className="flex items-center justify-between px-20 h-[15vh] bg-primaryBackgroundColor fixed full-width z-50">
+        <header className="flex items-center justify-between w-full h-24 px-10 bg-primaryBackgroundColor fixed z-30">
+            <div className="flex">
+                <Button
+                    icon="pi pi-bars"
+                    className="bg-actionColor text-white w-8 h-8 text-xs"
+                    onClick={toggleSidebar}
+                />
+                <Sidebar
+                    isOpenSidebar={isOpen}
+                    setIsOpenSidebar={setIsOpen}
+                />
+            </div>
             <h1 className="font-manrope font-bold">Accueil 🙂</h1>
             <input type='text'
-                   placeholder='&#128269; Rechercher un produit'
-                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg h-10 w-1/4
-                   focus:ring-blue-500 focus:outline-none focus:border-actionColor block p-2.5"/>
+                placeholder='&#128269; Rechercher un produit'
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg h-10 w-1/4
+               focus:ring-blue-500 focus:outline-none focus:border-actionColor block p-2.5"/>
 
-            <div className="flex gap-5 items-center">
+            <div className="flex gap-2 sm:gap-3 md:gap-4 lg:gap-5 items-center">
                 {status === 'authenticated' ? (
                     <>
                         <div className="relative">
@@ -47,7 +64,7 @@ export default function HeaderClient(): JSX.Element {
                         />
 
                         <Link href="/profil">
-                            <Avatar label={name} shape="circle" className="bg-actionColor text-white"/>
+                            <Avatar label={name} shape="circle" className="bg-actionColor text-white" />
                         </Link>
 
                         {session?.user["role"] === "ADMIN" ? (
@@ -58,11 +75,11 @@ export default function HeaderClient(): JSX.Element {
                             </Link>
                         ) : ("")}
 
-                        <LogoutButton/>
+                        <LogoutButton />
                     </>
                 ) : (
                     <Link href="/login"
-                          className="border-b-2 border-actionColor">Se connecter</Link>
+                        className="border-b-2 border-actionColor">Se connecter</Link>
                 )}
             </div>
         </header>

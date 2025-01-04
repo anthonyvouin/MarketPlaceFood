@@ -27,7 +27,7 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                                 <ProfilSidebar/>
                                 <div className="w-full">
                                     <HeaderClient/>
-                                    <div className="padding-header bg-primaryBackgroundColor">
+                                    <div className="bg-primaryBackgroundColor">
                                         {children}
                                     </div>
                                 </div>
@@ -48,7 +48,7 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                             <Sidebar/>
                             <div className="w-full">
                                 <HeaderClient/>
-                                <div className="padding-header bg-primaryBackgroundColor">
+                                <div className=" bg-primaryBackgroundColor">
                                     {children}
                                 </div>
                             </div>
