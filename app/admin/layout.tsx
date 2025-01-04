@@ -13,6 +13,7 @@ const adminLinks = [
     { name: "Contacts", href: "/admin/contact", icon: "pi pi-envelope" },
     { name: "Graphique", href: "/admin/chart", icon: "pi pi-chart-line" },
     { name: "Commandes", href: "/admin/order", icon: "pi pi-shopping-bag" },
+    { name: "Notifications", href: "/admin/products-notifications", icon: "pi pi-bell" },
 
 ];
 
