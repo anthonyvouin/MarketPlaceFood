@@ -1,14 +1,9 @@
-import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-
 const UPDATE_INTERVAL = 60000; 
 
 export async function GET() {
-    const headersList = headers();
-    
     const response = new Response(
         new ReadableStream({
             async start(controller) {
@@ -34,9 +29,19 @@ export async function GET() {
                             }
                         } catch (error) {
                             console.error('Erreur SSE:', error);
+                            isActive = false;
+                            controller.close();
+                            break;
                         }
                     }
-                }
+                };
+
+                sendData();
+
+                return () => {
+                    isActive = false;
+                    controller.close();
+                };
             }
         }),
         {
