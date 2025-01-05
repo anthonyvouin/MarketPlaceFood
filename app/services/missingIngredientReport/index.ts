@@ -1,8 +1,21 @@
 "use server"
 
-import {Prisma, PrismaClient, Product} from '@prisma/client';
+import {Prisma, PrismaClient, Product, MissingIngredientReport} from '@prisma/client';
+
+export interface MissingIngredientReportDto extends MissingIngredientReport {
+    product: Product;
+}
 
 const prisma = new PrismaClient();
+
+export async function getMissingIngredientReports(): Promise<MissingIngredientReportDto[]> {
+    try {
+        return await prisma.missingIngredientReport.findMany();
+    } catch (error) {
+        console.error("Erreur lors de la récupération des rapports d'ingrédient manquant :", error);
+        throw new Error("La récupération des rapports d'ingrédient manquant a échoué.");
+    }
+}
 
 export async function getMissingIngredientReportById(id: string): Promise<MissingIngredientReportDto | null> {
     try {
