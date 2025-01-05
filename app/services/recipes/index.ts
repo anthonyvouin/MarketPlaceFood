@@ -441,7 +441,9 @@ export async function getUserFavoriteRecipes(userId: string, page = 1, limit = 1
 // Récupérer les recettes créées par un utilisateur
 export async function getUserCreatedRecipes(userId: string, page = 1, limit = 10): Promise<any> {
     try {
-        return getAllRecipes(page, limit, { userId });
+        return getAllRecipes(page, limit, {
+            createdBy: { id: userId }
+        })
     } catch (error) {
         console.error("Erreur lors de la récupération des recettes créées :", error);
         throw new Error('La récupération des recettes créées a échoué.');
