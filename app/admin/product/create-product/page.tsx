@@ -10,10 +10,11 @@ import RoundedButton from "@/app/components/ui/rounded-button";
 import {getPageName} from "@/app/utils/utils";
 import {ProductDto} from "@/app/interface/product/productDto";
 
+export default function CreateProductPage({ searchParams }) {
+    const courseName = searchParams.name;
 
-export default function CreateProductPage() {
     const [product, setProduct] = useState({
-        name: '',
+        name: courseName || '',
         slug: '',
         description: '',
         image: '',
