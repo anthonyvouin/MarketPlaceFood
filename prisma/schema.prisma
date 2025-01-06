@@ -249,6 +249,16 @@ model Order {
   status      String      @default("pending")
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  
+  // Ajout des champs d'adresse de livraison
+  shippingName         String    @map("shipping_name")
+  shippingAddress      String    @map("shipping_address")
+  shippingAddressAdd   String?   @map("shipping_address_add")
+  shippingZipCode      String    @map("shipping_zip_code")
+  shippingCity         String    @map("shipping_city")
+  shippingPhoneNumber  String    @map("shipping_phone_number")
+  shippingNote         String?   @map("shipping_note") @db.Text
+
   user        User        @relation(fields: [userId], references: [id])
   orderItems  OrderItem[]
 

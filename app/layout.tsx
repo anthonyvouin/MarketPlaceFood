@@ -7,6 +7,7 @@ import {Metadata} from "next";
 import React from "react";
 import {PrimeReactProvider} from "primereact/api";
 import {ConfirmDialog} from "primereact/confirmdialog";
+import { ShippingAddressProvider } from './provider/shipping-address-provider';
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
@@ -42,10 +43,12 @@ export default function RootLayout({
         >
         <SessionWrapper>
             <PrimeReactProvider>
-                <LayoutWrapper>
-                    <ConfirmDialog />
-                    {children}
-                </LayoutWrapper>
+                <ShippingAddressProvider>
+                    <LayoutWrapper>
+                        <ConfirmDialog />
+                        {children}
+                    </LayoutWrapper>
+                </ShippingAddressProvider>
             </PrimeReactProvider>
         </SessionWrapper>
         </body>
