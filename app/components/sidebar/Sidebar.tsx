@@ -1,7 +1,6 @@
 "use client"
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { SidebarLinks } from "@/app/interface/sidebar-links/sidebar-links";
 
 interface SidebarProps {

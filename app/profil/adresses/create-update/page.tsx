@@ -86,7 +86,7 @@ const CreateUpdatePage = () => {
     }
 
     return (
-        <div className="bg-primaryBackgroundColor height-full flex items-center">
+        <div className="bg-primaryBackgroundColor flex items-center min-h-screen">
             <div className="w-6/12 flex ml-12">
                 <Image src="/images/adresses.png" width={566} height={436} alt="DriveFood"/>
             </div>

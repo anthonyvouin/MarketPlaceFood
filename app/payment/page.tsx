@@ -38,7 +38,7 @@ export default function PaymentPage() {
 
     if (error) {
         return (
-            <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor">
+            <div className="min-h-screen flex items-center justify-center bg-primaryBackgroundColor">
                 <p className="text-lg font-semibold text-red-500">{error}</p>
             </div>
         );
@@ -46,7 +46,7 @@ export default function PaymentPage() {
 
     if (!clientSecret) {
         return (
-            <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor">
+            <div className="min-h-screen flex items-center justify-center bg-primaryBackgroundColor">
                 <p className="text-lg font-semibold text-gray-700">Chargement du paiement...</p>
             </div>
         );
@@ -54,14 +54,14 @@ export default function PaymentPage() {
 
     if (!session || !session.user) {
         return (
-            <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor">
+            <div className="min-h-screen flex items-center justify-center bg-primaryBackgroundColor">
                 <p className="text-lg font-semibold text-gray-700">Veuillez vous connecter pour effectuer un paiement.</p>
             </div>
         );
     }
 
     return (
-        <div className="h-[84vh] bg-primaryBackgroundColor flex items-center justify-center">
+        <div className="min-h-screen bg-primaryBackgroundColor flex items-center justify-center">
             <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 md:p-10">
                 <h2 className="text-2xl font-bold text-darkActionColor mb-6">Récapitulatif de votre paiement</h2>
                 <div className="space-y-4">

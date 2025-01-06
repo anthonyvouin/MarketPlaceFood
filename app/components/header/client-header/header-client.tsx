@@ -9,6 +9,8 @@ import { useCart } from "@/app/provider/cart-provider";
 import { useSideBarBasket } from "@/app/provider/sideBar-cart-provider";
 import Sidebar from "../../sidebar/Sidebar";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+import ProfilSidebar from "../../sidebar/profil-sidebar";
 
 export default function HeaderClient(): JSX.Element {
     const [name, setName] = useState('');
@@ -25,8 +27,10 @@ export default function HeaderClient(): JSX.Element {
         }
     }, [session]);
 
+    const pathname: string = usePathname();
+
     return (
-        <header className="flex items-center justify-between w-full h-20 px-8 bg-white shadow-md fixed z-50 border-b border-gray-200">
+        <header className="flex items-center justify-between w-full h-20 px-8 bg-white shadow-md z-50 border-b border-gray-200">
             <div className="flex items-center gap-4">
                 <Button
                     icon="pi pi-bars"
@@ -37,7 +41,11 @@ export default function HeaderClient(): JSX.Element {
                     <Image src="/images/logo.svg" width={40} height={40} alt="Snap&Shop Logo" />
                     <h2 className="text-xl font-extrabold text-actionColor tracking-wide uppercase font-manrope">Snap&Shop</h2>
                 </Link>
-                <Sidebar isOpenSidebar={isOpen} setIsOpenSidebar={setIsOpen} />
+                { pathname.startsWith("/profil") ? 
+                <ProfilSidebar isOpenSidebar={isOpen} setIsOpenSidebar={setIsOpen} />
+                : <Sidebar isOpenSidebar={isOpen} setIsOpenSidebar={setIsOpen} />
+
+ } 
             </div>
 
             <input
