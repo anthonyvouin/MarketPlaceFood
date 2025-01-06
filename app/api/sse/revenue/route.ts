@@ -4,12 +4,12 @@ const prisma = new PrismaClient();
 const UPDATE_INTERVAL = 60000; 
 
 export async function GET() {
-    const response = new Response(
+const response : Response = new Response(
         new ReadableStream({
             async start(controller) {
                 let isActive = true;
 
-                const sendData = async () => {
+                const sendData: () => Promise<void>  = async () => {
                     while (isActive) {
                         try {
                             const revenue = await prisma.order.aggregate({
