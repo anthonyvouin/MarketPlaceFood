@@ -32,9 +32,9 @@ const Commandes = () => {
     fetchOrders();
   }, [session]);
 
-  const indexOfLastOrder = currentPage * itemsPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
-  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const indexOfLastOrder : number = currentPage * itemsPerPage;
+  const indexOfFirstOrder : number = indexOfLastOrder - itemsPerPage;
+  const currentOrders : OrderDto[] = orders.slice(indexOfFirstOrder, indexOfLastOrder);
 
   const generateInvoicePdf = (orderId: string) => {
     const order = orders.find((order) => order.id === orderId);
@@ -42,8 +42,27 @@ const Commandes = () => {
 
     const doc = new jsPDF();
     
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor("#85BC39");
     doc.setFontSize(10);
+    doc.text([
+      `Facture N° : ${order.id}`,
+      `Date : ${new Date(order.createdAt).toLocaleDateString()}`
+    ], 15, 20);
+
+    doc.setTextColor(0, 0, 0);
+    doc.text([
+      "Client :",
+      `${order.user?.name || 'Non spécifié'}`,
+      `${order.user?.email || 'Non spécifié'}`,
+      "",
+      "Adresse de livraison :",
+      `${order.shippingName}`,
+      `${order.shippingAddress}`,
+      `${order.shippingAddressAdd || ''}`,
+      `${order.shippingZipCode} ${order.shippingCity}`,
+      `Tél : ${order.shippingPhoneNumber}`,
+    ], 120, 20);
+
     doc.text([
       "Snap&Shop",
       "123 Rue de la Paix, 75000 Paris, France",
@@ -52,19 +71,7 @@ const Commandes = () => {
       "N° TVA : FR1234567890",
       "Contact : contact@snapandshop.fr",
       "Tél : +33 6 66 66 66 66"
-    ], 15, 20);
-
-    doc.text([
-      "Client :",
-      `${order.user?.name || 'Non spécifié'}`,
-      `${order.user?.email || 'Non spécifié'}`
-    ], 120, 20);
-
-    doc.setTextColor("#85BC39");
-    doc.text([
-      `Facture N° : ${order.id}`,
-      `Date : ${new Date(order.createdAt).toLocaleDateString()}`
-    ], 120, 50);
+    ], 15, 40);
 
     doc.setDrawColor(0, 0, 0);
     doc.line(15, 80, 195, 80);
@@ -89,8 +96,8 @@ const Commandes = () => {
 
     doc.line(15, yOffset + 10, 195, yOffset + 10);
 
-    const totalHT = (order.totalAmount / 120 * 100 / 100).toFixed(2);
-    const tva = ((order.totalAmount - (order.totalAmount / 1.2)) / 100).toFixed(2);
+    const totalHT : string = (order.totalAmount / 120 * 100 / 100).toFixed(2);
+    const tva : string = ((order.totalAmount - (order.totalAmount / 1.2)) / 100).toFixed(2);
     
     yOffset += 30;
     doc.text(`Total HT : ${totalHT} €`, 150, yOffset);
@@ -123,7 +130,7 @@ const Commandes = () => {
     doc.save(`facture-${orderId}.pdf`);
   };
 
-  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const totalPages : number = Math.ceil(orders.length / itemsPerPage);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {

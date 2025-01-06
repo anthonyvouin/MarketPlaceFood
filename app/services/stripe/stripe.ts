@@ -123,23 +123,44 @@ async function saveOrder(
 
 export async function getOrdersByUser(userId: string): Promise<OrderDto[]> {
     try {
-        const orders : OrderDto[] = await prisma.order.findMany({
+        const orders = await prisma.order.findMany({
             where: {userId},
-            include: {
+            select: {
+                id: true,
+                totalAmount: true,
+                status: true,
+                createdAt: true,
+                shippingName: true,
+                shippingAddress: true,
+                shippingAddressAdd: true,
+                shippingZipCode: true,
+                shippingCity: true,
+                shippingPhoneNumber: true,
+                shippingNote: true,
                 orderItems: {
-                    include: {
-                        product: true,
-                    },
+                    select: {
+                        quantity: true,
+                        unitPrice: true,
+                        totalPrice: true,
+                        product: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
                 },
                 user: {
-                    include: {
-                        addresses: true, 
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
                     }
-                },            },
+                }
+            },
             orderBy: {createdAt: 'desc'},
         });
 
-        return orders;
+        return orders as unknown as OrderDto[];
     } catch (error) {
         console.error('Erreur lors de la récupération des commandes :', error);
         throw new Error('Erreur lors de la récupération des commandes.');
