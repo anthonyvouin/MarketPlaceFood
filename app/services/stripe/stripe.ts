@@ -133,7 +133,11 @@ export async function getOrdersByUser(userId: string): Promise<OrderDto[]> {
                         product: true,
                     },
                 },
-            },
+                user: {
+                    include: {
+                        addresses: true, 
+                    }
+                },            },
             orderBy: {createdAt: 'desc'},
         });
 
