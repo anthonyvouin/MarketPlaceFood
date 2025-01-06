@@ -20,7 +20,6 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
 
     
     if (pathname.startsWith("/profil")) {
-        console.log(pathname);
         return (<>
                 <ToastProvider>
                     <CartProvider>

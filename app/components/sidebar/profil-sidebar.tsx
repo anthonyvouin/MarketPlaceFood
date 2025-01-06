@@ -1,13 +1,8 @@
 "use client"
 
 import Link from 'next/link';
-import { SidebarLinks } from "@/app/interface/sidebar-links/sidebar-links";
-import { useState } from 'react';
-
-interface SidebarProps {
-    isOpenSidebar: boolean;
-    setIsOpenSidebar: (isOpen: boolean) => void;
-}
+import { SidebarLinks } from "@/app/interface/sidebar/sidebar-links";
+import { SidebarProps } from '@/app/interface/sidebar/sidebar-props';
 
 const profilSidebarLinks: SidebarLinks[] = [
     {
