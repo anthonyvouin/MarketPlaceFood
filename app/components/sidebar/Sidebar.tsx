@@ -16,13 +16,6 @@ const sidebarLinks: SidebarLinks[] = [
     { name: 'Contact', href: '/contact', icon: 'pi pi-envelope' }
 ];
 
-const SidebarLogo = () => (
-    <Link href="/" className="flex items-center mb-8 gap-2">
-        <Image src="/images/logo.svg" width={40} height={40} alt="Snap&Shop Logo" />
-        <h2 className="text-lg font-black font-manrope text-actionColor uppercase">Snap&Shop</h2>
-    </Link>
-);
-
 const SidebarNav = () => (
     <nav className="flex-grow">
         <ul className="space-y-4">
@@ -44,7 +37,11 @@ const SidebarNav = () => (
 export default function Sidebar({ isOpenSidebar, setIsOpenSidebar }: SidebarProps) {
     return (
         <>
-            <aside className={`w-64 h-screen bg-primaryBackgroundColor fixed left-0 top-0 z-50 shadow-lg border-r border-gray-200 ${!isOpenSidebar && 'hidden'}`}>
+            <aside className={`
+                w-64 h-screen bg-primaryBackgroundColor fixed left-0 top-0 z-50 
+                shadow-lg border-r border-gray-200 transition-transform duration-300 ease-in-out
+                ${!isOpenSidebar ? '-translate-x-full' : 'translate-x-0'}
+            `}>
                 <div className="flex justify-end p-4">
                     <button 
                         onClick={() => setIsOpenSidebar(false)} 
@@ -53,7 +50,6 @@ export default function Sidebar({ isOpenSidebar, setIsOpenSidebar }: SidebarProp
                     </button>
                 </div>
                 <div className="sticky top-0 flex flex-col h-screen p-4 overflow-y-auto font-manrope">
-                    <SidebarLogo />
                     <SidebarNav />
                 </div>
             </aside>

@@ -21,7 +21,11 @@ const config: Config = {
         info: '#d7af44',
         star:'#F6C778',
         grey: '#b6b7b4',
-        borderGrey: '#858280'
+        borderGrey: '#858280',
+        tertiaryColorPink: '#FBB6B2',
+        tertiaryColorOrange: '#F6C778',
+        tertiaryColorBlue: '#61D4EC',
+        tertiaryColorPurple: '#9682DA',
       },
       backgroundColor: {
         tertiaryColorPink: '#FBB6B2',

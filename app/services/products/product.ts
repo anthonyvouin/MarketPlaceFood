@@ -345,7 +345,7 @@ export async function filterProduct(filters: {
     contains?: string;
     startsWith?: string;
     endsWith?: string;
-    in?: string[] | number[];
+    in?: string[] | number[] | null[];
     notIn?: string[] | number[];
 }): Promise<ProductDto[]> {
     try {
@@ -356,13 +356,17 @@ export async function filterProduct(filters: {
             }));
         }
 
+        let whereConditions: any[] = [{visible: true}];
+        
+        customFilters.forEach(filter => {
+            if (Object.values(filter)[0]?.in?.length > 0 || !Object.values(filter)[0]?.in) {
+                whereConditions.push(filter);
+            }
+        });
+
         return await prisma.product.findMany({
             where: {
-                AND: [
-                    {visible: true},
-                    ...(customFilters.length > 0 ? customFilters : []),
-
-                ],
+                AND: whereConditions
             },
             include: {category: true, discount: true},
         });

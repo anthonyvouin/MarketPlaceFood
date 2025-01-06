@@ -8,126 +8,186 @@ import { getAllCategories } from '../services/category/category';
 import { ProductDto } from '../interface/product/productDto';
 import { CategoryDto } from '../interface/category/categoryDto';
 import { getPageName } from '@/app/utils/utils';
-import { Slider, SliderChangeEvent } from 'primereact/slider';
-import { Checkbox } from 'primereact/checkbox';
+import { SliderChangeEvent } from 'primereact/slider';
+import { Dropdown } from 'primereact/dropdown';
+import { FloatLabel } from 'primereact/floatlabel';
+import ProductFiltersAside from '../components/ProductFiltersAside';
+import SelectCategories from '../components/SelectCategories';
+
+const bgColors = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
+const booleanOptions = [
+    { label: 'Oui', value: true },
+    { label: 'Non', value: false },
+];
 
 export default function Products() {
-    const [products, setProducts] = useState<ProductDto[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<ProductDto[]>([]);
-    const [filters, setFilters] = useState<{ [key in keyof ProductDto]?: any }>({});
-    const [priceRange, setPriceRange] = useState<[number, number]>([0, 50]);
     const [categories, setCategories] = useState<CategoryDto[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
-    const bgColors = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 50]);
+    const [filters, setFilters] = useState<{ price?: { gte: number; lte: number }; categoryId?: { in: string[] }; discountId?: boolean }>({});
+    const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+    const [selectedOption, setSelectedOption] = useState<boolean | null>(null);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchInitialData = async () => {
             try {
                 const allCategories = await getAllCategories();
                 setCategories(allCategories);
                 await fetchProducts(filters);
+                getPageName();
             } catch (error) {
                 console.error('Erreur lors de la récupération des données :', error);
             }
         };
-        fetchData();
-        getPageName();
+        fetchInitialData();
     }, []);
 
     useEffect(() => {
-        handleFilterChange('price', { gte: priceRange[0] * 100, lte: priceRange[1] * 100 });
-        handleFilterChange('categoryId', selectedCategories.length > 0 ? { in: selectedCategories } : undefined);
-    }, [priceRange, selectedCategories]);
+        const timeoutId = setTimeout(() => fetchProducts(filters), 300);
+        return () => clearTimeout(timeoutId);
+    }, [filters]);
 
-    const fetchProducts = async (filters: any): Promise<void> => {
+    const fetchProducts = async (currentFilters: typeof filters): Promise<void> => {
         try {
-            const filteredProducts = await filterProduct(filters);
-            setProducts(filteredProducts);
+            const filteredProducts = await filterProduct(currentFilters);
             setFilteredProducts(filteredProducts);
         } catch (error) {
             console.error('Erreur lors de la récupération des produits :', error);
         }
     };
 
-    const handleFilterChange = (key: keyof ProductDto, value: any): void => {
+    const handleFilterChange = (key: keyof typeof filters, value: any): void => {
         setFilters((prevFilters) => ({ ...prevFilters, [key]: value }));
-        fetchProducts({ ...filters, [key]: value });
     };
 
     const handlePriceChange = (e: SliderChangeEvent): void => {
-        setPriceRange(e.value as [number, number]);
+        const newPriceRange = e.value as [number, number];
+        setPriceRange(newPriceRange);
+        handleFilterChange('price', { gte: newPriceRange[0] * 100, lte: newPriceRange[1] * 100 });
     };
 
-    const handleCategoryChange = (categoryId: string): void => {
-        setSelectedCategories((prev) =>
-            prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]
-        );
+    const handleCategoryChange = (categoryId: string | string[]): void => {
+        const updatedCategories =
+            Array.isArray(categoryId) ? categoryId : selectedCategories.includes(categoryId)
+                ? selectedCategories.filter((id) => id !== categoryId)
+                : [...selectedCategories, categoryId];
+
+        setSelectedCategories(updatedCategories);
+        handleFilterChange('categoryId', { in: updatedCategories });
+    };
+
+    const updateFilters = (e: { value: boolean }): void => {
+        setSelectedOption(e.value);
+        handleFilterChange('discountId', e.value ? { not: null } : null);
+    };
+
+    const resetFilters = (): void => {
+        setSelectedCategories([]);
+        setPriceRange([0, 50]);
+        setSelectedOption(null);
+        setFilters({});
     };
 
     return (
         <section className="w-full">
-            <div className="h-[30vh] md:h-[40vh] lg:h-[85vh]">
-                <Image 
-                    src="/images/hero-banner-product-page.jpg"
-                    alt="Banner"
-                    width={1400}
-                    height={1000}
-                    className="w-full h-full object-cover brightness-50"
+            <Banner />
+            <div className="flex flex-col gap-8 p-8 bg-gray-50 rounded-lg shadow-lg">
+                <FilterControls
+                    categories={categories}
+                    selectedCategories={selectedCategories}
+                    setSelectedCategories={setSelectedCategories}
+                    handleCategoryChange={handleCategoryChange}
+                    selectedOption={selectedOption}
+                    updateFilters={updateFilters}
+                    isFilterOpen={isFilterOpen}
+                    setIsFilterOpen={setIsFilterOpen}
                 />
+                <ProductFiltersAside
+                    categories={categories}
+                    handlePriceChange={handlePriceChange}
+                    handleCategoryChange={handleCategoryChange}
+                    isFilterOpen={isFilterOpen}
+                    setIsFilterOpen={setIsFilterOpen}
+                    priceRange={priceRange}
+                    selectedCategories={selectedCategories}
+                    onReset={resetFilters}
+                    selectedOption={selectedOption}
+                    updateFilters={updateFilters}
+                    booleanOptions={booleanOptions}
+                />
+                <ProductGrid filteredProducts={filteredProducts} />
             </div>
-
-            <div className="mb-8 px-4 md:px-10">
-                <h2 className="text-xl font-bold mb-4">Filtres</h2>
-                <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-2">Prix</h3>
-                    {priceRange[0]} - {priceRange[1]} €
-                    <Slider
-                        value={priceRange}
-                        onChange={handlePriceChange}
-                        range
-                        min={0}
-                        max={50}
-                        step={1}
-                        pt={{
-                            handle: { className: 'bg-actionColor' },
-                            range: { className: 'bg-actionColor' },
-                        }}
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-2">Catégories</h3>
-                    {categories.map((category) => (
-                        <div key={category.id} className="flex items-center space-x-2 mt-2">
-                            <Checkbox
-                                inputId={category.id}
-                                value={category.id}
-                                onChange={() => handleCategoryChange(category.id)}
-                                checked={selectedCategories.includes(category.id)}
-                            />
-                            <label htmlFor={category.id} className="text-sm">{category.name}</label>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {filteredProducts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-4 md:px-10 gap-6">
-                    {filteredProducts.map((product, index) => (
-                        <ProductCard
-                            key={product.id}
-                            productSlug={product.slug}
-                            product={product}
-                            bgColor={bgColors[index % bgColors.length]}
-                        />
-                    ))}
-                </div>
-            ) : (
-                <div className="h-[30vh] text-center text-gray-500 mt-20">
-                    <p>Aucun produit ne correspond aux critères sélectionnés.</p>
-                </div>
-            )}
         </section>
     );
 }
+
+const Banner = () => (
+    <div className="relative h-[30vh] md:h-[40vh] lg:h-[85vh]">
+        <Image
+            src="/images/hero-banner-product-page.jpg"
+            alt="Banner"
+            layout="fill"
+            className="object-cover brightness-50"
+        />
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-white">
+            <h1 className="text-4xl font-bold">Découvrez Nos Produits</h1>
+            <p className="text-lg mt-2">Trouvez ce que vous cherchez facilement !</p>
+        </div>
+    </div>
+);
+
+const FilterControls = ({
+    categories,
+    selectedCategories,
+    setSelectedCategories,
+    handleCategoryChange,
+    selectedOption,
+    updateFilters,
+    isFilterOpen,
+    setIsFilterOpen,
+}) => (
+    <div className="flex border-y-2 border-l-2 border-black w-max items-stretch">
+        <SelectCategories
+            categories={categories}
+            selectedCategories={selectedCategories}
+            setSelectedCategories={setSelectedCategories}
+            handleCategoryChange={handleCategoryChange}
+        />
+        <FloatLabel>
+            <Dropdown
+                inputId="is-discounted"
+                value={selectedOption}
+                onChange={updateFilters}
+                options={booleanOptions}
+                optionLabel="label"
+                className="w-48 border-r-2 border-black rounded-none px-4"
+            />
+            <label htmlFor="is-discounted">En promotion ?</label>
+        </FloatLabel>
+        <p className="w-48 border-r-2 px-4 min-h-full border-black bg-white text-black hover:bg-black hover:text-white flex items-center justify-center cursor-pointer gap-4 font-manrope"
+            onClick={() => setIsFilterOpen(!isFilterOpen)}>
+            <i className={`pi ${isFilterOpen ? 'pi-times' : 'pi-filter'}`}></i>
+            {isFilterOpen ? 'Fermer les filtres' : 'Plus de filtres'}
+        </p>
+    </div>
+);
+
+const ProductGrid = ({ filteredProducts }) => (
+    <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
+        {filteredProducts.length > 0 ? (
+            filteredProducts.map((product, index) => (
+                <ProductCard
+                    key={product.id}
+                    productSlug={product.slug}
+                    product={product}
+                    bgColor={bgColors[index % bgColors.length]}
+                />
+            ))
+        ) : (
+            <div className="col-span-full flex justify-center items-center text-gray-500 text-lg">
+                Aucun produit ne correspond aux critères sélectionnés.
+            </div>
+        )}
+    </div>
+);
