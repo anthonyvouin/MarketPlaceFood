@@ -10,7 +10,7 @@ import { PaymentFormPropsDto } from '@/app/interface/stripe/PaymentFormPropsDto'
 
 
 
-const PaymentForm: React.FC<PaymentFormPropsDto> = ({ clientSecret, userId }) => {
+const PaymentForm: React.FC<PaymentFormPropsDto> = ({ clientSecret, userId, shippingAddress }) => {
     const stripe = useStripe();
     const elements = useElements();
     const [error, setError] = useState<string | null>(null);
@@ -46,7 +46,7 @@ const PaymentForm: React.FC<PaymentFormPropsDto> = ({ clientSecret, userId }) =>
             if (error) {
                 setError(error.message || 'Une erreur est survenue lors du paiement.');
             } else if (paymentIntent?.status === 'succeeded') {
-                await PaymentSuccess(userId);
+                await PaymentSuccess(userId, shippingAddress);
                 setSucceeded(true);
                 setSideBarCart(null);
                 updateProductList(null); 

@@ -22,6 +22,7 @@ export async function middleware(req: NextRequest) {
         const isAdminPage: boolean = req.nextUrl.pathname.startsWith('/admin');
         const isProfilePage: boolean = req.nextUrl.pathname.startsWith('/profil');
         const isRecapCartPage: boolean = req.nextUrl.pathname.startsWith('/recap-cart');
+        const isShippingPage: boolean = req.nextUrl.pathname.startsWith('/shipping');
 
         if (isAdminPage && userRole !== 'admin') {
             return NextResponse.redirect(new URL('/', req.url));
@@ -29,6 +30,16 @@ export async function middleware(req: NextRequest) {
 
         if ((isProfilePage || isRecapCartPage) && (userRole === 'user' || userRole === 'admin') && (isGoogleUser || emailVerified)) {
             return NextResponse.next();
+        }
+
+        if (isShippingPage) {
+            const referer = req.headers.get('referer');
+            if (!referer || !referer.includes('/recap-cart')) {
+                return NextResponse.redirect(new URL('/recap-cart', req.url));
+            }
+            if ((userRole === 'user' || userRole === 'admin') && (isGoogleUser || emailVerified)) {
+                return NextResponse.next();
+            }
         }
 
         if (isProfilePage && !emailVerified && !isGoogleUser) {
@@ -43,5 +54,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config: { matcher: string[] } = {
-    matcher: ['/profil/:path*', '/admin/:path*', '/recap-cart/:path*'],
+    matcher: ['/profil/:path*', '/admin/:path*', '/recap-cart/:path*', '/shipping/:path*'],
 };
