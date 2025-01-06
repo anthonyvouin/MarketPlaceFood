@@ -34,7 +34,7 @@ export default function ShippingPage() {
                     const userData = await getUserById(session.user.id);
                     if (userData) {
                         setAddresses(userData.addresses);
-                        if (!shippingAddress) {
+                        if (!shippingAddress && !useNewAddress) {
                             const principalAddress = userData.addresses.find(addr => addr.isPrincipal);
                             if (principalAddress) {
                                 setShippingAddress(principalAddress);
@@ -49,7 +49,7 @@ export default function ShippingPage() {
             };
             fetchUser();
         }
-    }, [session, shippingAddress, setShippingAddress]);
+    }, [session, shippingAddress, setShippingAddress, useNewAddress]);
 
     const handleNewAddressSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
