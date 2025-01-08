@@ -17,7 +17,7 @@ export type UserWithAdress = Prisma.UserGetPayload<{
 
 
 export async function getUserById(id: string): Promise<UserWithAdress | null> {
-  verifyAuth(["USER", "ADMIN"]);
+   await verifyAuth(["USER", "ADMIN"]);
 
   
   try {
