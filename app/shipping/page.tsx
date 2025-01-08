@@ -1,12 +1,13 @@
-"use client";
+    "use client"
 
-import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { AddressDto } from '@/app/interface/address/addressDto';
-import { getUserById } from "@/app/services/user/user";
 import { createAddress } from '@/app/services/addresses/addresses';
 import { useShippingAddress } from '@/app/provider/shipping-address-provider';
+import { getUserById } from '@/app/services/user/user';
+import { useState, useEffect } from 'react';
+
 
 export default function ShippingPage() {
     const { data: session } = useSession();
