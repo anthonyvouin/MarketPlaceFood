@@ -28,21 +28,13 @@ export async function middleware(req: NextRequest) {
             return NextResponse.redirect(new URL('/', req.url));
         }
 
-        if ((isProfilePage || isRecapCartPage) && (userRole === 'user' || userRole === 'admin') && (isGoogleUser || emailVerified)) {
+        if ((isProfilePage || isRecapCartPage || isShippingPage) && 
+            (userRole === 'user' || userRole === 'admin') && 
+            (isGoogleUser || emailVerified)) {
             return NextResponse.next();
         }
 
-        if (isShippingPage) {
-            const referer = req.headers.get('referer');
-            if (!referer || !referer.includes('/recap-cart')) {
-                return NextResponse.redirect(new URL('/recap-cart', req.url));
-            }
-            if ((userRole === 'user' || userRole === 'admin') && (isGoogleUser || emailVerified)) {
-                return NextResponse.next();
-            }
-        }
-
-        if (isProfilePage && !emailVerified && !isGoogleUser) {
+        if ((isProfilePage || isShippingPage) && !emailVerified && !isGoogleUser) {
             return NextResponse.redirect(new URL('/resend-email', req.url));
         }
 
