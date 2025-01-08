@@ -17,16 +17,19 @@ export type UserWithAdress = Prisma.UserGetPayload<{
 
 
 export async function getUserById(id: string): Promise<UserWithAdress | null> {
+  verifyAuth(["USER", "ADMIN"]);
+
+  
   try {
-      await verifyAuth();
+    
       return await prisma.user.findUnique({
           where: { id },
           include: {
               addresses: true,
-                    },
           },
-      );
+      });
   } catch (e: any) {
+      console.error('Erreur lors de la récupération de l\'utilisateur:', e);
       throw new Error(`La récupération de l'utilisateur a échoué : ${e.message}`);
   }
 }
@@ -236,6 +239,8 @@ export async function resetPassword(token: string, newPassword: string): Promise
     throw new Error("Une erreur est survenue lors de la réinitialisation du mot de passe. Veuillez réessayer.");
   }
 }
+
+
 
 
 
