@@ -40,9 +40,8 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ hashFiles('package-lock.json') }}
-      - run: ls
-      - name: "Build"
-        run: echo "Project built"
+      - name: Build the project
+        run: npm run build
 
   # test_unit:
   #   needs: ["build"]

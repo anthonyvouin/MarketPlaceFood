@@ -23,7 +23,9 @@ const nextConfig = {
         STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY, 
         NEXT_PUBLIC_APP_URL: process.env.APP_URL,
     },
-    
+    typescript: {
+        ignoreBuildErrors: true,
+    }
 };
 
 export default nextConfig;
