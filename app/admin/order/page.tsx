@@ -8,7 +8,7 @@ import { formatPriceEuro } from "@/app/pipe/formatPrice";
 const OrderPage: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
+  const itemsPerPage =  1;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
