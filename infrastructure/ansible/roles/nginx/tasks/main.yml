@@ -1,0 +1,31 @@
+---
+- name: "Install nginx"
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: true
+
+- name: "Install nginx vhost"
+  ansible.builtin.template:
+    src: ./templates/default.conf.j2
+    dest: /etc/nginx/sites-available/snap-and-shop
+    mode: "0644"
+  notify: Reload-nginx
+
+- name: "Enable nginx vhost"
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/snap-and-shop
+    dest: /etc/nginx/sites-enabled/snap-and-shop
+    state: link
+  notify: Reload-nginx
+
+- name: "Remove default nginx index page"
+  ansible.builtin.file:
+    path: /var/www/html/index.nginx-debian.html
+    state: absent
+
+- name: "Ensure nginx is running and enabled"
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
