@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, StatusOrder } from '@prisma/client';
 
 const prisma = new PrismaClient();
-const UPDATE_INTERVAL = 60000; 
+const UPDATE_INTERVAL = 6000;
 
 export async function GET() {
 const response : Response = new Response(
@@ -13,6 +13,7 @@ const response : Response = new Response(
                     while (isActive) {
                         try {
                             const revenue = await prisma.order.aggregate({
+                                where:{status:StatusOrder.PAYMENT_SUCCEDED},
                                 _sum: {
                                     totalAmount: true,
                                 },
@@ -22,6 +23,7 @@ const response : Response = new Response(
                                 timestamp: new Date().toISOString(),
                                 amount: (revenue._sum.totalAmount ?? 0) / 100
                             };
+                            console.log(data)
 
                             if (isActive) {
                                 controller.enqueue(`data: ${JSON.stringify(data)}\n\n`);
