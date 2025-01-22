@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
 import { Order, StatusOrder } from '@prisma/client';
-import { sendPaymentConfirmationEmail } from '@/app/services/mail/email';
+import { sendPaymentConfirmationEmail, sendPaymentFailedEmail } from '@/app/services/mail/email';
 
 const stripe: Stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '',);
 
@@ -52,7 +52,7 @@ export async function webhook(req: Request) {
 
 
 export const paymentSucceded = async (paymentIntent: Stripe.PaymentIntent, type: 'success' | 'failed') => {
-  const order  = await prisma.order.findFirst({
+  const order = await prisma.order.findFirst({
     where: {
       totalAmount: paymentIntent.amount,
       status: StatusOrder.PAYMENT_PENDING,
@@ -75,14 +75,21 @@ export const paymentSucceded = async (paymentIntent: Stripe.PaymentIntent, type:
       }
     });
     
-    if (type === 'success' && order.user.email) {
-      await sendPaymentConfirmationEmail(order.user.email, {
-        orderNumber: order.id,
-        totalAmount: order.totalAmount,
-        shippingAddress: order.shippingAddress,
-        shippingCity: order.shippingCity,
-        shippingZipCode: order.shippingZipCode
-      });
+    if (order.user.email) {
+      if (type === 'success') {
+        await sendPaymentConfirmationEmail(order.user.email, {
+          orderNumber: order.id,
+          totalAmount: order.totalAmount,
+          shippingAddress: order.shippingAddress,
+          shippingCity: order.shippingCity,
+          shippingZipCode: order.shippingZipCode
+        });
+      } else {
+        await sendPaymentFailedEmail(order.user.email, {
+          orderNumber: order.id,
+          totalAmount: order.totalAmount
+        });
+      }
     }
   }
 };

@@ -123,3 +123,41 @@ export const sendPaymentConfirmationEmail = async (email: string, orderDetails: 
     console.error(`Erreur lors de l'envoi de l'email de confirmation : ${error}`);
   }
 };
+
+export const sendPaymentFailedEmail = async (email: string, orderDetails: {
+  orderNumber: string;
+  totalAmount: number;
+}) => {
+  const transporter = createTransporter();
+
+  const mailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: "Échec du paiement de votre commande",
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; background-color: #FFF0F0; border: 1px solid #ddd; border-radius: 5px;">
+          <h2 style="color: #D32F2F;">Échec du paiement</h2>
+          <p>Nous sommes désolés, mais le paiement de votre commande n'a pas pu être traité.</p>
+          
+          <div style="background-color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #D32F2F;">Détails de la commande</h3>
+            <p><strong>Numéro de commande :</strong> ${orderDetails.orderNumber}</p>
+            <p><strong>Montant total :</strong> ${(orderDetails.totalAmount / 100).toFixed(2)}€</p>
+          </div>
+
+          <p>Vous pouvez réessayer le paiement en vous rendant sur notre site.</p>
+          
+          <footer style="font-size: 12px; color: #777; margin-top: 20px;">
+              <p>Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter.</p>
+          </footer>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Email d'échec de paiement envoyé à ${email}`);
+  } catch (error) {
+    console.error(`Erreur lors de l'envoi de l'email d'échec : ${error}`);
+  }
+};
