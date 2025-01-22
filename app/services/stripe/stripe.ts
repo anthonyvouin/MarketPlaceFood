@@ -1,7 +1,7 @@
 'use server';
 
 import Stripe from 'stripe';
-import {PrismaClient} from '@prisma/client';
+import { PrismaClient, StatusOrder } from '@prisma/client';
 import {getClientCart} from '@/app/services/cart/cart';
 import {CartDto} from '@/app/interface/cart/cartDto';
 import {CartItemDto} from '@/app/interface/cart/cart-item.dto';
@@ -95,7 +95,7 @@ async function saveOrder(
             data: {
                 userId: userId,
                 totalAmount: totalAmount,
-                status: 'PAID',
+                status: StatusOrder.PAYMENT_PENDING,
                 shippingName: shippingAddress.name,
                 shippingAddress: shippingAddress.address,
                 shippingAddressAdd: shippingAddress.additionalAddress,
