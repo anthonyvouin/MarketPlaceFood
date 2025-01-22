@@ -1,4 +1,6 @@
 import Stripe from 'stripe';
+import { prisma } from '@/lib/db';
+import { Order, StatusOrder } from '@prisma/client';
 
 const stripe: Stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '',);
 
@@ -15,8 +17,8 @@ export async function webhook(req: Request) {
   let event: Stripe.Event;
 
   try {
-    const rawBody:ArrayBuffer = await req.arrayBuffer();
-    const textBody:string = new TextDecoder().decode(rawBody);
+    const rawBody: ArrayBuffer = await req.arrayBuffer();
+    const textBody: string = new TextDecoder().decode(rawBody);
 
     event = stripe.webhooks.constructEvent(
       textBody,
@@ -33,12 +35,12 @@ export async function webhook(req: Request) {
 
   switch (event.type) {
     case 'payment_intent.succeeded':
-      const paymentIntent:Stripe.PaymentIntent = event.data.object;
-      console.log('Paiement réussi :', paymentIntent);
+      const paymentIntent: Stripe.PaymentIntent = event.data.object;
+      await paymentSucceded(paymentIntent, 'success');
       break;
     case 'payment_intent.payment_failed':
       const paymentFailed = event.data.object;
-      console.log('Paiement échoué :', paymentFailed);
+      await paymentSucceded(paymentFailed, 'failed');
       break;
     default:
       console.log(`Événement inattendu reçu : ${event.type}`);
@@ -46,3 +48,28 @@ export async function webhook(req: Request) {
 
   return new Response('OK', { status: 200 });
 }
+
+
+export const paymentSucceded = async (paymentIntent: Stripe.PaymentIntent, type: 'success' | 'failed') => {
+  const order: Order | null = await prisma.order.findFirst({
+    where: {
+      totalAmount: paymentIntent.amount,
+      status: StatusOrder.PAYMENT_PENDING,
+      user: {
+        stripeCustomerId: paymentIntent.customer as string,
+      }
+    },
+
+  });
+
+  if (order) {
+   await prisma.order.update({
+      where: {
+        id: order.id,
+      },
+      data: {
+        status: type === 'success' ? StatusOrder.PAYMENT_SUCCEDED : StatusOrder.PAYMENT_FAILED
+      }
+    });
+  }
+};
