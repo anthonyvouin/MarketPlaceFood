@@ -103,6 +103,7 @@ model Product {
   cartItems        CartItem[]
   orderItems       OrderItem[]
   highlighting     Boolean            @default(false)
+  stock            Int                @default(100)
   RecipeIngredient RecipeIngredient[]
 
   @@map("products")

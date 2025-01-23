@@ -1,5 +1,5 @@
 "use client";
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import {getAllCategories} from '@/app/services/category/category';
 import {createProduct} from '@/app/services/products/product';
 import {CategoryDto} from '@/app/interface/category/categoryDto';
@@ -9,14 +9,17 @@ import ImagePreview from "@/app/components/imagePreview/imagePreview";
 import RoundedButton from "@/app/components/ui/rounded-button";
 import {getPageName} from "@/app/utils/utils";
 import {ProductDto} from "@/app/interface/product/productDto";
+import { ToastContext } from '@provider/toastProvider';
 
 export default function CreateProductPage({ searchParams }) {
+    const {show} = useContext(ToastContext)
     const courseName = searchParams.name;
 
     const [product, setProduct] = useState({
         name: courseName || '',
         slug: '',
         description: '',
+        stock:0,
         image: '',
         price: 0,
         categoryId: '',
@@ -27,8 +30,6 @@ export default function CreateProductPage({ searchParams }) {
     const [categories, setCategories] = useState<CategoryDto[]>([]);
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,7 +40,7 @@ export default function CreateProductPage({ searchParams }) {
                 setCategories(fetchedCategories);
             } catch (err: unknown) {
                 if (err instanceof Error) {
-                    setError("Erreur lors de la récupération des catégories.");
+                   show('Erreur', 'Erreur lors du chargement des catégories','error')
                 }
             } finally {
                 setLoadingCategories(false);
@@ -61,8 +62,6 @@ export default function CreateProductPage({ searchParams }) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
-        setSuccess(null);
 
 
         try {
@@ -75,13 +74,14 @@ export default function CreateProductPage({ searchParams }) {
             const productFormatted: number = product.price * 100
             const productWithImage: ProductDto = {...product, image: imagePath, price: productFormatted};
             await createProduct(productWithImage);
-            setSuccess("Produit créé avec succès !");
+            show('Création de produit', `Le produit ${product.name} a bien été créer`,'success')
             setProduct({
                 name: '',
                 slug: '',
                 description: '',
                 image: '',
                 price: 0,
+                stock:0,
                 categoryId: '',
                 discountId: null
             });
@@ -91,7 +91,8 @@ export default function CreateProductPage({ searchParams }) {
             }
         } catch (err: unknown) {
             if (err instanceof Error) {
-                setError("Erreur lors de la création du produit : " + err.message);
+                show('Erreur', 'Erreur lors de la création des produits','error')
+
             }
         } finally {
             setLoading(false);
@@ -115,14 +116,11 @@ export default function CreateProductPage({ searchParams }) {
             <div className="p-5 bg-primaryBackgroundColor">
                 <h1 className="text-2xl mb-5">Créer un Produit</h1>
                 {loadingCategories ? (
-                    <p>Chargement des catégories...</p>
+                    <p>Chargement du formulaire...</p>
                 ) : (
                     <div className="flex justify-center">
                         <div className="w-3/6 max-w-xl p-6 mr-12 bg-white shadow-md rounded-md">
                             <form onSubmit={handleSubmit} className="space-y-6">
-                                {error && <p style={{color: 'red'}}>{error}</p>}
-                                {success && <p style={{color: 'green'}}>{success}</p>}
-
                                 <div className="flex justify-between">
                                     <div>
                                         <label>Nom</label>
@@ -181,18 +179,31 @@ export default function CreateProductPage({ searchParams }) {
 
                                 </div>
                                 <div>
+                                    <label>Stock</label>
+                                    <input
+                                      type="number"
+                                      name="stock"
+                                      value={product.stock}
+                                      onChange={handleChange}
+                                      className="block w-60 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"
+                                      required
+                                      step="0.01"
+                                      min="0"
+                                    />
+                                </div>
+                                <div>
                                     <label>Description</label>
                                     <textarea
-                                        name="description"
-                                        value={product.description}
-                                        className="w-full h-32 block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"
-                                        onChange={handleChange}
-                                        required
+                                      name="description"
+                                      value={product.description}
+                                      className="w-full h-32 block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"
+                                      onChange={handleChange}
+                                      required
                                     />
                                 </div>
 
                                 {imageFile ? (
-                                    <div className='flex items-center justify-center'>
+                                  <div className='flex items-center justify-center'>
                                         <ImagePreview file={imageFile}></ImagePreview>
                                         <RoundedButton onClickAction={() => deleteImage()} message="Supprimer" positionIcon="right" icon='delete' classes="tomato"/>
                                     </div>
