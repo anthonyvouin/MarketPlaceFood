@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { useSession } from 'next-auth/react';
@@ -21,6 +21,7 @@ export default function PaymentPage() {
     const router = useRouter();
     const [clientSecret, setClientSecret] = useState('');
     const { shippingAddress } = useShippingAddress();
+    const intentRequestPending = useRef(false);
 
     useEffect(() => {
         if (!shippingAddress) {
@@ -29,7 +30,8 @@ export default function PaymentPage() {
         }
 
         const createIntent = async () => {
-            if (session?.user?.id) {
+            if (session?.user?.id && !intentRequestPending.current && !clientSecret) {
+                intentRequestPending.current = true;
                 try {
                     const secret : string | null = await createPaymentIntent(session.user.id);
                     if (secret) {
@@ -41,6 +43,8 @@ export default function PaymentPage() {
                 } catch (error) {
                     console.error("Erreur lors de la création de l'intention de paiement:", error);
                     router.push('/recap-cart');
+                } finally {
+                    intentRequestPending.current = false;
                 }
             }
         };
