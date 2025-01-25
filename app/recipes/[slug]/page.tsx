@@ -65,7 +65,7 @@ const RecipeDetailPage = () => {
         if (fetchedRecipe.steps?.length === 0 && !isLoadingSteps) {
           await generateRecipeSteps(fetchedRecipe);
         }
-      } catch (err) {
+      } catch {
         setError("Erreur lors du chargement de la recette");
         showErrorToast("Erreur lors du chargement de la recette");
       }
@@ -90,17 +90,17 @@ const RecipeDetailPage = () => {
         unit: ingredient.unit,
       })));
 
-      const generatedSteps = await generateRecipes("generate-steps", {
+      const generatedSteps = await generateRecipes("generate-steps", JSON.stringify({
         name: recipe.name,
         description: recipe.description,
         ingredients: ingredients,
-      });
+      }));
 
       await updateRecipe(recipe.id, { steps: generatedSteps.steps });
       
       const updatedRecipe = await getRecipeBySlug(params.slug as string);
       setRecipeDetails(updatedRecipe);
-    } catch (err) {
+    } catch {
       showErrorToast("Erreur lors de la génération des étapes");
     } finally {
       setIsLoadingSteps(false);
@@ -120,7 +120,7 @@ const RecipeDetailPage = () => {
         "Recette ajoutée aux favoris" : 
         "Recette retirée des favoris"
       );
-    } catch (err) {
+    } catch {
       show("Erreur", "Erreur lors de l'ajout aux favoris", "error");    
     }
   };
@@ -228,7 +228,7 @@ const RecipeDetailPage = () => {
               </div>
             ))}
           </div>
-          <h3 className="text-lg font-bold mb-4 text-black">Pas encore dans notre magasin, mais c'est pour bientôt</h3>
+          <h3 className="text-lg font-bold mb-4 text-black">Pas encore dans notre magasin, mais c&apos;est pour bientôt</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {recipeDetails.recipeMissingIngredientReports.map((ingredient, index) => (
               <div 

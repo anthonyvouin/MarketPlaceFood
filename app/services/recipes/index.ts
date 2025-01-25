@@ -17,6 +17,7 @@ type CreateRecipeInput = {
     difficulty: string;
     type: RecipeType;
     ingredients: {
+        productId: any;
         name: string;
         quantity: number;
         unit: string;
@@ -88,7 +89,10 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
             if (product) {
                 foundProducts.push({ ...product, quantity: ingredient.quantity, unit: ingredient.unit });
             } else {
-                const report = await createOrUpdateMissingIngredientReport({ name: ingredient.name });
+                const report = await createOrUpdateMissingIngredientReport({
+                    name: ingredient.name,
+                    count: 1
+                });
                 notFoundProducts.push({ ...report, quantity: ingredient.quantity, unit: ingredient.unit });
             }
         }
@@ -141,11 +145,11 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
 
         return createdRecipe
     } catch (error) {
-        if (error.code === 'P2002') {
+        if ((error as any).code === 'P2002') {
             console.log("Recipe already exists, skipping:", data.name);
             return null; // Retourne null pour ne pas interrompre le processus, parce qu'on veut continuer à créer les autres recettes
         }
-        if (error.code === 'P2025') {
+        if ((error as any).code === 'P2025') {
             console.log("One of the product of the recipes not found, skipping:", JSON.stringify(data.ingredients));
             return null; // Retourne null pour ne pas interrompre le processus, parce qu'on veut continuer à créer les autres recettes
         }

@@ -30,8 +30,10 @@ export async function uploadTemporaryImageToCloudinary(formData: FormData): Prom
         }, (error, result) => {
             if (error) {
                 reject(error);
-            } else {
+            } else if (result) {
                 resolve(result);
+            } else {
+                reject(new Error('Upload result is undefined'));
             }
         });
         uploadStream.end(buffer);
