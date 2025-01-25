@@ -94,8 +94,8 @@ export default function Home() {
     }, []);
 
     return (
-        <div className="w-full bg-primaryBackgroundColor min-h-[85vh]">
-            <section className="h-[85vh] relative overflow-hidden w-full">
+        <div className="w-full bg-primaryBackgroundColor min-h-screen h-screen">
+            <section className="h-full relative overflow-hidden w-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-green-100/50" />
 
                 <div className="absolute w-full h-full">

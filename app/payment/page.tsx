@@ -54,8 +54,8 @@ export default function PaymentPage() {
 
     if (!clientSecret || !shippingAddress) {
         return (
-            <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor">
-                <p className="text-lg font-semibold text-gray-700">Chargement...</p>
+            <div className="min-h-screen flex items-center justify-center bg-primaryBackgroundColor">
+                <p className="text-lg font-semibold text-red-500">Chargement...</p>
             </div>
         );
     }
@@ -67,7 +67,7 @@ export default function PaymentPage() {
     };
 
     return (
-        <div className="h-[84vh] bg-primaryBackgroundColor flex items-center justify-center">
+        <div className="min-h-screen bg-primaryBackgroundColor flex items-center justify-center">
             <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 md:p-10">
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold text-darkActionColor">Paiement</h1>

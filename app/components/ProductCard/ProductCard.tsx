@@ -8,7 +8,7 @@ import {useSideBarBasket} from "@/app/provider/sideBar-cart-provider";
 const ProductCard = ({product, bgColor, productSlug}: ProductCardProps) => {
     const {addProduct} = useSideBarBasket();
     return (
-        <div className={`${bgColor} bg-opacity-25 w-full rounded-lg shadow-md p-4 font-manrope relative`}>
+        <div className={`${bgColor} bg-opacity-75 w-full rounded-md shadow-md p-4 font-manrope relative`}>
             <Link href={`/products/${productSlug}`}>
                 <div className="grid grid-cols-1 grid-rows-[1.5fr,0.5fr,1fr,1fr] h-[25rem]">
                     <div className="flex justify-center items-start h-full">
@@ -37,7 +37,7 @@ const ProductCard = ({product, bgColor, productSlug}: ProductCardProps) => {
                     ) : ('')}
                 </div>
 
-                <button className={`${bgColor} bg-opacity-50 text-white h-max p-3 rounded-md items-center justify-center hover:bg-opacity-100`}
+                <button className={`bg-white text-black h-max p-3 rounded-md items-center justify-center hover:bg-opacity-100`}
                         onClick={() => addProduct(product, 1)}>
                     <span className="pi pi-plus"></span>
                 </button>
