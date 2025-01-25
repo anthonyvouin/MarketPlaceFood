@@ -30,6 +30,7 @@ model Account {
 enum Role {
   USER
   ADMIN
+  STOREKEEPER
 }
 
 model User {

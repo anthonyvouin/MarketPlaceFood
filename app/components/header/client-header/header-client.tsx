@@ -31,32 +31,45 @@ export default function HeaderClient(): JSX.Element {
             <div className="flex gap-5 items-center">
                 {status === 'authenticated' ? (
                     <>
-                        <div className="relative">
+                      {session?.user["role"] !== "STOREKEEPER"? (
+                        <div>
+                          <div className="relative">
                             <Button
-                                rounded
-                                icon="pi pi-shopping-cart"
-                                className="bg-actionColor text-white w-8 h-8 text-xs"
-                                onClick={toggleBasketList}
+                              rounded
+                              icon="pi pi-shopping-cart"
+                              className="bg-actionColor text-white w-8 h-8 text-xs"
+                              onClick={toggleBasketList}
                             />
                             <span className="absolute bg-primaryColor px-1 rounded-full ft-10px badge-shop text-white">{totalLengthItems}</span>
-                        </div>
-                        <Button
+                          </div>
+                          <Button
                             rounded
                             icon="pi pi-bell"
                             className="bg-actionColor text-white w-8 h-8 text-xs"
-                        />
+                          />
 
-                        <Link href="/profil">
+                          <Link href="/profil">
                             <Avatar label={name} shape="circle" className="bg-actionColor text-white"/>
-                        </Link>
+                          </Link>
 
-                        {session?.user["role"] === "ADMIN" ? (
+                          {session?.user["role"] === "ADMIN" ? (
                             <Link href="/admin">
-                                <div className="bg-info text-white w-8 h-8 text-xs rounded-full flex items-center justify-center">
-                                    <span className="pi pi-folder"></span>
-                                </div>
+                              <div className="bg-info text-white w-8 h-8 text-xs rounded-full flex items-center justify-center">
+                                <span className="pi pi-folder"></span>
+                              </div>
                             </Link>
-                        ) : ("")}
+                          ) : ("")}
+
+                        </div>
+                      ):('')}
+
+                      {session?.user["role"] === "STOREKEEPER" ? (
+                        <Link href="/admin/product">
+                          <div className="bg-info text-white w-8 h-8 text-xs rounded-full flex items-center justify-center">
+                            <span className="pi pi-folder"></span>
+                          </div>
+                        </Link>
+                      ) : ("")}
 
                         <LogoutButton/>
                     </>
