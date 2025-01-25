@@ -55,7 +55,7 @@ export default function PaymentPage() {
     if (!clientSecret || !shippingAddress) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-primaryBackgroundColor">
-                <p className="text-lg font-semibold text-red-500">{error}</p>
+                <p className="text-lg font-semibold text-red-500">Chargement...</p>
             </div>
         );
     }
@@ -65,21 +65,6 @@ export default function PaymentPage() {
         userId: session?.user?.id || '',
         shippingAddress: shippingAddress
     };
-    if (!clientSecret) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-primaryBackgroundColor">
-                <p className="text-lg font-semibold text-gray-700">Chargement du paiement...</p>
-            </div>
-        );
-    }
-
-    if (!session || !session.user) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-primaryBackgroundColor">
-                <p className="text-lg font-semibold text-gray-700">Veuillez vous connecter pour effectuer un paiement.</p>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-primaryBackgroundColor flex items-center justify-center">
