@@ -1,0 +1,53 @@
+---
+- name: Install rsync
+  apt:
+    name: rsync
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Install PM2 globally
+  community.general.npm:
+    name: pm2
+    global: yes
+  become: yes
+
+- name: Copy frontend build files
+  ansible.posix.synchronize:
+    src: "{{ playbook_dir }}/../../app/front-end/dist/"
+    dest: /app/front-end/dist
+    rsync_opts:
+      - "--rsync-path='mkdir -p /app/front-end/dist && rsync'"
+    delete: yes
+  become: yes
+
+# - name: Copy frontend files
+#   ansible.posix.synchronize:
+#     src: "{{ playbook_dir }}/../../app/front-end/"
+#     dest: /app/front-end
+#     rsync_opts:
+#       - "--rsync-path='mkdir -p /app/front-end && rsync'"
+#     delete: yes
+#   become: yes
+
+# - name: Install frontend dependencies
+#   command:
+#     cmd: npm install
+#     chdir: /app/front-end
+
+# - name: Build frontend
+#   command:
+#     cmd: npm run build
+#     chdir: /app/front-end
+#   become: yes
+
+- name: Start or restart backend with PM2
+  shell:
+    cmd: pm2 restart snapandshop || pm2 start index.js --name snapandshop
+    chdir: /app/back-end
+  become: yes
+
+# - name: Seed database
+#   command:
+#     cmd: node migrate.js
+#     chdir: /app/back-end

@@ -1,0 +1,10 @@
+---
+http_port:
+node_port:
+backend_port:
+full_hostname:
+DB_NAME:
+MYSQL_ROOT_USER:
+MYSQL_ROOT_PASSWORD:
+DB_USER:
+DB_PASSWORD:
