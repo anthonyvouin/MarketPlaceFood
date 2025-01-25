@@ -103,6 +103,7 @@ model Product {
   cartItems        CartItem[]
   orderItems       OrderItem[]
   highlighting     Boolean            @default(false)
+  stock            Int                @default(100)
   RecipeIngredient RecipeIngredient[]
 
   @@map("products")
@@ -242,15 +243,33 @@ model MissingIngredientReport {
   @@map("missing_ingredient_reports")
 }
 
+enum StatusOrder {
+  PAYMENT_FAILED
+  PAYMENT_PENDING
+  PAYMENT_SUCCEDED
+  PREPARING
+  SHIP
+  RECEIVED
+}
+
 model Order {
   id          String      @id @default(cuid())
   userId      String      @map("user_id")
   totalAmount Int
-  status      String      @default("pending")
+  status      StatusOrder @default(PAYMENT_PENDING)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  user        User        @relation(fields: [userId], references: [id])
-  orderItems  OrderItem[]
+
+  shippingName        String  @map("shipping_name")
+  shippingAddress     String  @map("shipping_address")
+  shippingAddressAdd  String? @map("shipping_address_add")
+  shippingZipCode     String  @map("shipping_zip_code")
+  shippingCity        String  @map("shipping_city")
+  shippingPhoneNumber String  @map("shipping_phone_number")
+  shippingNote        String? @map("shipping_note") @db.Text
+
+  user       User        @relation(fields: [userId], references: [id])
+  orderItems OrderItem[]
 
   @@map("orders")
 }

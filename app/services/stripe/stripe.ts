@@ -1,17 +1,17 @@
 'use server';
 
 import Stripe from 'stripe';
-import {PrismaClient} from '@prisma/client';
+import { PrismaClient, StatusOrder } from '@prisma/client';
 import {getClientCart} from '@/app/services/cart/cart';
 import {CartDto} from '@/app/interface/cart/cartDto';
 import {CartItemDto} from '@/app/interface/cart/cart-item.dto';
 import {OrderDto} from '@/app/interface/order/orderDto';
+import {AddressDto} from '@/app/interface/address/addressDto';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2022-11-15' as any,
 });
 const prisma = new PrismaClient();
-
 
 export async function createPaymentIntent(userId: string) {
 
@@ -63,39 +63,31 @@ export async function createPaymentIntent(userId: string) {
     }
 }
 
-export async function PaymentSuccess(userId: string) {
+export const PaymentSuccess = async (userId: string, shippingAddress: AddressDto) => {
     try {
-        const cart : CartDto  | null = await getClientCart(userId);
+        const cart = await getClientCart(userId);
+        if (!cart) throw new Error('Panier non trouvé');
+        if (!cart.id) throw new Error('ID du panier non trouvé');
 
-        if (!cart || cart.cartItems.length === 0) {
-            throw new Error('Votre panier est vide.');
-        }
-
-        await saveOrder(userId, cart.totalPrice, cart.cartItems);
-
-        if (cart.id) {
-            await convertCart(cart.id);
-        }
-
-        return { success: true };
-    } catch (error: unknown) {
-        console.error('Erreur lors de la finalisation de la commande :', error);
-        throw new Error('Erreur lors de la confirmation de paiement.');
+        await saveOrder(userId, cart.totalPrice, cart.cartItems, shippingAddress);
+        await convertCart(cart.id);
+        
+        return true;
+    } catch (error) {
+        console.error('Erreur lors de la création de la commande:', error);
+        throw error;
     }
-}
+};
 
-
-
-
-async function saveOrder(userId: string, totalAmount: number, cartItems: CartItemDto[]) {
+async function saveOrder(
+    userId: string, 
+    totalAmount: number, 
+    cartItems: CartItemDto[], 
+    shippingAddress: AddressDto
+) {
     if (!userId) {
         console.error('Erreur : L\'ID utilisateur est manquant.');
         throw new Error('Erreur : L\'ID utilisateur est requis.');
-    }
-
-    if (!cartItems || cartItems.length === 0) {
-        console.error('Erreur : Aucun article dans le panier.');
-        throw new Error('Erreur : Le panier est vide.');
     }
 
     try {
@@ -103,7 +95,14 @@ async function saveOrder(userId: string, totalAmount: number, cartItems: CartIte
             data: {
                 userId: userId,
                 totalAmount: totalAmount,
-                status: 'Payed',
+                status: StatusOrder.PAYMENT_PENDING,
+                shippingName: shippingAddress.name,
+                shippingAddress: shippingAddress.address,
+                shippingAddressAdd: shippingAddress.additionalAddress,
+                shippingZipCode: shippingAddress.zipCode,
+                shippingCity: shippingAddress.city,
+                shippingPhoneNumber: shippingAddress.phoneNumber,
+                shippingNote: shippingAddress.note,
                 orderItems: {
                     create: cartItems.map((item) => ({
                         product: {
@@ -122,28 +121,51 @@ async function saveOrder(userId: string, totalAmount: number, cartItems: CartIte
     }
 }
 
-
 export async function getOrdersByUser(userId: string): Promise<OrderDto[]> {
     try {
-        const orders : OrderDto[] = await prisma.order.findMany({
+        const orders = await prisma.order.findMany({
             where: {userId},
-            include: {
+            select: {
+                id: true,
+                totalAmount: true,
+                status: true,
+                createdAt: true,
+                shippingName: true,
+                shippingAddress: true,
+                shippingAddressAdd: true,
+                shippingZipCode: true,
+                shippingCity: true,
+                shippingPhoneNumber: true,
+                shippingNote: true,
                 orderItems: {
-                    include: {
-                        product: true,
-                    },
+                    select: {
+                        quantity: true,
+                        unitPrice: true,
+                        totalPrice: true,
+                        product: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
                 },
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
             },
             orderBy: {createdAt: 'desc'},
         });
 
-        return orders;
+        return orders as unknown as OrderDto[];
     } catch (error) {
         console.error('Erreur lors de la récupération des commandes :', error);
         throw new Error('Erreur lors de la récupération des commandes.');
     }
 }
-
 
 async function convertCart(cartId: string) {
     try {

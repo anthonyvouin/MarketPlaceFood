@@ -70,6 +70,9 @@ export const authOptions = {
     maxAge: 24 * 60 * 60,
   },
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      return baseUrl + "/";
+    },
     async jwt({ token, user, account }) {
       if (user) {
         token.isGoogleUser = account.provider === "google" ? true : false;

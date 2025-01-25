@@ -22,16 +22,19 @@ export async function middleware(req: NextRequest) {
         const isAdminPage: boolean = req.nextUrl.pathname.startsWith('/admin');
         const isProfilePage: boolean = req.nextUrl.pathname.startsWith('/profil');
         const isRecapCartPage: boolean = req.nextUrl.pathname.startsWith('/recap-cart');
+        const isShippingPage: boolean = req.nextUrl.pathname.startsWith('/shipping');
 
         if (isAdminPage && userRole !== 'admin') {
             return NextResponse.redirect(new URL('/', req.url));
         }
 
-        if ((isProfilePage || isRecapCartPage) && (userRole === 'user' || userRole === 'admin') && (isGoogleUser || emailVerified)) {
+        if ((isProfilePage || isRecapCartPage || isShippingPage) && 
+            (userRole === 'user' || userRole === 'admin') && 
+            (isGoogleUser || emailVerified)) {
             return NextResponse.next();
         }
 
-        if (isProfilePage && !emailVerified && !isGoogleUser) {
+        if ((isProfilePage || isShippingPage) && !emailVerified && !isGoogleUser) {
             return NextResponse.redirect(new URL('/resend-email', req.url));
         }
 
@@ -43,5 +46,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config: { matcher: string[] } = {
-    matcher: ['/profil/:path*', '/admin/:path*', '/recap-cart/:path*'],
+    matcher: ['/profil/:path*', '/admin/:path*', '/recap-cart/:path*', '/shipping/:path*'],
 };

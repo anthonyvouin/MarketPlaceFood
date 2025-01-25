@@ -8,7 +8,7 @@ import { formatPriceEuro } from "@/app/pipe/formatPrice";
 const OrderPage: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
+  const itemsPerPage =  1;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,6 +71,19 @@ const OrderPage: React.FC = () => {
               <p className="text-sm">Total: {formatPriceEuro(order.totalAmount)} €</p>
               <p className="text-sm">Créée le: {new Date(order.createdAt).toLocaleDateString()}</p>
 
+              <div className="mt-3 p-3 bg-gray-50 rounded">
+                <h3 className="text-md font-medium mb-2">Informations de livraison:</h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <p>Nom: {order.shippingName}</p>
+                  <p>Téléphone: {order.shippingPhoneNumber}</p>
+                  <p>Adresse: {order.shippingAddress}</p>
+                  {order.shippingAddressAdd && <p>Complément: {order.shippingAddressAdd}</p>}
+                  <p>Code postal: {order.shippingZipCode}</p>
+                  <p>Ville: {order.shippingCity}</p>
+                  {order.shippingNote && <p className="col-span-2">Note: {order.shippingNote}</p>}
+                </div>
+              </div>
+
               <h3 className="mt-2 text-md font-medium">Articles:</h3>
               <ul className="text-sm">
                 {order.orderItems.map((item: any) => (
@@ -83,8 +96,8 @@ const OrderPage: React.FC = () => {
               </ul>
 
               <h3 className="mt-2 text-md font-medium">Utilisateur:</h3>
-              <p className="text-sm">Nom: {! order.user ? 'Aucun utilisateur' : order.user.name}</p>
-              <p className="text-sm">Email: {! order.user ? 'Aucun utilisateur' : order.user.email}</p>
+              <p className="text-sm">Nom: {!order.user ? 'Aucun utilisateur' : order.user.name}</p>
+              <p className="text-sm">Email: {!order.user ? 'Aucun utilisateur' : order.user.email}</p>
             </div>
           ))}
 
