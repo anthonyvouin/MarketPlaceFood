@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - ci-cd/init
+      - main
   workflow_dispatch: ~
 
 jobs:
@@ -40,9 +40,12 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ hashFiles('package-lock.json') }}
+      - name: Set GOOGLE_API_KEY as environment variable
+        run: echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> $GITHUB_ENV
       - name: Build the project
         run: npm run build
 
+  # Uncomment and modify the following jobs as needed
   # test_unit:
   #   needs: ["build"]
   #   name: "Unit Tests"
