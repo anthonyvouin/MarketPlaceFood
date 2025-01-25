@@ -23,5 +23,9 @@ jobs:
             pip install ansible
 
       - name: Deploy application
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'False'
+          ANSIBLE_USER: ${{ secrets.ANSIBLE_USER }}
+          ANSIBLE_PASS: ${{ secrets.ANSIBLE_PASSWORD }}
         run: |
-            ansible-playbook -i infrastructure/ansible/inventory.ini infrastructure/ansible/deploy.yml
+          ansible-playbook -i infrastructure/ansible/inventory.ini infrastructure/ansible/deploy.yml --extra-vars "ansible_user=$ANSIBLE_USER ansible_ssh_pass=$ANSIBLE_PASS"
