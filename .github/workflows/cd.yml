@@ -34,7 +34,7 @@ jobs:
           ANSIBLE_USER: ${{ secrets.ANSIBLE_USER }}
           ANSIBLE_PASS: ${{ secrets.ANSIBLE_PASSWORD }}
         run: |
-          ansible-playbook -i inventory.ini deploy.yml \
+          ansible-playbook -i infrastructure/ansible/inventory.ini infrastructure/ansible/deploy.yml \
           --vault-password-file vault_pass.txt \
           --extra-vars "ansible_user=$ANSIBLE_USER ansible_ssh_pass=$ANSIBLE_PASSWORD"
 
