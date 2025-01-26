@@ -1,9 +1,10 @@
 name: CD
 
 on:
-  workflow_run:
-    workflows: [CI]
-    types: completed
+  # workflow_run:
+  #   workflows: [CI]
+  #   types: completed
+  workflow_dispatch: ~
 
 jobs:
   deploy:
@@ -16,10 +17,11 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519  # Assurer que la clé a les bonnes permissions
-          ssh-keyscan -H 217.160.164.228 >> ~/.ssh/known_hosts  # Ajouter l'hôte à known_hosts
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H 217.160.164.228 >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
-      - name: Deploy to server
+      - name: Test SSH connection
         run: |
           ssh -i ~/.ssh/id_ed25519 anthony@217.160.164.228 "echo 'Déploiement réussi!'"
 
