@@ -1,18 +1,17 @@
 name: CD
 
 on:
-  # workflow_run:
-  #   workflows: [CI]
-  #   types: completed
   workflow_dispatch: ~
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # Étape 1 : Récupération du dépôt
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      # Étape 2 : Configuration de la clé SSH
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -21,37 +20,40 @@ jobs:
           ssh-keyscan -H 217.160.164.228 >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
+      # Étape 3 : Test de la connexion SSH
       - name: Test SSH connection
         run: |
-          ssh -i ~/.ssh/id_ed25519 anthony@217.160.164.228 "echo 'Déploiement réussi!'"
+          ssh -i ~/.ssh/id_ed25519 anthony@217.160.164.228 "echo 'Connexion SSH réussie!'"
 
-      # - name: Set up Python
-      #   uses: actions/setup-python@v2
-      #   with:
-      #       python-version: '3.x'
+      # Étape 4 : Configuration de Python pour installer Ansible
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+            python-version: '3.x'
 
-      # - name: Install Ansible
-      #   run: |
-      #       python -m pip install --upgrade pip
-      #       pip install ansible
+      # Étape 5 : Installation d'Ansible
+      - name: Install Ansible
+        run: |
+            python -m pip install --upgrade pip
+            pip install ansible
 
-      # - name: Create vault password file
-      #   env:
-      #     VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-      #   run: |
-      #     echo "$VAULT_PASSWORD" > vault_pass.txt
+      # Étape 6 : Création du fichier de mot de passe pour Vault
+      - name: Create vault password file
+        env:
+          VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          echo "$VAULT_PASSWORD" > vault_pass.txt
 
-      # - name: Deploy application
-      #   env:
-      #     ANSIBLE_HOST_KEY_CHECKING: 'False'
-      #     ANSIBLE_USER: ${{ secrets.ANSIBLE_USER }}
-      #     ANSIBLE_PASS: ${{ secrets.ANSIBLE_PASSWORD }}
-      #   run: |
-      #     ansible-playbook -i infrastructure/ansible/inventory.ini infrastructure/ansible/deploy.yml \
-      #     --vault-password-file vault_pass.txt \
-      #     --extra-vars "ansible_user=$ANSIBLE_USER ansible_ssh_pass=$ANSIBLE_PASSWORD" \
-      #     -vvvv
+      # Étape 7 : Exécution du playbook Ansible
+      - name: Deploy application
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'False'
+        run: |
+          ansible-playbook -i infrastructure/ansible/inventory.ini infrastructure/ansible/deploy.yml \
+          --vault-password-file vault_pass.txt \
+          -vvvv
 
-      # - name: Cleanup
-      #   run: |
-      #     rm -f vault_pass.txt
+      # Étape 8 : Nettoyage (suppression des fichiers sensibles)
+      - name: Cleanup
+        run: |
+          rm -f vault_pass.txt
