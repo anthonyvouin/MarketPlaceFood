@@ -2,6 +2,7 @@
 
 import OpenAI from "openai";
 import { getAllProducts } from "../products/product";
+import { ResponseFormatJSONSchema } from "openai/resources/shared.mjs";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || ""
@@ -87,25 +88,23 @@ export async function analysePicture(format: string = 'recipe', imageUrl: string
     // const fullImageUrl = `${process.env.NEXT_PUBLIC_APP_URL}${imageUrl}`
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         {
           role: "user",
-          content: [
-            { type: "text", text: prompt },
-            {
-              type: "image_url",
-              image_url: { url:  imageUrl }
-            }
-          ]
+          content: prompt
         },
+        {
+          role: "user",
+          content: imageUrl
+        }
       ],
-      response_format: data[format].response_format || data.recipe.prompt
+      response_format: data[format].response_format as ResponseFormatJSONSchema
     });
 
     const responseContent = response.choices[0].message.content;
 
-    const parsedResponse = JSON.parse(responseContent);
+    const parsedResponse = responseContent ? JSON.parse(responseContent) : null;
 
     return parsedResponse;
 
@@ -117,7 +116,7 @@ export async function analysePicture(format: string = 'recipe', imageUrl: string
 
 export async function generateRecipes(format: string, complement: string = "", products?: any, recipeName?: string) {
   try {
-    let formattedIngredients = null
+    let formattedIngredients: string | null = null
 
     let prompt = ""
     
@@ -159,7 +158,7 @@ export async function generateRecipes(format: string, complement: string = "", p
     })
 
     if (format !== "generate-steps") {
-      if (formattedIngredients.length > 0) {
+      if (formattedIngredients && formattedIngredients.length > 0) {
         if (formattedIngredients) {
           message.push({
             role: "user",
@@ -308,16 +307,16 @@ export async function generateRecipes(format: string, complement: string = "", p
 
     //? ça marche bien j'ai l'impression
     const response = await openai.chat.completions.create({
-      "model": "gpt-4o",
-      "messages": message,
-      response_format: formatOfReturn || undefined
+      model: "gpt-4o",
+      messages: message as OpenAI.ChatCompletionMessageParam[],
+      response_format: formatOfReturn as ResponseFormatJSONSchema | undefined
     });
 
     let recipesFormatted;
     try {
-      let responseContent = response?.choices[0]?.message?.content;
+      const responseContent = response?.choices[0]?.message?.content;
 
-      recipesFormatted = JSON.parse(responseContent);
+      recipesFormatted = responseContent ? JSON.parse(responseContent) : null;
       if (recipesFormatted.recipes) {
         recipesFormatted = recipesFormatted.recipes
       }

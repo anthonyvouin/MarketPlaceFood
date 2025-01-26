@@ -18,8 +18,10 @@ export default function RecipesPage() {
 
     async function getFavoritedRecipes() {
         setLoading(true);
-        const lastRecipes = await getUserFavoriteRecipes(session.user.id);
-        setRecipes(lastRecipes.recipes);
+        if (session?.user?.id) {
+            const lastRecipes = await getUserFavoriteRecipes(session.user.id);
+            setRecipes(lastRecipes.recipes);
+        }
         setLoading(false);
     }
 

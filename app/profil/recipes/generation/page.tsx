@@ -18,8 +18,10 @@ export default function RecipesPage() {
 
     async function getCreatedRecipesByCurrentUser() {
         setLoading(true);
-        const lastRecipes = await getUserCreatedRecipes(session.user.id);
-        setRecipes(lastRecipes.recipes);
+        if (session) {
+            const lastRecipes = await getUserCreatedRecipes(session.user.id);
+            setRecipes(lastRecipes.recipes);
+        }
         setLoading(false);
     }
 

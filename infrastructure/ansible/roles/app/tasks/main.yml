@@ -1,0 +1,64 @@
+---
+- name: Installer PM2 globalement
+  community.general.npm:
+    name: pm2
+    global: yes
+
+- name: Créer le répertoire cible
+  file:
+    path: /var/www/html/snap-and-shop
+    state: directory
+  become: yes
+  become_user: root
+  become_method: sudo
+
+- name: Définir les permissions du répertoire cible
+  file:
+    path: "{{ target_path }}"
+    owner: "{{ target_owner }}"
+    group: "{{ target_group }}"
+    mode: "{{ target_mode }}"
+  become: yes
+  become_user: root
+  become_method: sudo
+
+- name: Synchroniser les fichiers du projet
+  synchronize:
+    src: "{{ playbook_dir }}/../../"
+    dest: "/var/www/html/snap-and-shop"
+    rsync_opts:
+      - "--exclude=node_modules"
+      - "--exclude=.next"
+      - "--exclude=infrastructure"
+
+- name: Installer les dépendances
+  shell:
+    cmd: npm install
+    chdir: /var/www/html/snap-and-shop
+
+- name: Construire le projet
+  shell:
+    cmd: npm run build
+    chdir: /var/www/html/snap-and-shop
+
+# - name: Appliquer les migrations
+#   shell:
+#     cmd: npm run migrate -- --env production
+#     chdir: /var/www/html/snap-and-shop
+
+- name: Vérifier si l'application PM2 existe
+  shell: pm2 list | grep "snap-and-shop"
+  register: pm2_status
+  failed_when: false
+
+- name: Démarrer l'application avec PM2 si elle n'est pas enregistrée
+  shell:
+    cmd: pm2 start npm --name "snap-and-shop" -- run start -- --port 3001
+    chdir: /var/www/html/snap-and-shop
+  when: pm2_status.rc != 0
+
+- name: Redémarrer l'application avec PM2
+  shell:
+    cmd: pm2 restart snap-and-shop
+    chdir: /var/www/html/snap-and-shop
+  when: pm2_status.rc == 0

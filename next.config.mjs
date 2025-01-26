@@ -17,13 +17,21 @@ const nextConfig = {
         ],
     },
     eslint: {
-        ignoreDuringBuilds: true, // Désactive ESLint lors du build
+        ignoreDuringBuilds: true, 
     },
     env: {
         STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY, 
         NEXT_PUBLIC_APP_URL: process.env.APP_URL,
     },
-    
+    // typescript: {
+    //     ignoreBuildErrors: true,
+    // },
+    output: 'standalone',
+    experimental: {
+        outputFileTracingExcludes: {
+            '/api/sse/revenue': ['**/*']
+        }
+    }
 };
 
 export default nextConfig;

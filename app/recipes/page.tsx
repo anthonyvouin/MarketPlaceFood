@@ -20,13 +20,18 @@ import { getClientCart } from "../services/cart/cart";
 import { formatPriceEuro } from "../pipe/formatPrice";
 import ImageUploadDialog from "../components/uploadImageDialog";
 import { uploadImage, uploadTemporaryImageToCloudinary } from "@/lib/uploadImage";
+import { RecipeDto } from "../interface/recipe/RecipeDto";
 
 export default function RecipesPage() {
     const { data: session } = useSession();
     const { show } = useContext(ToastContext);
     const [recipes, setRecipes] = useState([]);
-    const [recipeName, setRecipeName] = useState(null);
-    const [ingredients, setIngredients] = useState({
+    const [recipeName, setRecipeName] = useState<string | null>(null);
+    const [ingredients, setIngredients] = useState<{
+        products_not_found: string[],
+        products_found: any[],
+        original_ingredients: { name: string; quantity: string; }[],
+    }>({
         products_not_found: [],
         products_found: [],
         original_ingredients: [],
@@ -35,7 +40,7 @@ export default function RecipesPage() {
     const [ingredientsDialogVisible, setIngredientsDialogVisible] = useState(false);
     const [selectedFormat, setSelectedFormat] = useState("");
     const [imageUploadVisible, setImageUploadVisible] = useState(false);
-    const [selectedAction, setSelectedAction] = useState(null); // Pour différencier l'action (analyse ou frigo)
+    const [selectedAction, setSelectedAction] = useState<"analyse-recipe" | "fridge" | null>(null); // Pour différencier l'action (analyse ou frigo)
 
     const handleImageUpload = async (formData) => {
         try {
@@ -61,21 +66,28 @@ export default function RecipesPage() {
             }
             setSelectedFormat(format);
             setLoading(true);
-            const recipe = await analysePicture(format, imagePath);
+            const recipe: RecipeDto = await analysePicture(format, imagePath);
+            if (!recipe) {
+                show("Erreur", "Erreur lors de l'analyse de la recette", "error");
+                setLoading(false);
+                return;
+            }
             setRecipeName(recipe.name);
 
-            const foundProducts = [];
-            const notFoundProducts = [];
-            const originalIngredients = []
+            const foundProducts: any[] = [];
+            const notFoundProducts: string[] = [];
+            const originalIngredients: { name: string; quantity: string; }[] = [];
 
             for (const ingredient of recipe.ingredients) {
-                const ingredientInBdd = await searchProduct(ingredient.name)
+                const ingredientInBdd = await searchProduct(ingredient?.name)
                 const isIngredientExist = ingredientInBdd ? true : false;
-                originalIngredients.push(ingredient);
-                if (!isIngredientExist) {
-                    notFoundProducts.push(ingredient.name);
-                } else {
-                    foundProducts.push(ingredientInBdd);
+                if (ingredient) {
+                    originalIngredients.push(ingredient);
+                    if (!isIngredientExist) {
+                        notFoundProducts.push(ingredient.name);
+                    } else {
+                        foundProducts.push(ingredientInBdd);
+                    }
                 }
             }
 
@@ -132,13 +144,17 @@ export default function RecipesPage() {
                     id: product.product.id,
                     name: product.product.name,
                     price: formatPriceEuro(product.product.price),
+                    quantity: product.quantity,
+                    product: product.product,
+                    totalPrice: product.totalPrice,
+                    productId: product.product.id,
                 }
             });
 
             recipes = await generateRecipes(format, "", products);
 
-            const generatedRecipes = [];
-            for (const recipe of recipes) {
+            const generatedRecipes: any[] = [];
+            for (const recipe of recipes as any) {
                 const generatedImageForRecipe = await getImageFromPixabay(recipe.englishName);
                 recipe.image = generatedImageForRecipe;
                 delete recipe.englishName;
@@ -177,7 +193,7 @@ export default function RecipesPage() {
                     Découvrez nos délicieuses recettes et régalez-vous en famille ou entre amis.
                 </p>
                 <div className="flex gap-5">
-                <Button
+                    <Button
                         label="Pas d'idées ?"
                         icon="pi pi-refresh"
                         className="p-button-success"
@@ -192,7 +208,7 @@ export default function RecipesPage() {
                         onClick={() => generateRecipe("generate-recipes-from-cart")}
                         disabled={loading}
                     />
-                    
+
                     <Button
                         label="Analyser une recette"
                         icon="pi pi-refresh"

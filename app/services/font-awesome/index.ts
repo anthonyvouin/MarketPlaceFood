@@ -4,8 +4,7 @@ import {
   faCarrot,
   faLemon,
   faPepperHot,
-  faEggplant,
   faSeedling,
 } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faAppleWhole, faCarrot, faLemon, faPepperHot, faEggplant, faSeedling);
+library.add(faAppleWhole, faCarrot, faLemon, faPepperHot, faSeedling);
