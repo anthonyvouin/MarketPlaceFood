@@ -20,12 +20,17 @@ export async function middleware(req: NextRequest) {
         const isGoogleUser: boolean = userJwt['payload'].isGoogleUser || false;
 
         const isAdminPage: boolean = req.nextUrl.pathname.startsWith('/admin');
+        const isStorekeeperPage: boolean = req.nextUrl.pathname === '/admin/product' || req.nextUrl.pathname.startsWith('/admin/prep-order');
         const isProfilePage: boolean = req.nextUrl.pathname.startsWith('/profil');
         const isRecapCartPage: boolean = req.nextUrl.pathname.startsWith('/recap-cart');
         const isShippingPage: boolean = req.nextUrl.pathname.startsWith('/shipping');
 
-        if (isAdminPage && userRole !== 'admin') {
+        if (isAdminPage && userRole === 'user') {
             return NextResponse.redirect(new URL('/', req.url));
+        }
+
+        if (!isStorekeeperPage && userRole === 'storekeeper'){
+            return NextResponse.redirect(new URL('/admin/product', req.url));
         }
 
         if ((isProfilePage || isRecapCartPage || isShippingPage) && 

@@ -44,7 +44,7 @@ export default function Product() {
     }, [clientSideBartCart]);
 
     return (
-        <section className="bg-primaryBackgroundColor font-manrope h-[84vh] w-full px-40">
+        <section className="bg-primaryBackgroundColor font-manrope min-h-screen w-full px-40">
             {product ? (
                 <>
                     <div className="flex flex-col h-full">

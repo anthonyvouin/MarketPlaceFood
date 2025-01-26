@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { getOrdersByUser } from "@/app/services/stripe/stripe";
-import { OrderDto } from "@/app/interface/order/orderDto";
+import { OrderDto, statusInFrench } from '@/app/interface/order/orderDto';
 import { jsPDF } from "jspdf";
 
 const Commandes = () => {
@@ -153,7 +153,7 @@ const Commandes = () => {
   }
 
   return (
-    <div className="h-[84vh] p-6 bg-primaryBackgroundColor overflow-auto">
+    <div className="min-h-screen p-6 bg-primaryBackgroundColor overflow-auto">
       <h1 className="text-2xl font-bold mb-4">Vos commandes</h1>
       {orders.length === 0 ? (
         <p>Aucune commande trouvée.</p>
@@ -162,7 +162,7 @@ const Commandes = () => {
           {currentOrders.map((order: OrderDto) => (
             <div key={order.id} className="border rounded-lg p-4 shadow-md bg-white">
               <p className="font-bold text-lg">Commande #{order.id}</p>
-              <p>Status : <span className="text-blue-500">{order.status}</span></p>
+              <p>Status : <span className="text-blue-500">{statusInFrench(order.status)}</span></p>
               <p>Total : {(order.totalAmount / 100).toFixed(2)} €</p>
               <p>Date : {new Date(order.createdAt).toLocaleDateString()}</p>
               <h3 className="mt-4 font-bold">Détails des articles :</h3>

@@ -18,16 +18,16 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
         </>;
     }
 
+    
     if (pathname.startsWith("/profil")) {
         return (<>
                 <ToastProvider>
                     <CartProvider>
                         <SideBarBasketProvider>
                             <div className="flex">
-                                <ProfilSidebar/>
                                 <div className="w-full">
                                     <HeaderClient/>
-                                    <div className="padding-header bg-primaryBackgroundColor">
+                                    <div className="bg-primaryBackgroundColor">
                                         {children}
                                     </div>
                                 </div>
@@ -45,10 +45,9 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                 <CartProvider>
                     <SideBarBasketProvider>
                         <div className="flex">
-                            <Sidebar/>
                             <div className="w-full">
                                 <HeaderClient/>
-                                <div className="padding-header bg-primaryBackgroundColor">
+                                <div className=" bg-primaryBackgroundColor">
                                     {children}
                                 </div>
                             </div>

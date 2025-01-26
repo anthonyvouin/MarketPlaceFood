@@ -68,7 +68,6 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
   }
 }
 
-
 export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise<ProductDto[]> {
   try {
     if (Object.keys(fields).length === 0) {
@@ -334,35 +333,39 @@ export async function getProductBySlug(slug: string): Promise<ProductDto | null>
 }
 
 export async function filterProduct(filters: {
-  equals?: string | number | boolean | null;
-  lte?: number;
-  gte?: number;
-  lt?: number;
-  gt?: number;
-  contains?: string;
-  startsWith?: string;
-  endsWith?: string;
-  in?: string[] | number[];
-  notIn?: string[] | number[];
+    equals?: string | number | boolean | null;
+    lte?: number;
+    gte?: number;
+    lt?: number;
+    gt?: number;
+    contains?: string;
+    startsWith?: string;
+    endsWith?: string;
+    in?: string[] | number[] | null[];
+    notIn?: string[] | number[];
 }): Promise<ProductDto[]> {
-  try {
-    let customFilters: any[] = [];
-    if (filters) {
-      customFilters = Object.entries(filters)?.map(([key, value]) => ({
-        [key]: value
-      }));
-    }
+    try {
+        let customFilters: any[] = []
+        if (filters) {
+            customFilters = Object.entries(filters)?.map(([key, value]) => ({
+                [key]: value
+            }));
+        }
 
-    return await prisma.product.findMany({
-      where: {
-        AND: [
-          { visible: true },
-          ...(customFilters.length > 0 ? customFilters : []),
+        let whereConditions: any[] = [{visible: true}];
+        
+        customFilters.forEach(filter => {
+            if (Object.values(filter)[0]?.in?.length > 0 || !Object.values(filter)[0]?.in) {
+                whereConditions.push(filter);
+            }
+        });
 
-        ],
-      },
-      include: { category: true, discount: true },
-    });
+        return await prisma.product.findMany({
+            where: {
+                AND: whereConditions
+            },
+            include: {category: true, discount: true},
+        });
 
   } catch (error) {
     console.error('Erreur lors du filtrage des produits :', error);

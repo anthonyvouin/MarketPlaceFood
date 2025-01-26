@@ -2,10 +2,12 @@
 
 import {Category, PrismaClient} from '@prisma/client';
 import {CategoryDto} from '@/app/interface/category/categoryDto';
+import { verifyAuth } from '@/app/core/verifyAuth';
 
 const prisma = new PrismaClient();
 
 export async function createCategory(category: CategoryDto): Promise<CategoryDto> {
+    await verifyAuth(['ADMIN']);
     if (!category.name || category.name.trim() === '') {
         throw new Error('Le nom de la catégorie est requis et doit être une chaîne de caractères non vide.');
     }
@@ -26,6 +28,7 @@ export async function createCategory(category: CategoryDto): Promise<CategoryDto
 }
 
 export async function getAllCategories(): Promise<Category[]> {
+    // no middleWare because all people can have access to allCategories
     try {
         return await prisma.category.findMany({
             orderBy: {
@@ -38,6 +41,7 @@ export async function getAllCategories(): Promise<Category[]> {
 }
 
 export async function deleteCategoryById(id: CategoryDto['id']): Promise<{ message: string }> {
+    await verifyAuth(['ADMIN']);
     if (!id) {
         throw new Error(`L'ID de la catégorie est requis pour la suppression.`);
     }
@@ -54,10 +58,8 @@ export async function deleteCategoryById(id: CategoryDto['id']): Promise<{ messa
     }
 }
 
-
-
-
 export async function updateCategory(category: CategoryDto): Promise<CategoryDto> {
+    await verifyAuth(['ADMIN']);
     if (!category.id) {
         throw new Error(`L'ID de la catégorie est requis pour la mise à jour.`);
     }
@@ -82,19 +84,4 @@ export async function updateCategory(category: CategoryDto): Promise<CategoryDto
         }
         throw new Error('La mise à jour de la catégorie a échoué');
     }
-}
-
-export async function getCategoriesData() {
-    const categories = await prisma.category.findMany({
-        include: {
-            _count: {
-                select: {products: true},
-            },
-        },
-    });
-
-    return categories.map((category) => ({
-        name: category.name,
-        productCount: category._count.products,
-    }));
 }

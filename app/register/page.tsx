@@ -32,7 +32,7 @@ export default function SignUpPage() {
     };
 
     return (
-        <div className="h-[84vh] bg-primaryBackgroundColor pt-20">
+        <div className="min-h-screen bg-primaryBackgroundColor pt-20">
             <div className="flex w-full pl-2.5 pr-2.5 ">
                 <div className="w-3/6 flex items-center justify-center">
                     <Image src="/images/sign-in.svg" alt='' className="leftDecorationImage" width="500" height="200"/>

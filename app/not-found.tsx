@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const NotFound = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-[84vh] bg-primaryBackgroundColor">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-primaryBackgroundColor">
       <img
         src="/images/404.svg"  
         alt="Page Not Found"

@@ -1,8 +1,11 @@
 import nodemailer from 'nodemailer';
+import { PrepOrderItemsDto } from '@/app/admin/prep-order/[id]/prep-order-item.dto';
+import { DiscountDto } from '@interface/discount/discountDto';
+import { Product } from '@prisma/client';
 
 const createTransporter = () => {
   return nodemailer.createTransport({
-    host: "smtp.gmail.com",
+    host: 'smtp.gmail.com',
     port: 465,
     secure: true,
     auth: {
@@ -15,7 +18,7 @@ const createTransporter = () => {
 export const sendWelcomeEmail = async (email: string, name: string, token: string, isGoogleUser: boolean) => {
   const transporter = createTransporter();
 
-  let verificationUrl = "";
+  let verificationUrl = '';
   if (!isGoogleUser) {
     verificationUrl = `${process.env.APP_URL}/verify-email?token=${token}`;
   }
@@ -23,17 +26,17 @@ export const sendWelcomeEmail = async (email: string, name: string, token: strin
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,
-    subject: "Confirmation de compte et Bienvenue",
+    subject: 'Confirmation de compte et Bienvenue',
     html: `
       <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; background-color:#EBF2F0; border: 1px solid #ddd; border-radius: 5px;">
           <h2 style="color: #85BC39;">Bonjour <strong>${name}</strong>,</h2>
           <p>Bienvenue sur notre site ! Nous sommes ravis de vous compter parmi nous !</p>
           ${
-            isGoogleUser
-              ? `<p>Nous sommes ravis que vous ayez utilisé Google pour vous connecter. Nous avons activé votre compte et vous pouvez commencer à explorer notre site.</p>`
-              : `<p>Pour commencer, veuillez vérifier votre adresse e-mail en cliquant sur le lien ci-dessous :</p>
+      isGoogleUser
+        ? `<p>Nous sommes ravis que vous ayez utilisé Google pour vous connecter. Nous avons activé votre compte et vous pouvez commencer à explorer notre site.</p>`
+        : `<p>Pour commencer, veuillez vérifier votre adresse e-mail en cliquant sur le lien ci-dessous :</p>
                  <a href="${verificationUrl}" style="padding: 10px 20px; background-color: #85BC39; color: white; text-decoration: none; border-radius: 5px;">Vérifier mon e-mail</a>`
-          }
+    }
           <p>Pour explorer nos fonctionnalités, connectez-vous dès que votre compte est vérifié.</p>
           <footer style="font-size: 12px; color: #777;">
               <p>Si vous n'avez pas demandé de création de compte, veuillez ignorer cet email.</p>
@@ -57,7 +60,7 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,
-    subject: "Réinitialisation de mot de passe",
+    subject: 'Réinitialisation de mot de passe',
     html: `
       <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; background-color: #EBF2F0; border: 1px solid #ddd; border-radius: 5px;">
           <h2 style="color: #85BC39;">Bonjour,</h2>
@@ -91,7 +94,7 @@ export const sendPaymentConfirmationEmail = async (email: string, orderDetails: 
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,
-    subject: "Confirmation de votre commande",
+    subject: 'Confirmation de votre commande',
     html: `
       <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; background-color: #EBF2F0; border: 1px solid #ddd; border-radius: 5px;">
           <h2 style="color: #85BC39;">Confirmation de votre commande</h2>
@@ -133,7 +136,7 @@ export const sendPaymentFailedEmail = async (email: string, orderDetails: {
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,
-    subject: "Échec du paiement de votre commande",
+    subject: 'Échec du paiement de votre commande',
     html: `
       <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; background-color: #FFF0F0; border: 1px solid #ddd; border-radius: 5px;">
           <h2 style="color: #D32F2F;">Échec du paiement</h2>
@@ -146,6 +149,61 @@ export const sendPaymentFailedEmail = async (email: string, orderDetails: {
           </div>
 
           <p>Vous pouvez réessayer le paiement en vous rendant sur notre site.</p>
+          
+          <footer style="font-size: 12px; color: #777; margin-top: 20px;">
+              <p>Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter.</p>
+          </footer>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Email d'échec de paiement envoyé à ${email}`);
+  } catch (error) {
+    console.error(`Erreur lors de l'envoi de l'email d'échec : ${error}`);
+  }
+};
+
+export const sendEmailSendOrder = async (email: string, orderDetails: {
+  orderNumber: string;
+  totalAmount: number;
+  products: PrepOrderItemsDto[]
+}) => {
+  const transporter = createTransporter();
+
+  const mailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: 'Envois de votre commande',
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; background-color: #EBF2F0FF; border: 1px solid #ddd; border-radius: 5px;">
+          <h1 style="font-weight:bold; font-size: 30px;color: #85BC39;">Envois de votre commande</h1>
+          <p>L'équipe Snap&Shop à le plaisir de vous annoncé que votre commande à été envoyé !</p>
+          
+          <div style="background-color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="font-size: 20px">Détails de la commande</h3>
+            <p><strong>Numéro de commande :</strong> ${orderDetails.orderNumber}</p>
+                          
+                ${orderDetails.products.map((product: PrepOrderItemsDto) => {
+      return `
+                      <div style="display: flex; align-items: center; flex-wrap: wrap;">
+                        <img src=${product.product.image} alt="image du produit" style="width: 50px; height: 50px; object-fit: contain; margin-right: 10px">
+                        <div>
+                          <p><strong>Nom du produit :</strong> ${product.product.name}</p>
+                          <p><strong>Quantité :</strong> ${product.quantity}</p>
+                          <p><strong>Prix :</strong> ${(product.unitPrice / 100).toFixed(2)}€</p>
+                        </div>
+                      </div>
+                    `;
+    })
+      .join('')}
+
+            
+            <p><strong>Montant total :</strong> ${(orderDetails.totalAmount / 100).toFixed(2)}€</p>
+          </div>
+
+          <p>Un transporteur arrivera dans la journée</p>
           
           <footer style="font-size: 12px; color: #777; margin-top: 20px;">
               <p>Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter.</p>

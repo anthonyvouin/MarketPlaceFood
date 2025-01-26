@@ -30,6 +30,7 @@ model Account {
 enum Role {
   USER
   ADMIN
+  STOREKEEPER
 }
 
 model User {
@@ -248,7 +249,7 @@ enum StatusOrder {
   PAYMENT_PENDING
   PAYMENT_SUCCEDED
   PREPARING
-  SHIP
+  SEND
   RECEIVED
 }
 
@@ -260,14 +261,14 @@ model Order {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  shippingName        String  @map("shipping_name")
-  shippingAddress     String  @map("shipping_address")
-  shippingAddressAdd  String? @map("shipping_address_add")
-  shippingZipCode     String  @map("shipping_zip_code")
-  shippingCity        String  @map("shipping_city")
-  shippingPhoneNumber String  @map("shipping_phone_number")
-  shippingNote        String? @map("shipping_note") @db.Text
-
+  shippingName        String    @map("shipping_name")
+  shippingAddress     String    @map("shipping_address")
+  shippingAddressAdd  String?   @map("shipping_address_add")
+  shippingZipCode     String    @map("shipping_zip_code")
+  shippingCity        String    @map("shipping_city")
+  shippingPhoneNumber String    @map("shipping_phone_number")
+  shippingNote        String?   @map("shipping_note") @db.Text
+  sendAt              DateTime? @map("send_at")
   user       User        @relation(fields: [userId], references: [id])
   orderItems OrderItem[]
 
@@ -275,12 +276,13 @@ model Order {
 }
 
 model OrderItem {
-  id         String @id @default(cuid())
-  orderId    String @map("order_id")
-  productId  String @map("product_id")
+  id         String  @id @default(cuid())
+  orderId    String  @map("order_id")
+  productId  String  @map("product_id")
   quantity   Int
   unitPrice  Int
   totalPrice Int
+  isPrep     Boolean @default(false)
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
