@@ -36,7 +36,8 @@ jobs:
         run: |
           ansible-playbook -i infrastructure/ansible/inventory.ini infrastructure/ansible/deploy.yml \
           --vault-password-file vault_pass.txt \
-          --extra-vars "ansible_user=$ANSIBLE_USER ansible_ssh_pass=$ANSIBLE_PASSWORD"
+          --extra-vars "ansible_user=$ANSIBLE_USER ansible_ssh_pass=$ANSIBLE_PASSWORD" \
+          -vvvv
 
       - name: Cleanup
         run: |
