@@ -16,7 +16,7 @@ export const CartProvider = ({children}: { children: ReactNode }) => {
     const [totalLengthItems, setTotalLengthItems] = useState<number>(0);
 
     useEffect(() => {
-        if (session) {
+        if (session && session.user["role"]!== 'STOREKEEPER') {
             const fetchCart = async (): Promise<void> => {
                 const lengthCart: number = await getTotalLengthItemsCart(session.user.id)
                 setTotalLengthItems(lengthCart);

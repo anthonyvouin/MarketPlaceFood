@@ -68,7 +68,6 @@ export async function createProduct(product: ProductDto): Promise<ProductDto> {
   }
 }
 
-
 export async function getAllProducts(fields: Prisma.ProductSelect = {}): Promise<ProductDto[]> {
   try {
     if (Object.keys(fields).length === 0) {

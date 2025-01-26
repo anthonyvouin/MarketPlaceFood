@@ -41,8 +41,8 @@ export async function getAllContacts(): Promise<ContactDto[]> {
     }
 }
 
-
 export async function deleteContactById(id: ContactDto['id']): Promise<{ message: string }> {
+    await verifyAuth(["ADMIN"]);
     if (!id) {
         throw new Error('L\'ID du contact est requis pour la suppression.');
     }

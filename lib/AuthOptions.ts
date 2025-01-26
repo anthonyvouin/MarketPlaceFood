@@ -1,30 +1,30 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
-import { prisma } from "./db";
-import bcrypt from "bcrypt";
-import { SignJWT } from "jose";
-import { sendWelcomeEmail } from "@/app/services/mail/email";
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
+import { prisma } from './db';
+import bcrypt from 'bcrypt';
+import { SignJWT } from 'jose';
+import { sendWelcomeEmail } from '@/app/services/mail/email';
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET 
+  process.env.NEXTAUTH_SECRET
 );
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   pages: {
-    signIn: "/login",
+    signIn: '/login',
   },
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
         email: {
-          label: "Email",
-          type: "text",
-          placeholder: "email@example.com",
+          label: 'Email',
+          type: 'text',
+          placeholder: 'email@example.com',
         },
-        password: { label: "Password", type: "password" },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         const user = await prisma.user.findUnique({
@@ -35,14 +35,14 @@ export const authOptions = {
           user &&
           user.password &&
           credentials &&
-          (await bcrypt.compare(credentials.password, user.password) )
+          (await bcrypt.compare(credentials.password, user.password))
 
         ) {
 
-        if(!user.emailVerified) {
-          throw new Error("Veuillez vérifier votre email pour vous connecter.");
+          if (!user.emailVerified) {
+            throw new Error('Veuillez vérifier votre email pour vous connecter.');
 
-        }
+          }
           const jwtToken = await new SignJWT({
             id: user.id,
             email: user.email,
@@ -50,8 +50,8 @@ export const authOptions = {
             emailVerified: user.emailVerified,
             isGoogleUser: false,
           })
-            .setProtectedHeader({ alg: "HS256" })
-            .setExpirationTime("1h")
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime('1h')
             .sign(JWT_SECRET);
 
           return { ...user, jwt: jwtToken };
@@ -66,16 +66,14 @@ export const authOptions = {
     }),
   ],
   session: {
-    strategy: "jwt" as const,
+    strategy: 'jwt' as const,
     maxAge: 24 * 60 * 60,
   },
   callbacks: {
-    async redirect({ url, baseUrl }) {
-      return baseUrl + "/";
-    },
+
     async jwt({ token, user, account }) {
       if (user) {
-        token.isGoogleUser = account.provider === "google" ? true : false;
+        token.isGoogleUser = account.provider === 'google' ? true : false;
 
         token.id = user.id;
         token.email = user.email;
@@ -88,8 +86,8 @@ export const authOptions = {
           emailVerified: user.emailVerified,
           isGoogleUser: token.isGoogleUser,
         })
-          .setProtectedHeader({ alg: "HS256" })
-          .setExpirationTime("1h")
+          .setProtectedHeader({ alg: 'HS256' })
+          .setExpirationTime('1h')
           .sign(JWT_SECRET);
       }
       return token;
@@ -104,27 +102,27 @@ export const authOptions = {
       session.user.jwt = token.jwt;
       return session;
     },
-
     async signIn({ user, account }) {
-      if (account?.provider === "google") {
+      if (account?.provider === 'google') {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email },
         });
 
         if (!existingUser) {
-          await sendWelcomeEmail(user.email, user.name, user.token || "Utilisateur", true);
+          await sendWelcomeEmail(user.email, user.name, user.token || 'Utilisateur', true);
         }
-      } else if (account?.provider === "credentials") {
+      } else if (account?.provider === 'credentials') {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email },
         });
 
         if (!existingUser) {
-          await sendWelcomeEmail(user.email, user.name, user.token || "Utilisateur", false);
+          await sendWelcomeEmail(user.email, user.name, user.token || 'Utilisateur', false);
         }
       }
 
       return true;
     },
+
   },
 };

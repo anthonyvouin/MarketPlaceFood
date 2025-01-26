@@ -5,10 +5,28 @@ export enum StatusEnum {
   PAYMENT_PENDING = 'PAYMENT_PENDING',
   PAYMENT_SUCCEDED = 'PAYMENT_SUCCEDED',
   PREPARING = 'PREPARING',
-  SHIP = 'SHIP',
+  SEND = 'SEND',
   RECEIVED = 'RECEIVED'
 }
 
+
+export const statusInFrench = (status: StatusEnum) => {
+  switch (status) {
+    case StatusEnum.PAYMENT_FAILED:
+      return 'Paiement échoué';
+    case StatusEnum.PAYMENT_PENDING:
+      return 'Paiement en attente';
+    case StatusEnum.PAYMENT_SUCCEDED:
+      return 'Paiement réussi';
+    case StatusEnum.PREPARING:
+      return 'Commande en préparation';
+    case StatusEnum.SEND:
+      return 'Commande envoyée';
+    case StatusEnum.RECEIVED:
+      return 'Commande reçue par le client';
+
+  }
+};
 
 export interface OrderDto {
   id: string;
