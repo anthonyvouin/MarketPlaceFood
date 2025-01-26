@@ -1,14 +1,14 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { getAllOrders } from "@/app/services/order/order";
-import { OrderDto } from "@/app/interface/order/orderDto";
-import { formatPriceEuro } from "@/app/pipe/formatPrice";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { getAllOrders } from '@/app/services/order/order';
+import { OrderDto, statusInFrench } from '@/app/interface/order/orderDto';
+import { formatPriceEuro } from '@/app/pipe/formatPrice';
 
 
 const OrderPage: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage =  1;
+  const itemsPerPage = 1;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,8 +18,8 @@ const OrderPage: React.FC = () => {
         const fetchedOrders = await getAllOrders();
         setOrders(fetchedOrders);
       } catch (error) {
-        setError("Erreur lors de la récupération des commandes.");
-        console.error("Error fetching orders:", error);
+        setError('Erreur lors de la récupération des commandes.');
+        console.error('Error fetching orders:', error);
       } finally {
         setLoading(false);
       }
@@ -30,7 +30,7 @@ const OrderPage: React.FC = () => {
 
   const indexOfLastOrder: number = currentPage * itemsPerPage;
   const indexOfFirstOrder: number = indexOfLastOrder - itemsPerPage;
-  const currentOrders= orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
 
   const totalPages = Math.ceil(orders.length / itemsPerPage);
 
@@ -67,7 +67,7 @@ const OrderPage: React.FC = () => {
           {currentOrders.map((order: OrderDto) => (
             <div key={order.id} className="mb-4 p-4 border rounded-md shadow-sm bg-white">
               <h2 className="text-lg font-medium">Commande ID: {order.id}</h2>
-              <p className="text-sm">Status: {order.status}</p>
+              <p className="text-sm">Status: {statusInFrench(order.status)}</p>
               <p className="text-sm">Total: {formatPriceEuro(order.totalAmount)} €</p>
               <p className="text-sm">Créée le: {new Date(order.createdAt).toLocaleDateString()}</p>
 

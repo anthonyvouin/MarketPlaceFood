@@ -1,10 +1,13 @@
 'use server';
 import {PrismaClient} from "@prisma/client";
 import {DiscountDto} from "@/app/interface/discount/discountDto";
+import { verifyAuth } from '@/app/core/verifyAuth';
 
 const prisma = new PrismaClient();
 
 export async function createDiscount(discount: DiscountDto): Promise<DiscountDto> {
+    await verifyAuth(["ADMIN"]);
+
     if (!discount.name || discount.name.trim() === '') {
         throw new Error('Le nom de la remise est requis et doit être une chaîne de caractères non vide.');
     }
@@ -26,6 +29,7 @@ export async function createDiscount(discount: DiscountDto): Promise<DiscountDto
 }
 
 export async function getAllDiscount(): Promise<DiscountDto[]> {
+    await verifyAuth(["ADMIN", "STOREKEEPER"]);
     return prisma.discount.findMany({
         orderBy: {
             name: 'asc',
@@ -35,6 +39,7 @@ export async function getAllDiscount(): Promise<DiscountDto[]> {
 
 
 export async function deleteDiscount(discountId: string): Promise<string> {
+    await verifyAuth(["ADMIN"]);
     if (!discountId || discountId.trim() === '') {
         throw new Error("L'identifiant de la remise est requis.");
     }
