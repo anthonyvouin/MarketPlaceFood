@@ -1,12 +1,15 @@
 ---
-- name: "Update repositories cache"
-  ansible.builtin.apt:
-    update_cache: true
+# - name: "Update repositories cache"
+#   ansible.builtin.apt:
+#     update_cache: true
 
 - name: "Install nodejs"
   ansible.builtin.apt:
     name: nodejs
     state: present
+  become: yes
+  become_user: root
+  become_method: sudo
 
 - name: "Install npm"
   ansible.builtin.apt:

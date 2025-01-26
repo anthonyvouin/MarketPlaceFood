@@ -25,7 +25,7 @@ export default function RecapCart() {
     const {setSideBarCart, clientSideBartCart, deleteProduct, handleChangeQuantityProduct} = useSideBarBasket();
 
     const goToPayment = () => {
-        router.push('/payment')
+        router.push('/shipping')
     }
 
     useEffect(() => {
@@ -102,7 +102,7 @@ export default function RecapCart() {
                         className="bg-actionColor hover:bg-darkActionColor text-white font-semibold py-2 px-6 rounded-lg shadow-md transition ease-in-out duration-150"
                         onClick={goToPayment}
                     >
-                        Passer commande
+                        Continuer
                     </button>
                 </div>
 

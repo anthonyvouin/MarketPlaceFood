@@ -22,7 +22,7 @@ const Sidebar = () => {
                 <nav>
                     <ul>
                         {links.map((link) => (
-                            <Link href={link.href} key={link.href} className="mb-4 flex  justify-start gap-5 group font-manrope">
+                            <Link href={link.href||''} key={link.href} className="mb-4 flex  justify-start gap-5 group font-manrope">
                                 <span className='border-l-4 rounded-full border-actionColor opacity-0 group-hover:opacity-100  transition-all'></span>
                                 <div className='flex gap-3 items-center'>
                                     <span className={`${link.icon} group-hover:text-actionColor`}/>

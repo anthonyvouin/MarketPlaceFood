@@ -10,23 +10,33 @@ import { ToastContext } from "@/app/provider/toastProvider";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
+interface Ingredient {
+    name: string;
+    quantity: string;
+    mustBeUsed: boolean;
+}
+
 export default function IngredientsDialog({ visible, ingredients, recipeName, onHide, addProduct, format }) {
-    const [selectedIngredients, setSelectedIngredients] = useState([]);
+    const [selectedIngredients, setSelectedIngredients] = useState<Ingredient[]>([]);
     const { show } = useContext(ToastContext);
     const router = useRouter();
     const { data: session } = useSession();
 
     async function createAnalyzedRecipe(ingredients) {
         try {
-            const userConnected = session.user.id;
+            const userConnected = session?.user?.id;
             const recipes = await generateRecipes("generate-recipe-from-image-of-recipe", "", ingredients.original_ingredients, recipeName);
 
             for (const recipe of recipes) {
                 const generatedImageForRecipe = await getImageFromPixabay(recipe.englishName);
                 recipe.image = generatedImageForRecipe;
                 delete recipe.englishName;
-                const createdRecipe = await createRecipe(recipe, userConnected);
-                router.push(`/recipes/${createdRecipe.slug}`);
+                if (userConnected) {
+                    const createdRecipe = await createRecipe(recipe, userConnected) as { slug: string };
+                    router.push(`/recipes/${createdRecipe.slug}`);
+                } else {
+                    throw new Error("User is not connected");
+                }
             }
 
            
@@ -46,7 +56,7 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
             const user = session.user.id;
             const ingredientsToUse = selectedIngredients.filter(ingredient => ingredient.mustBeUsed);
             recipes = await generateRecipes(format, "", ingredientsToUse);
-            const generatedRecipes = [];
+            const generatedRecipes: any[] = [];
             for (const recipe of recipes) {
                 const generatedImageForRecipe = await getImageFromPixabay(recipe.englishName);
                 recipe.image = generatedImageForRecipe;
@@ -120,7 +130,7 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
                     <Button
                         label="Générer une recette"
                         icon="pi pi-external-link"
-                        onClick={() => createAnalyzedRecipe(ingredients, session.user.id)}
+                        onClick={() => createAnalyzedRecipe(ingredients)}
                     />
                 </>
             )}

@@ -51,8 +51,8 @@ export default function Admin() {
 
     return (
         <div className="h-full bg-primaryBackgroundColor p-10">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Données importantes </h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Données importantes</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 {kpiData.map((kpi, index) => (
                     <div
                         key={index}
@@ -68,6 +68,7 @@ export default function Admin() {
                     </div>
                 ))}
             </div>
+           
         </div>
     );
 }

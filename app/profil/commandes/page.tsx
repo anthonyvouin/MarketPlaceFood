@@ -32,54 +32,105 @@ const Commandes = () => {
     fetchOrders();
   }, [session]);
 
-  const indexOfLastOrder = currentPage * itemsPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
-  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const indexOfLastOrder : number = currentPage * itemsPerPage;
+  const indexOfFirstOrder : number = indexOfLastOrder - itemsPerPage;
+  const currentOrders : OrderDto[] = orders.slice(indexOfFirstOrder, indexOfLastOrder);
 
   const generateInvoicePdf = (orderId: string) => {
     const order = orders.find((order) => order.id === orderId);
     if (!order) return;
 
     const doc = new jsPDF();
+    
+    doc.setTextColor("#85BC39");
+    doc.setFontSize(10);
+    doc.text([
+      `Facture N° : ${order.id}`,
+      `Date : ${new Date(order.createdAt).toLocaleDateString()}`
+    ], 15, 20);
 
-    doc.setFont("helvetica");
-    doc.setFontSize(12);
-    doc.setFontSize(16);
-    doc.text(`Facture Commande #${order.id}`, 10, 10);
+    doc.setTextColor(0, 0, 0);
+    doc.text([
+      "Client :",
+      `${order.user?.name || 'Non spécifié'}`,
+      `${order.user?.email || 'Non spécifié'}`,
+      "",
+      "Adresse de livraison :",
+      `${order.shippingName}`,
+      `${order.shippingAddress}`,
+      `${order.shippingAddressAdd || ''}`,
+      `${order.shippingZipCode} ${order.shippingCity}`,
+      `Tél : ${order.shippingPhoneNumber}`,
+    ], 120, 20);
 
-    doc.setFontSize(12);
-    doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 10, 20);
-    doc.text(`Status: ${order.status}`, 10, 30);
-    doc.text(`Total: ${(order.totalAmount / 100).toFixed(2)} €`, 10, 40);
+    doc.text([
+      "Snap&Shop",
+      "123 Rue de la Paix, 75000 Paris, France",
+      "75000 - Paris",
+      "SIRET : 12345678901234",
+      "N° TVA : FR1234567890",
+      "Contact : contact@snapandshop.fr",
+      "Tél : +33 6 66 66 66 66"
+    ], 15, 40);
 
-    doc.setFontSize(14);
-    doc.text("Détails des articles", 10, 50);
+    doc.setDrawColor(0, 0, 0);
+    doc.line(15, 80, 195, 80);
 
-    let yOffset = 60;
-    order.orderItems.forEach((item, index) => {
-      doc.setFontSize(12);
-      doc.text(
-        `${item.quantity} x ${item.product.name} - ${(item.totalPrice / 100).toFixed(2)} €`,
-        10,
-        yOffset
-      );
+    doc.setTextColor("#85BC39");
+    doc.setFontSize(10);
+    doc.text("Description", 15, 90);
+    doc.text("Quantité", 100, 90);
+    doc.text("Prix Unit. HT", 130, 90);
+    doc.text("Total TTC", 170, 90);
+
+    doc.setTextColor(0, 0, 0);
+    let yOffset = 100;
+    order.orderItems.forEach((item) => {
+      doc.text(item.product.name, 15, yOffset);
+      doc.text(item.quantity.toString(), 105, yOffset);
+      const prixUnitHT = ((item.totalPrice / item.quantity) / 120 * 100 / 100).toFixed(2);
+      doc.text(`${prixUnitHT} €`, 130, yOffset);
+      doc.text(`${(item.totalPrice / 100).toFixed(2)} €`, 170, yOffset);
       yOffset += 10;
     });
 
-    doc.setLineWidth(0.5);
-    doc.line(10, yOffset + 10, 200, yOffset + 10); 
+    doc.line(15, yOffset + 10, 195, yOffset + 10);
 
-    doc.setFontSize(10);
-    doc.text(
-      "Merci pour votre achat !",
-      10,
-      yOffset + 20
-    );
+    const totalHT : string = (order.totalAmount / 120 * 100 / 100).toFixed(2);
+    const tva : string = ((order.totalAmount - (order.totalAmount / 1.2)) / 100).toFixed(2);
+    
+    yOffset += 30;
+    doc.text(`Total HT : ${totalHT} €`, 150, yOffset);
+    doc.text(`TVA (20%) : ${tva} €`, 150, yOffset + 7);
+    doc.text(`Total TTC : ${(order.totalAmount / 100).toFixed(2)} €`, 150, yOffset + 14);
+
+    yOffset += 40;
+    doc.setTextColor("#85BC39");
+    doc.text("Mentions légales :", 15, yOffset);
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(8);
+    const mentionsLegales = [
+      `Cette facture a été acquittée le ${new Date(order.createdAt).toLocaleDateString()}`,
+      "Merci de votre confiance !",
+      "Conformément aux articles L.211-4 et suivants du Code de la consommation, vous bénéficiez de la garantie légale de conformité.",
+      "Droit de rétractation : Vous disposez d'un délai de 14 jours à compter de la réception pour retourner votre commande.",
+      "Les données personnelles collectées sont utilisées uniquement dans le cadre de la gestion de votre commande.",
+      "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles.",
+      "Pour toute réclamation, contactez notre service client : contact@snapandshop.fr",
+      "Conservation recommandée : 5 ans (garantie légale de conformité)"
+    ];
+
+    yOffset += 4;
+    mentionsLegales.forEach((mention) => {
+      doc.text(mention, 15, yOffset);
+      yOffset += 4;
+    });
 
     doc.save(`facture-${orderId}.pdf`);
   };
 
-  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const totalPages : number = Math.ceil(orders.length / itemsPerPage);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {

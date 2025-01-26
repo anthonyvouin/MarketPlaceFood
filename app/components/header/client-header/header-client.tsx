@@ -21,8 +21,8 @@ export default function HeaderClient(): JSX.Element {
     }, [session]);
 
     return (
-        <header className="flex items-center justify-between px-20 h-[15vh] bg-primaryBackgroundColor fixed full-width z-50">
-            <h1 className="font-manrope font-bold">Accueil 🙂</h1>
+        <header className="flex items-center justify-between px-20 h-[15vh] bg-white w-[81rem] fixed full-width z-50 shadow-sm">
+            <h1 className="font-manrope font-bold">Accueil 🤖🙂</h1>
             <input type='text'
                    placeholder='&#128269; Rechercher un produit'
                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg h-10 w-1/4

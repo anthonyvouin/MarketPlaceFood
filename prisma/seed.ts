@@ -75,7 +75,8 @@ async function seedOpenFoodFactsProducts(): Promise<void> {
                 price: formatedPrice,
                 categoryId: await findOrCreateCategory(product.categories_tags_fr),
                 discountId: null,
-                discount: null
+                discount: null,
+                stock: 100
             };
 
             console.log('Création du produit :', formattedProduct);

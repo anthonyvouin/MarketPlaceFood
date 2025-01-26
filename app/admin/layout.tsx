@@ -13,6 +13,7 @@ const adminLinks = [
     { name: "Contacts", href: "/admin/contact", icon: "pi pi-envelope" },
     { name: "Graphique", href: "/admin/chart", icon: "pi pi-chart-line" },
     { name: "Commandes", href: "/admin/order", icon: "pi pi-shopping-bag" },
+    { name: "Notifications", href: "/admin/products-notifications", icon: "pi pi-bell" },
 
 ];
 
@@ -21,7 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <html lang="en">
             <body>
                 <div className="flex h-screen">
-                    <aside className="w-56 h-screen bg-white p-4">
+                    <aside className="w-56 h-screen bg-white p-4 shadow-xl shadow-black">
                         <div className='fixed top-0 h-full'>
                             <Link href="/">
                                 <div className="flex justify-center items-center mb-8 gap-1">
