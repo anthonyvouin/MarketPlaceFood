@@ -38,5 +38,5 @@ yarn-error.log*
 next-env.d.ts
 
 # Ansible
-/infrastructure/ansible/vars/vault_password.txt
+/infrastructure/ansible/vault_pass.txt
 /infrastructure/ssh_keys/*
