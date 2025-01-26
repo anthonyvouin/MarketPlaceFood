@@ -97,7 +97,7 @@ export default function HeaderClient(): JSX.Element {
                                 </Link>
 
                             </div>
-                            {session?.user?.role === "ADMIN" && (
+                            { session?.user?.['role'] === "ADMIN" && (
                                 <Link href="/admin">
                                     <Button
                                         rounded
