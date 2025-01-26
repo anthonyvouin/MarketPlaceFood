@@ -88,7 +88,7 @@ export async function analysePicture(format: string = 'recipe', imageUrl: string
     // const fullImageUrl = `${process.env.NEXT_PUBLIC_APP_URL}${imageUrl}`
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         {
           role: "user",
