@@ -2,8 +2,8 @@
 - name: "Install infrastructure"
   hosts: all
 
-  # vars_files:
-  #   - vars/config.yml
+  vars_files:
+    - vars/config.yml
 
   roles:
     - node

@@ -22,10 +22,22 @@ jobs:
             python -m pip install --upgrade pip
             pip install ansible
 
+      - name: Create vault password file
+        env:
+          VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          echo "$VAULT_PASSWORD" > vault_pass.txt
+
       - name: Deploy application
         env:
           ANSIBLE_HOST_KEY_CHECKING: 'False'
           ANSIBLE_USER: ${{ secrets.ANSIBLE_USER }}
           ANSIBLE_PASS: ${{ secrets.ANSIBLE_PASSWORD }}
         run: |
-          ansible-playbook -i infrastructure/ansible/inventory.ini infrastructure/ansible/deploy.yml --extra-vars "ansible_user=$ANSIBLE_USER ansible_ssh_pass=$ANSIBLE_PASS"
+          ansible-playbook -i inventory.ini deploy.yml \
+          --vault-password-file vault_pass.txt \
+          --extra-vars "ansible_user=$ANSIBLE_USER ansible_ssh_pass=$ANSIBLE_PASSWORD"
+
+      - name: Cleanup
+        run: |
+          rm -f vault_pass.txt
