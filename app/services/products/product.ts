@@ -355,7 +355,8 @@ export async function filterProduct(filters: {
         let whereConditions: any[] = [{visible: true}];
         
         customFilters.forEach(filter => {
-            if (Object.values(filter)[0]?.in?.length > 0 || !Object.values(filter)[0]?.in) {
+          // @ts-ignore
+          if (Object.values(filter)[0]?.in?.length > 0 || !Object.values(filter)[0]?.in) {
                 whereConditions.push(filter);
             }
         });
