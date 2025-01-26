@@ -12,33 +12,44 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-            python-version: '3.x'
-
-      - name: Install Ansible
+      - name: Set up SSH key
         run: |
-            python -m pip install --upgrade pip
-            pip install ansible
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519  # Assurer que la clé a les bonnes permissions
+          ssh-keyscan -H 217.160.164.228 >> ~/.ssh/known_hosts  # Ajouter l'hôte à known_hosts
 
-      - name: Create vault password file
-        env:
-          VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+      - name: Deploy to server
         run: |
-          echo "$VAULT_PASSWORD" > vault_pass.txt
+          ssh -i ~/.ssh/id_ed25519 anthony@217.160.164.228 "echo 'Déploiement réussi!'"
 
-      - name: Deploy application
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: 'False'
-          ANSIBLE_USER: ${{ secrets.ANSIBLE_USER }}
-          ANSIBLE_PASS: ${{ secrets.ANSIBLE_PASSWORD }}
-        run: |
-          ansible-playbook -i infrastructure/ansible/inventory.ini infrastructure/ansible/deploy.yml \
-          --vault-password-file vault_pass.txt \
-          --extra-vars "ansible_user=$ANSIBLE_USER ansible_ssh_pass=$ANSIBLE_PASSWORD" \
-          -vvvv
+      # - name: Set up Python
+      #   uses: actions/setup-python@v2
+      #   with:
+      #       python-version: '3.x'
 
-      - name: Cleanup
-        run: |
-          rm -f vault_pass.txt
+      # - name: Install Ansible
+      #   run: |
+      #       python -m pip install --upgrade pip
+      #       pip install ansible
+
+      # - name: Create vault password file
+      #   env:
+      #     VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+      #   run: |
+      #     echo "$VAULT_PASSWORD" > vault_pass.txt
+
+      # - name: Deploy application
+      #   env:
+      #     ANSIBLE_HOST_KEY_CHECKING: 'False'
+      #     ANSIBLE_USER: ${{ secrets.ANSIBLE_USER }}
+      #     ANSIBLE_PASS: ${{ secrets.ANSIBLE_PASSWORD }}
+      #   run: |
+      #     ansible-playbook -i infrastructure/ansible/inventory.ini infrastructure/ansible/deploy.yml \
+      #     --vault-password-file vault_pass.txt \
+      #     --extra-vars "ansible_user=$ANSIBLE_USER ansible_ssh_pass=$ANSIBLE_PASSWORD" \
+      #     -vvvv
+
+      # - name: Cleanup
+      #   run: |
+      #     rm -f vault_pass.txt
