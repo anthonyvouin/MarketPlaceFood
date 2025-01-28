@@ -48,7 +48,7 @@ export default function Products() {
         return () => clearTimeout(timeoutId);
     }, [filters]);
 
-    const fetchProducts = async (currentFilters: typeof filters): Promise<void> => {
+    const fetchProducts = async (currentFilters: any): Promise<void> => {
         try {
             const filteredProducts = await filterProduct(currentFilters);
             setFilteredProducts(filteredProducts);
