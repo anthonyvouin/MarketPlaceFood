@@ -1,9 +1,9 @@
 name: CI
 
 on:
-#  push:
-#    branches:
-#      - main
+  push:
+    branches:
+      - recipes-management
   workflow_dispatch: ~
 
 jobs:
