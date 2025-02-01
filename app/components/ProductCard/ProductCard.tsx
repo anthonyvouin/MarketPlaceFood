@@ -14,6 +14,7 @@ const ProductCard = ({product, bgColor, productSlug}: ProductCardProps) => {
                     <div className="flex justify-center items-start h-full">
                         <Image
                             src={product?.image ? product?.image : "/images/default-image.png"}
+                            overrideSrc={product?.image ? product?.image : "/images/default-image.png"}
                             alt={product.name}
                             width={150}
                             height={150}
