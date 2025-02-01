@@ -24,7 +24,7 @@ function AdminSidebarNav() {
     { name: 'Commandes', href: '/admin/order', icon: 'pi pi-shopping-bag', roles: ['ADMIN'] },
     { name: 'Préparation Commandes', href: '/admin/prep-order', icon: 'pi pi-shopping-bag', roles: ['ADMIN', 'STOREKEEPER'] },
     { name: 'Notifications', href: '/admin/products-notifications', icon: 'pi pi-bell', roles: ['ADMIN'] },
-
+    { name: 'Recettes', href: '/admin/recipes', icon: 'pi pi-book', roles: ['ADMIN'] }
   ];
 
 

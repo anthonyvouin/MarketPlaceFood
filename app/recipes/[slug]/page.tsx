@@ -237,11 +237,11 @@ const RecipeDetailPage = () => {
               >
                 <div className="p-4 flex flex-col items-center text-center space-y-3">
                   <div className="w-24 h-24 rounded-full overflow-hidden shadow-md p-2 hover:bg-primaryColor">
-                    {/* <Image
-                      src={ingredient.product.image}
-                      alt={ingredient.product.name}
+                    <Image
+                      src="/images/default-image.png"
+                      alt="Image manquante"
                       imageClassName="w-full h-full object-cover rounded-full"
-                    /> */}
+                    />
                   </div>
                   <div>
                     <span className="block text-lg font-bold text-black">

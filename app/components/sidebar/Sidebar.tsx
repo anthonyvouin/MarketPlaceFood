@@ -17,9 +17,8 @@ const SidebarNav = () => (
             {sidebarLinks.map((link) => (
                 <li key={link.href}>
                     <Link
-                        href={link.href}
-                        className="flex items-center gap-4 py-2 pl-4 rounded-lg transition-all hover:bg-actionColor hover:text-white"
-                    >
+                        href={link.href || '#'}
+                        className="flex items-center gap-4 py-2 pl-4 rounded-lg transition-all hover:bg-actionColor hover:text-white">
                         <span className={`${link.icon} text-lg`} />
                         <p className="text-md">{link.name}</p>
                     </Link>
