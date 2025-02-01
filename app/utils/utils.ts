@@ -6,6 +6,10 @@ export const getPageName = (): string => {
 }
 
 export const formatDateTime = (date: Date, options?: Intl.DateTimeFormatOptions): string => {
+    if (isNaN(date.getTime())) {
+        return 'Date invalide';
+    }
+
     const defaultOptions: Intl.DateTimeFormatOptions = {
         year: 'numeric',
         month: 'long',
