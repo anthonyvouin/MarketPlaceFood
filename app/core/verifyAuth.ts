@@ -18,7 +18,9 @@ const JWT_SECRET = new TextEncoder().encode(
 
 export async function verifyAuth(allowedRoles: string[] = []) {
     const cookieStore = cookies();
-    const token: string | undefined = cookieStore.get("next-auth.session-token")?.value;
+    const isProduction = process.env.NODE_ENV === "production";
+    const variableCookieName = isProduction ? "__Secure-next-auth.session-token" : "next-auth.session-token";
+    const token: string | undefined = cookieStore.get(variableCookieName)?.value;
     if (token) {
         try {
             const decoded: JWT | null = await decode({
