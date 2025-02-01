@@ -9,27 +9,27 @@ const ProductCard = ({product, bgColor, productSlug}: ProductCardProps) => {
     const {addProduct} = useSideBarBasket();
     return (
         <div className={`${bgColor} bg-opacity-75 w-full rounded-md shadow-md p-4 font-manrope relative`}>
-            <Link href={`/products/${productSlug}`}>
-                <div className="grid grid-cols-1 grid-rows-[1.5fr,0.5fr,1fr,1fr] h-[25rem]">
-                    <div className="flex justify-center items-start h-full">
-                        <Image
-                            src={product?.image ? product?.image : "/images/default-image.png"}
-                            overrideSrc={product?.image ? product?.image : "/images/default-image.png"}
-                            alt={product.name}
-                            width={150}
-                            height={150}
-                            className="object-contain max-w-[150px] max-h-32"
-                        />
-                    </div>
-                    <p className="text-lg font-bold mt-2.5">{product.name}</p>
-                    <p className="text-black items-start">
-                        {product?.description?.length > 50
-                            ? `${product?.description?.substring(0, 50)}...`
-                            : product?.description}
-                    </p>
-                </div>
+           <Link href={`/products/${productSlug}`}>
+      <div className="grid grid-cols-1 grid-rows-[1.5fr,0.5fr,1fr,1fr] h-[25rem]">
+        <div className="flex justify-center items-start h-full">
+          <Image
+            src={product?.image ? product?.image : "/images/default-image.png"}
 
-            </Link>
+            alt={product.name}
+            width={150}
+            height={150}
+            className="object-contain max-w-[150px] max-h-32"
+            unoptimized 
+          />
+        </div>
+        <p className="text-lg font-bold mt-2.5">{product.name}</p>
+        <p className="text-black items-start">
+          {product?.description?.length > 50
+            ? `${product?.description?.substring(0, 50)}...`
+            : product?.description}
+        </p>
+      </div>
+    </Link>
             <div className="flex justify-between items-center">
                 <div>
                     <p className={`text-black font-bold ${product.discount ? 'text-sm line-through' : 'text-xl'}`}>{formatPriceEuro(product?.price)} €</p>
