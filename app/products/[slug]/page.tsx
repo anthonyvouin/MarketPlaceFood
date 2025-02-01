@@ -50,7 +50,7 @@ export default function Product() {
                     <div className="flex flex-col h-full">
                         <h1 className="font-bold text-3xl pt-10">Détails du produit</h1>
                         <div className="mt-20 flex items-center justify-around">
-                            <Image src={product?.image ? product?.image : "/images/default-image.png"} alt={product?.name ?? 'Product Image'} width={100} height={100}/>
+                            <Image unoptimized src={product?.image ? product?.image : "/images/default-image.png"} alt={product?.name ?? 'Product Image'} width={100} height={100}/>
                             <div className="flex flex-col gap-5">
                                 <div className="flex flex-col gap-4">
                                     <div className="flex flex-col gap-2">
