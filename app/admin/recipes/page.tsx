@@ -48,8 +48,8 @@ export default function RecipesAdminPage() {
         }
     }
 
-    function handleEdit(id: string) {
-        router.push(`/admin/recipes/${id}`);
+    function handleEdit(slug: string) {
+        router.push(`/admin/recipes/${slug}`);
     }
 
     function formatDate(date: string) {
@@ -105,7 +105,7 @@ export default function RecipesAdminPage() {
                                         icon="pi pi-pencil" 
                                         className="p-button-sm p-button-outlined p-button-primary"
                                         tooltip="Modifier"
-                                        onClick={() => handleEdit(rowData.id)}
+                                        onClick={() => handleEdit(rowData.slug)}
                                     />
                                     <Button 
                                         icon="pi pi-trash" 
