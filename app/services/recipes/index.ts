@@ -357,6 +357,10 @@ export async function deleteRecipe(id: string): Promise<any> {
             where: { recipeId: id }
         });
 
+        await prisma.recipeMissingIngredientReport.deleteMany({
+            where: { recipeId: id }
+        });
+
         const recipe = await prisma.recipe.delete({
             where: { id }
         });

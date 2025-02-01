@@ -40,3 +40,6 @@ next-env.d.ts
 # Ansible
 /infrastructure/ansible/vault_pass.txt
 /infrastructure/ssh_keys/*
+
+# VS code
+.vscode/*

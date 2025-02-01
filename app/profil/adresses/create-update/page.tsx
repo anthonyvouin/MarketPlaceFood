@@ -36,8 +36,13 @@ const CreateUpdatePage = () => {
 
             if (id) {
                 const fetchAdressById = async (): Promise<void> => {
-                    newAddress = await getAdressById(id, session.user.id)
-                    setAddress(newAddress)
+                    const fetchedAddress = await getAdressById(id, session.user.id);
+                    if (fetchedAddress) {
+                        newAddress = fetchedAddress;
+                        setAddress(newAddress);
+                    } else {
+                        show('Erreur', 'Adresse non trouvée', 'error');
+                    }
                 }
                 fetchAdressById()
             }

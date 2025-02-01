@@ -21,24 +21,50 @@ export async function uploadTemporaryImageToCloudinary(formData: FormData): Prom
     }
     const buffer = Buffer.from(await file.arrayBuffer());
     const result = await new Promise<cloudinary.UploadApiResponse>((resolve, reject) => {
-        const uploadStream = cloudinary.v2.uploader.upload_stream({
-            folder: 'temp',
-            resource_type: 'image',
-            type: 'upload',
-            invalidate: true,
-            eager: [{ transformation: { width: 500, crop: 'scale' } }],
-        }, (error, result) => {
-            if (error) {
-                reject(error);
-            } else if (result) {
-                resolve(result);
-            } else {
-                reject(new Error('Upload result is undefined'));
-            }
-        });
-        uploadStream.end(buffer);
+      const uploadStream = cloudinary.v2.uploader.upload_stream({
+        folder: 'temp',
+        resource_type: 'image',
+        type: 'upload',
+        invalidate: true,
+        eager: [{ transformation: { width: 1000, crop: 'scale' } }],
+      }, (error, result) => {
+        if (error) {
+          reject(error);
+        } else if (result) {
+          resolve(result);
+        } else {
+          reject(new Error('Upload result is undefined'));
+        }
+      });
+      uploadStream.end(buffer);
     });
 
+    return result.secure_url;
+}
+
+export async function uploadImageToCloudinary(formData: FormData): Promise<string> {
+    const file = formData.get('file') as File;
+    if (!file) {
+        throw new Error('Aucun fichier n\'a été téléchargé');
+    }
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const result = await new Promise<cloudinary.UploadApiResponse>((resolve, reject) => {
+      const uploadStream = cloudinary.v2.uploader.upload_stream({
+        folder: 'uploads',
+        resource_type: 'image',
+        type: 'upload',
+        eager: [{ transformation: { width: 1000, crop: 'scale' } }],
+      }, (error, result) => {
+        if (error) {
+          reject(error);
+        } else if (result) {
+          resolve(result);
+        } else {
+          reject(new Error('Upload result is undefined'));
+        }
+      });
+      uploadStream.end(buffer);
+    });
 
     return result.secure_url;
 }
