@@ -3,7 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - recipes-management
+      - '**'
+  pull_request:
+    branches:
+      - main
   workflow_dispatch: ~
 
 jobs:
@@ -40,8 +43,6 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ hashFiles('package-lock.json') }}
-      - name: Set GOOGLE_API_KEY as environment variable
-        run: echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> $GITHUB_ENV
       - name: Build the project
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}

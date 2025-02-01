@@ -30,10 +30,15 @@
       - "--exclude=node_modules"
       - "--exclude=.next"
       - "--exclude=infrastructure"
+      - "--exclude=.git"
+      - "--exclude=.github"
+      - "--exclude=.vscode"
+      - "--exclude=.env"
+      - "--exclude=.env.local"
 
 - name: Installer les dépendances
   shell:
-    cmd: npm install
+    cmd: npm ci
     chdir: /var/www/html/snap-and-shop
 
 - name: Construire le projet
