@@ -26,7 +26,7 @@ export async function uploadTemporaryImageToCloudinary(formData: FormData): Prom
         resource_type: 'image',
         type: 'upload',
         invalidate: true,
-        eager: [{ transformation: { width: 1000, crop: 'scale' } }],
+        eager: [{ transformation: { width: 1500, crop: 'scale', quality: 'auto:good' } }],
       }, (error, result) => {
         if (error) {
           reject(error);
