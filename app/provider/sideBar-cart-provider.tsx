@@ -188,10 +188,13 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
                          className="relative bg-primaryBackgroundColor"
                 >
                     <header className='sticky top-2.5 right-0 w-full h-20 border-b-actionColor border-b text-center bg-primaryBackgroundColor'>
+                      <div className='flex justify-center'>
                         <RoundedButton
-                            onClickAction={goToDetailPanier}
-                            message={'Voir le detail du panier'}
-                            classes={"border-actionColor text-actionColor"}/>
+                          onClickAction={goToDetailPanier}
+                          message={'Voir le detail du panier'}
+                          classes={"border-actionColor text-actionColor"}/>
+                      </div>
+
                     </header>
                     {clientCart && clientCart.cartItems.length > 0 ? (
                         <div className="mt-2.5">

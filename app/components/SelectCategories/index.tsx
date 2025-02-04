@@ -27,7 +27,7 @@ export default function SelectCategories({
                 optionLabel="name"
                 optionValue="id"
                 placeholder="Sélectionner une ou plusieurs catégories"
-                className="border-r-2 px-4 border-black rounded-none w-80 outline-none focus:shadow-none"
+                className="md:border-r-2 px-4 border-black rounded-none w-80 outline-none focus:shadow-none"
                 display="chip"
             />
             <label htmlFor="categories">Catégories</label>

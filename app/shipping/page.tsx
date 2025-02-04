@@ -100,7 +100,7 @@ export default function ShippingPage() {
     }
 
     return (
-        <div className="h-[84vh] bg-primaryBackgroundColor flex items-center justify-center">
+        <div className="h-full flex items-center justify-center pt-20">
             <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 md:p-10">
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold text-darkActionColor">Adresse de livraison</h1>
