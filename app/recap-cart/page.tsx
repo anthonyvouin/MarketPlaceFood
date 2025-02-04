@@ -85,13 +85,13 @@ export default function RecapCart() {
                 <h1 className="text-2xl font-bold text-darkActionColor mb-6">Récapitulatif de votre panier</h1>
 
                 <div className="flex items-center justify-between border-b border-gray-300 pb-4 mb-6">
-                    <div className="flex items-center">
+                    <div className="flex flex-col md:flex-row items-center">
                         <p className="text-lg font-semibold text-gray-600 mr-4">
                             Total : <span>{formatPriceEuro(cart.totalPrice)}€</span>
                         </p>
                         {totalDiscount ? (
                             <>
-                                <p>|</p>
+                                <p className='hidden md:block'>|</p>
                                 <p className='ml-4 '><span className="text-actionColor font-semibold">{totalDiscount}€</span> d'économisé</p>
                             </>
                         ) : ('')}
@@ -110,7 +110,7 @@ export default function RecapCart() {
                     {cart.cartItems.map((item: CartItemDto) => (
                         <div
                             key={item.product.id}
-                            className="grid grid-cols-4 items-center gap-4 p-4 bg-gray-50 rounded-lg shadow-sm"
+                            className="grid grid-cols-1 md:grid-cols-4 items-center gap-4 p-4 bg-gray-50 rounded-lg shadow-sm"
                         >
                             <div className="flex justify-center">
                                 <Link href={`/products/${item.product.slug}`}>
@@ -146,7 +146,7 @@ export default function RecapCart() {
 
                             </div>
 
-                            <div className='flex items-center mt-2.5'>
+                            <div className='flex items-center justify-center mt-2.5'>
                                 <div className='bg-white w-10 h-10 flex items-center justify-center border border-t-borderGrey border-l-borderGrey border-b-borderGrey'>
                                     <p>
                                         {item.quantity}

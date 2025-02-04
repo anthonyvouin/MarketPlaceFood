@@ -37,9 +37,9 @@ export default function HeaderClient(): JSX.Element {
                     className="bg-actionColor text-white w-10 h-10 hover:bg-actionColorHover"
                     onClick={toggleSidebar}
                 />
-                <Link href="/" className="ml-10 flex items-center gap-2 cursor-pointer">
+                <Link href="/" className="items-center gap-2 cursor-pointer hidden md:flex">
                     <Image src="/images/logo.svg" width={40} height={40} alt="Snap&Shop Logo" />
-                    <h2 className="text-xl font-extrabold text-actionColor tracking-wide uppercase font-manrope">Snap&Shop</h2>
+                    <h2 className="text-sm md:text-xl font-extrabold text-actionColor tracking-wide uppercase font-manrope">Snap&Shop</h2>
                 </Link>
                 { pathname.startsWith("/profil") ? 
                 <ProfilSidebar isOpenSidebar={isOpen} setIsOpenSidebar={setIsOpen} />
@@ -47,13 +47,6 @@ export default function HeaderClient(): JSX.Element {
 
  } 
             </div>
-
-            <input
-                type="text"
-                placeholder="🔍 Rechercher un produit..."
-                className="border border-gray-300 text-sm rounded-lg w-1/3 px-4 py-2 focus:ring-2 focus:ring-actionColor focus:outline-none"
-            />
-
             <div className="flex items-center gap-6">
                 {status === 'authenticated' ? (
                     <>
@@ -78,14 +71,14 @@ export default function HeaderClient(): JSX.Element {
                                 </div>
 
 
-                                <Button
-                                    rounded
-                                    icon="pi pi-bell"
-                                    className="bg-actionColor text-white w-10 h-10 shadow-lg 
-                                    transition-all duration-300 ease-in-out hover:scale-105
-                                    hover:bg-darkActionColor hover:rotate-12"
-                                    aria-label="Voir les notifications"
-                                />
+                                {/*<Button*/}
+                                {/*    rounded*/}
+                                {/*    icon="pi pi-bell"*/}
+                                {/*    className="bg-actionColor text-white w-10 h-10 shadow-lg */}
+                                {/*    transition-all duration-300 ease-in-out hover:scale-105*/}
+                                {/*    hover:bg-darkActionColor hover:rotate-12"*/}
+                                {/*    aria-label="Voir les notifications"*/}
+                                {/*/>*/}
 
                                 <Link href="/profil">
                                     <Avatar
@@ -115,13 +108,13 @@ export default function HeaderClient(): JSX.Element {
                 ) : (
                     <Link
                         href="/login"
-                        className="flex items-center gap-2 text-actionColor font-semibold border-2 border-actionColor 
+                        className="flex items-center gap-2 text-actionColor font-semibold border-2 border-actionColor flex-row
                             hover:text-white hover:bg-actionColor transition-all duration-300 transform hover:scale-105 px-4 py-2 rounded-md"
-                        aria-label="Se connecter"
+                        aria-label="Connexion"
                         role="button"
                     >
-                        <span>Se connecter</span>
-                        <i className="pi pi-sign-in text-lg" />
+                        <span className='text-sm md:text-lg'>Connexion</span>
+                        <i className="pi pi-sign-in !hidden md:!inline-block"/>
                     </Link>
                 )}
             </div>

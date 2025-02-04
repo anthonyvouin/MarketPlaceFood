@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { getOrdersByUser } from "@/app/services/stripe/stripe";
+import React, { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { getOrdersByUser } from '@/app/services/stripe/stripe';
 import { OrderDto, statusInFrench } from '@/app/interface/order/orderDto';
-import { jsPDF } from "jspdf";
+import { jsPDF } from 'jspdf';
+import { Tag } from 'primereact/tag';
 
 const Commandes = () => {
   const { data: session } = useSession();
@@ -12,7 +13,7 @@ const Commandes = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2; 
+  const itemsPerPage = 2;
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -21,7 +22,7 @@ const Commandes = () => {
           const userOrders = await getOrdersByUser(session.user.id);
           setOrders(userOrders);
         } catch (err) {
-          setError("Erreur lors de la récupération des commandes.");
+          setError('Erreur lors de la récupération des commandes.');
           console.error(err);
         } finally {
           setLoading(false);
@@ -32,17 +33,17 @@ const Commandes = () => {
     fetchOrders();
   }, [session]);
 
-  const indexOfLastOrder : number = currentPage * itemsPerPage;
-  const indexOfFirstOrder : number = indexOfLastOrder - itemsPerPage;
-  const currentOrders : OrderDto[] = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const indexOfLastOrder: number = currentPage * itemsPerPage;
+  const indexOfFirstOrder: number = indexOfLastOrder - itemsPerPage;
+  const currentOrders: OrderDto[] = orders.slice(indexOfFirstOrder, indexOfLastOrder);
 
   const generateInvoicePdf = (orderId: string) => {
-    const order = orders.find((order) => order.id === orderId);
+    const order: OrderDto | undefined = orders.find((order) => order.id === orderId);
     if (!order) return;
 
     const doc = new jsPDF();
-    
-    doc.setTextColor("#85BC39");
+
+    doc.setTextColor('#85BC39');
     doc.setFontSize(10);
     doc.text([
       `Facture N° : ${order.id}`,
@@ -51,11 +52,11 @@ const Commandes = () => {
 
     doc.setTextColor(0, 0, 0);
     doc.text([
-      "Client :",
+      'Client :',
       `${order.user?.name || 'Non spécifié'}`,
       `${order.user?.email || 'Non spécifié'}`,
-      "",
-      "Adresse de livraison :",
+      '',
+      'Adresse de livraison :',
       `${order.shippingName}`,
       `${order.shippingAddress}`,
       `${order.shippingAddressAdd || ''}`,
@@ -64,29 +65,29 @@ const Commandes = () => {
     ], 120, 20);
 
     doc.text([
-      "Snap&Shop",
-      "123 Rue de la Paix, 75000 Paris, France",
-      "75000 - Paris",
-      "SIRET : 12345678901234",
-      "N° TVA : FR1234567890",
-      "Contact : contact@snapandshop.fr",
-      "Tél : +33 6 66 66 66 66"
+      'Snap&Shop',
+      '123 Rue de la Paix, 75000 Paris, France',
+      '75000 - Paris',
+      'SIRET : 12345678901234',
+      'N° TVA : FR1234567890',
+      'Contact : contact@snapandshop.fr',
+      'Tél : +33 6 66 66 66 66'
     ], 15, 40);
 
     doc.setDrawColor(0, 0, 0);
     doc.line(15, 80, 195, 80);
 
-    doc.setTextColor("#85BC39");
+    doc.setTextColor('#85BC39');
     doc.setFontSize(10);
-    doc.text("Description", 15, 90);
-    doc.text("Quantité", 100, 90);
-    doc.text("Prix Unit. HT", 130, 90);
-    doc.text("Total TTC", 170, 90);
+    doc.text('Description', 15, 90);
+    doc.text('Quantité', 100, 90);
+    doc.text('Prix Unit. HT', 130, 90);
+    doc.text('Total TTC', 170, 90);
 
     doc.setTextColor(0, 0, 0);
     let yOffset = 100;
     order.orderItems.forEach((item) => {
-      doc.text(item.product.name, 15, yOffset);
+      doc.text(item.product.name, 15, yOffset, { maxWidth: 70 });
       doc.text(item.quantity.toString(), 105, yOffset);
       const prixUnitHT = ((item.totalPrice / item.quantity) / 120 * 100 / 100).toFixed(2);
       doc.text(`${prixUnitHT} €`, 130, yOffset);
@@ -96,29 +97,29 @@ const Commandes = () => {
 
     doc.line(15, yOffset + 10, 195, yOffset + 10);
 
-    const totalHT : string = (order.totalAmount / 120 * 100 / 100).toFixed(2);
-    const tva : string = ((order.totalAmount - (order.totalAmount / 1.2)) / 100).toFixed(2);
-    
+    const totalHT: string = (order.totalAmount / 120 * 100 / 100).toFixed(2);
+    const tva: string = ((order.totalAmount - (order.totalAmount / 1.2)) / 100).toFixed(2);
+
     yOffset += 30;
     doc.text(`Total HT : ${totalHT} €`, 150, yOffset);
     doc.text(`TVA (20%) : ${tva} €`, 150, yOffset + 7);
     doc.text(`Total TTC : ${(order.totalAmount / 100).toFixed(2)} €`, 150, yOffset + 14);
 
     yOffset += 40;
-    doc.setTextColor("#85BC39");
-    doc.text("Mentions légales :", 15, yOffset);
-    
+    doc.setTextColor('#85BC39');
+    doc.text('Mentions légales :', 15, yOffset);
+
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(8);
     const mentionsLegales = [
       `Cette facture a été acquittée le ${new Date(order.createdAt).toLocaleDateString()}`,
-      "Merci de votre confiance !",
-      "Conformément aux articles L.211-4 et suivants du Code de la consommation, vous bénéficiez de la garantie légale de conformité.",
-      "Droit de rétractation : Vous disposez d'un délai de 14 jours à compter de la réception pour retourner votre commande.",
-      "Les données personnelles collectées sont utilisées uniquement dans le cadre de la gestion de votre commande.",
-      "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles.",
-      "Pour toute réclamation, contactez notre service client : contact@snapandshop.fr",
-      "Conservation recommandée : 5 ans (garantie légale de conformité)"
+      'Merci de votre confiance !',
+      'Conformément aux articles L.211-4 et suivants du Code de la consommation, vous bénéficiez de la garantie légale de conformité.',
+      'Droit de rétractation : Vous disposez d\'un délai de 14 jours à compter de la réception pour retourner votre commande.',
+      'Les données personnelles collectées sont utilisées uniquement dans le cadre de la gestion de votre commande.',
+      'Conformément au RGPD, vous disposez d\'un droit d\'accès, de rectification et de suppression de vos données personnelles.',
+      'Pour toute réclamation, contactez notre service client : contact@snapandshop.fr',
+      'Conservation recommandée : 5 ans (garantie légale de conformité)'
     ];
 
     yOffset += 4;
@@ -130,7 +131,7 @@ const Commandes = () => {
     doc.save(`facture-${orderId}.pdf`);
   };
 
-  const totalPages : number = Math.ceil(orders.length / itemsPerPage);
+  const totalPages: number = Math.ceil(orders.length / itemsPerPage);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -161,11 +162,15 @@ const Commandes = () => {
         <div className="space-y-6">
           {currentOrders.map((order: OrderDto) => (
             <div key={order.id} className="border rounded-lg p-4 shadow-md bg-white">
-              <p className="font-bold text-lg">Commande #{order.id}</p>
-              <p>Status : <span className="text-blue-500">{statusInFrench(order.status)}</span></p>
+              <div className="flex flex-col md:flex-row  items-start md:items-center">
+                <p className="font-bold text-lg mr-5">Commande #{order.id}</p>
+                <Tag value={statusInFrench(order.status)}
+                     className={`${statusInFrench(order.status) === 'Paiement réussi' ? 'bg-actionColor' : 'bg-primaryColor'} mb-8 md:mb-0`}></Tag>
+              </div>
+
               <p>Total : {(order.totalAmount / 100).toFixed(2)} €</p>
-              <p>Date : {new Date(order.createdAt).toLocaleDateString()}</p>
-              <h3 className="mt-4 font-bold">Détails des articles :</h3>
+              <p>Date de la commande: {new Date(order.createdAt).toLocaleDateString()}</p>
+              <h3 className="mt-4 font-bold underline">Détails des articles :</h3>
               <ul className="list-disc list-inside">
                 {order.orderItems.map((item, index) => (
                   <li key={index}>
@@ -176,7 +181,7 @@ const Commandes = () => {
 
               <button
                 onClick={() => generateInvoicePdf(order.id)}
-                className="mt-4 bg-actionColor text-white py-2 px-4 rounded"
+                className="mt-4 bg-black text-white py-2 px-4 rounded"
               >
                 Télécharger la facture
               </button>
