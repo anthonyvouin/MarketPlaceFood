@@ -55,7 +55,7 @@ export default function PaymentPage() {
     if (!clientSecret || !shippingAddress) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-primaryBackgroundColor">
-                <p className="text-lg font-semibold text-red-500">Chargement...</p>
+                <p className="text-lg font-semibold">Chargement...</p>
             </div>
         );
     }

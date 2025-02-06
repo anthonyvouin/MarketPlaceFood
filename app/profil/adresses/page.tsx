@@ -88,7 +88,6 @@ const Adresses = () => {
       }
     };
 
-
     const popupDelete = (address: AddressDto): void => {
       confirmDialog({
         header: 'Confirmer la suppression',
@@ -130,17 +129,22 @@ const Adresses = () => {
         }
       }
     };
-
     return (
-      <div className="bg-primaryBackgroundColor min-h-screen">
-        <div className="grid grid-cols-3 gap-4 width-85 mx-auto">
-          <div className="bg-white p-2.5 rounded-lg w-96 ">
-            <Link href="adresses/create-update">Ajouter une adresse</Link>
+      <div className="bg-primaryBackgroundColor min-h-screen pt-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 width-85 mx-auto">
+          <div className="bg-white p-2.5 rounded-lg md:w-96 h-56 ">
+            <Link href="adresses/create-update">
+              <div className='flex items-center justify-center flex-col h-full text-actionColor font-bold hover:border border-actionColor'>
+                  <h2 className="text-lg">Ajouter une adresse</h2>
+                  <span className="pi pi-plus mt-5 bold"></span>
+              </div>
+
+            </Link>
           </div>
           {user && user.addresses.length > 0 ? (
             user.addresses.map((address: AddressDto) => (
               <div key={address.id}
-                   className="bg-white p-5 rounded-lg w-96 h-56 relative">
+                   className="bg-white p-5 rounded-lg md:w-96 h-56 relative">
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-bold">{address.name}</h2>
                   {address.isPrincipal ? (<Badge value="Adresse Principale"></Badge>) : ('')}
@@ -166,19 +170,23 @@ const Adresses = () => {
                   <p className="italic ">{address.note}</p>
                 </div>
 
-                <div className="flex absolute bottom-2.5 left-5 items-center">
+                <div className="flex flex-col md:flex-row absolute bottom-2.5 left-5 md:items-center">
                   <Link href={`/profil/adresses/create-update?id=${address.id}`} className="text-sm">Modifier</Link>
                   {!address.isPrincipal ? (
                     <div>
-                      <span className="text-sm">&ensp;| &ensp;</span>
+                      <span className="text-sm hidden md:inline-block">&ensp;| &ensp;</span>
                       <span
                         className="text-actionColor underline text-sm"
                         onClick={() => handleSetPrincipal(address)}>
                                             Définir comme adresse principale
                                         </span>
                     </div>) : ('')}
-                  <span className="text-sm">&ensp;|&ensp;</span>
-                  <span className="pi pi-trash" onClick={() => popupDelete(address)}></span>
+                  <span className="text-sm hidden md:inline-block">&ensp;|&ensp;</span>
+                  <div className="flex items-center text-red-700">
+                    <span className='mr-1 md:hidden text-sm'>Supprimer</span>
+                    <span className="pi pi-trash text-sm" onClick={() => popupDelete(address)}></span>
+                  </div>
+
                 </div>
               </div>
             ))

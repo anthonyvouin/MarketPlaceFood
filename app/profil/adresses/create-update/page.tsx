@@ -92,12 +92,12 @@ const CreateUpdatePage = () => {
 
     return (
         <div className="bg-primaryBackgroundColor flex items-center min-h-screen">
-            <div className="w-6/12 flex ml-12">
+            <div className="w-6/12 md:flex ml-12 hidden">
                 <Image src="/images/adresses.png" width={566} height={436} alt="DriveFood"/>
             </div>
 
             <form onSubmit={submit}
-                  className="w-6/12 bg-white p-5 mr-12">
+                  className="md:w-6/12 bg-white p-5 md:mr-12">
                 <div>
                     <label htmlFor="name">Nom*</label>
                     <input type="text"
@@ -129,7 +129,7 @@ const CreateUpdatePage = () => {
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-actionColor sm:text-sm"/>
                 </div>
 
-                <div className="flex mt-2.5">
+                <div className="flex flex-col md:flex-row mt-2.5">
                     <div className="mr-2.5">
                         <label htmlFor="zipCode">Code postal*</label>
                         <input type="text"

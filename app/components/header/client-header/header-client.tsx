@@ -70,12 +70,14 @@ export default function HeaderClient(): JSX.Element {
                                 )}
                             </div>
 
-                            <Button
-                                rounded
-                                icon="pi pi-bell"
-                                className="bg-actionColor text-white w-10 h-10 shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:bg-darkActionColor hover:rotate-12"
-                                aria-label="Voir les notifications"
-                            />
+                                {/*<Button*/}
+                                {/*    rounded*/}
+                                {/*    icon="pi pi-bell"*/}
+                                {/*    className="bg-actionColor text-white w-10 h-10 shadow-lg */}
+                                {/*    transition-all duration-300 ease-in-out hover:scale-105*/}
+                                {/*    hover:bg-darkActionColor hover:rotate-12"*/}
+                                {/*    aria-label="Voir les notifications"*/}
+                                {/*/>*/}
 
                             <Link href="/profil">
                                 <Avatar
@@ -105,8 +107,8 @@ export default function HeaderClient(): JSX.Element {
                         aria-label="Se connecter"
                         role="button"
                     >
-                        <span>Se connecter</span>
-                        <i className="pi pi-sign-in text-lg" />
+                        <span className='text-sm md:text-lg'>Connexion</span>
+                        <i className="pi pi-sign-in !hidden md:!inline-block"/>
                     </Link>
                 )}
             </div>
