@@ -31,6 +31,21 @@ jobs:
       - name: "Install deps"
         run: npm ci
 
+  test:
+    needs: ["prepare"]
+    name: "Run tests"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: ./node_modules
+          key: node_modules-${{ hashFiles('package-lock.json') }}
+      - name: Run tests
+        run: npm run test
+
   build:
     needs: ["prepare"]
     name: "Build project"

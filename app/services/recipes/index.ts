@@ -3,6 +3,7 @@
 import { PrismaClient, Prisma, RecipeType, Recipe } from '@prisma/client';
 import { searchProduct } from '../products/product';
 import { createOrUpdateMissingIngredientReport } from '../missingIngredientReport';
+import slugify from 'slugify';
 
 const prisma = new PrismaClient();
 
@@ -111,6 +112,8 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
                 notFoundProducts.splice(index, 1);
             }
         });
+
+        recipeData.slug = slugify(recipeData.name, { lower: true });
 
         const recipe = await prisma.recipe.create({
             data: {

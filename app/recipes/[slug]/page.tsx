@@ -16,6 +16,7 @@ import {
 import { generateRecipes } from "@/app/services/ia-integration/ia";
 import { RecipeDto } from "@/app/interface/recipe/RecipeDto";
 import { ToastContext } from "@/app/provider/toastProvider";
+import { useSideBarBasket } from "@/app/provider/sideBar-cart-provider";
 
 const RecipeDetailPage = () => {
   const [recipeDetails, setRecipeDetails] = useState<RecipeDto | null>(null);
@@ -26,13 +27,13 @@ const RecipeDetailPage = () => {
 
   const params = useParams();
   const { data: sessionData } = useSession();
-  const { show } = useContext(ToastContext); 
-
+  const { show } = useContext(ToastContext);
+  const { addProduct } = useSideBarBasket();
 
   useEffect(() => {
     const loadRecipeDetails = async () => {
       const recipeSlug = params.slug as string;
-      
+
       if (!recipeSlug) {
         setError("Identifiant de recette manquant");
         return;
@@ -40,7 +41,9 @@ const RecipeDetailPage = () => {
 
       try {
         const fetchedRecipe = await getRecipeBySlug(recipeSlug);
-        
+
+        console.log(fetchedRecipe);
+
         if (!fetchedRecipe) {
           setError("Recette non trouvée");
           return;
@@ -56,7 +59,7 @@ const RecipeDetailPage = () => {
         ];
 
         setMetrics(metrics);
-        
+
         if (sessionData?.user?.id) {
           const userFavoriteRecipes = await getUserFavoriteRecipes(sessionData.user.id, 1, 10);
           setIsRecipeFavorite(userFavoriteRecipes.recipes.some(recipe => recipe.id === fetchedRecipe.id));
@@ -97,7 +100,7 @@ const RecipeDetailPage = () => {
       }));
 
       await updateRecipe(recipe.id, { steps: generatedSteps.steps });
-      
+
       const updatedRecipe = await getRecipeBySlug(params.slug as string);
       setRecipeDetails(updatedRecipe);
     } catch {
@@ -116,12 +119,12 @@ const RecipeDetailPage = () => {
     try {
       const response = await toggleRecipeFavorite(recipeDetails.id, sessionData.user.id);
       setIsRecipeFavorite(response.isFavorited);
-      showSuccessToast(response.isFavorited ? 
-        "Recette ajoutée aux favoris" : 
+      showSuccessToast(response.isFavorited ?
+        "Recette ajoutée aux favoris" :
         "Recette retirée des favoris"
       );
     } catch {
-      show("Erreur", "Erreur lors de l'ajout aux favoris", "error");    
+      show("Erreur", "Erreur lors de l'ajout aux favoris", "error");
     }
   };
 
@@ -156,8 +159,13 @@ const RecipeDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-primaryBackgroundColor">      
+    <div className="min-h-screen bg-primaryBackgroundColor mt-16">
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        <button
+          onClick={() => window.history.back()}
+          className="px-4 py-2 bg-darkActionColor text-white rounded-full flex items-center gap-2 hover:bg-primaryColor transition-colors">
+          <i className="pi pi-chevron-left text-xl"></i> Retour à la liste des recettes
+        </button>
         <div className=" rounded-2xl overflow-hidden">
           {recipeDetails.image && (
             <div className="relative rounded-full h-96 w-full">
@@ -169,11 +177,10 @@ const RecipeDetailPage = () => {
               <div className="absolute top-4 right-4">
                 <button
                   onClick={handleFavoriteToggle}
-                  className={`w-10 h-10 rounded-full transition-all flex items-center justify-center ${
-                    isRecipeFavorite 
-                      ? 'bg-red-500 text-white' 
-                      : 'bg-white text-gray-600 hover:bg-red-50'
-                  }`}
+                  className={`w-10 h-10 rounded-full transition-all flex items-center justify-center ${isRecipeFavorite
+                    ? 'bg-red-500 text-white'
+                    : 'bg-white text-gray-600 hover:bg-red-50'
+                    }`}
                 >
                   <i className={`${isRecipeFavorite ? PrimeIcons.HEART_FILL : PrimeIcons.HEART} text-xl`}></i>
                 </button>
@@ -201,21 +208,20 @@ const RecipeDetailPage = () => {
 
         <div className="p-8">
           <h2 className="text-2xl font-bold mb-6 text-black">Ingrédients</h2>
+
+          {/* Liste des ingrédients disponibles */}
           <h3 className="text-lg font-bold mb-4 text-black">Dans notre magasin</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {recipeDetails.recipeIngredients.map((ingredient, index) => (
-              <div 
-                key={index}
-                className="group transform transition-transform"
-              >
-                <div className="p-4 flex flex-col items-center text-center space-y-3">
-                  <div className="w-24 h-24 rounded-full overflow-hidden shadow-md p-2 hover:bg-primaryColor">
-                    <Image
+              <div key={index} className="group transition-transform transform hover:scale-105 p-4">
+                <div className="grid place-items-center grid-rows-3 text-center space-y-3">
+                    <div className="w-24 h-24 flex items-center justify-center rounded-full overflow-hidden shadow-md p-2 group-hover:bg-primaryColor">
+                      <Image
                       src={ingredient.product.image}
                       alt={ingredient.product.name}
-                      imageClassName="w-full h-full object-cover rounded-full"
-                    />
-                  </div>
+                      className="object-cover"
+                      />
+                    </div>
                   <div>
                     <span className="block text-lg font-bold text-black">
                       {ingredient.quantity} {ingredient.unit}
@@ -224,25 +230,45 @@ const RecipeDetailPage = () => {
                       {ingredient.product.name}
                     </span>
                   </div>
+                  <button
+                    className="mt-2 flex items-center gap-2 px-4 py-2 bg-darkActionColor text-white rounded-full hover:bg-primaryColor transition"
+                    onClick={() => addProduct(ingredient.product, 1)}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l1 5h8l1-5M5 21h14M9 21a2 2 0 100-4 2 2 0 000 4M15 21a2 2 0 100-4 2 2 0 000 4" />
+                    </svg>
+                    Ajouter
+                  </button>
                 </div>
               </div>
             ))}
           </div>
-          <h3 className="text-lg font-bold mb-4 text-black">Pas encore dans notre magasin, mais c&apos;est pour bientôt</h3>
+
+          <div className="flex justify-center mt-8">
+            <button
+              className="flex items-center gap-2 px-6 py-3 bg-darkActionColor text-white font-semibold rounded-full hover:bg-primaryColor transition"
+              onClick={() => recipeDetails.recipeIngredients.forEach(ingredient => addProduct(ingredient.product, 1))}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l1 5h8l1-5M5 21h14M9 21a2 2 0 100-4 2 2 0 000 4M15 21a2 2 0 100-4 2 2 0 000 4" />
+              </svg>
+              Ajouter tous les ingrédients au panier
+            </button>
+          </div>
+
+          {/* Liste des ingrédients manquants */}
+          <h3 className="text-lg font-bold mt-10 mb-4 text-black">Pas encore dans notre magasin, mais c&apos;est pour bientôt</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {recipeDetails.recipeMissingIngredientReports.map((ingredient, index) => (
-              <div 
-                key={index}
-                className="group transform transition-transform"
-              >
-                <div className="p-4 flex flex-col items-center text-center space-y-3">
-                  <div className="w-24 h-24 rounded-full overflow-hidden shadow-md p-2 hover:bg-primaryColor">
+              <div key={index} className="group transition-transform transform hover:scale-105 p-4">
+                <div className="flex flex-col items-center text-center space-y-3">
+                  {/* Image par défaut */}
+                  <div className="w-24 h-24 rounded-full overflow-hidden shadow-md p-2">
                     <Image
                       src="/images/default-image.png"
                       alt="Image manquante"
-                      imageClassName="w-full h-full object-cover rounded-full"
+                      className="w-full h-full object-cover rounded-full"
                     />
                   </div>
+                  {/* Infos ingrédient */}
                   <div>
                     <span className="block text-lg font-bold text-black">
                       {ingredient.quantity} {ingredient.unit}
@@ -255,7 +281,6 @@ const RecipeDetailPage = () => {
               </div>
             ))}
           </div>
-          
         </div>
 
         {/* Recipe Steps */}
@@ -268,7 +293,7 @@ const RecipeDetailPage = () => {
           ) : (
             <div className="space-y-6">
               {recipeDetails.steps.map((step, index) => (
-                <div 
+                <div
                   key={index}
                   className="flex gap-6 p-6 bg-white text-black hover:text-white rounded-xl hover:bg-primaryColor/65 transition-colors"
                 >

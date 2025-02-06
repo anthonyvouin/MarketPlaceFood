@@ -13,6 +13,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
 import ProductFiltersAside from '../components/ProductFiltersAside';
 import SelectCategories from '../components/SelectCategories';
+import Pagination from '../components/Pagination';
 
 const bgColors = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
 const booleanOptions = [
@@ -21,13 +22,23 @@ const booleanOptions = [
 ];
 
 export default function Products() {
-  const [filteredProducts, setFilteredProducts] = useState<ProductDto[]>([]);
-  const [categories, setCategories] = useState<CategoryDto[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50]);
-  const [filters, setFilters] = useState<{ price?: { gte: number; lte: number }; categoryId?: { in: string[] }; discountId?: boolean }>({});
-  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
-  const [selectedOption, setSelectedOption] = useState<boolean | null>(null);
+    const [filteredProducts, setFilteredProducts] = useState<ProductDto[]>([]);
+    const [categories, setCategories] = useState<CategoryDto[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 50]);
+    const [filters, setFilters] = useState<{ price?: { gte: number; lte: number }; categoryId?: { in: string[] }; discountId?: boolean }>({});
+    const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+    const [selectedOption, setSelectedOption] = useState<boolean | null>(null);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const itemsPerPage = 12;
+
+    const handlePageChange = (page: number): void => {
+        setCurrentPage(page);
+    };
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -61,65 +72,74 @@ export default function Products() {
     setFilters((prevFilters) => ({ ...prevFilters, [key]: value }));
   };
 
-  const handlePriceChange = (e: SliderChangeEvent): void => {
-    const newPriceRange = e.value as [number, number];
-    setPriceRange(newPriceRange);
-    handleFilterChange('price', { gte: newPriceRange[0] * 100, lte: newPriceRange[1] * 100 });
-  };
+    const handlePriceChange = (e: SliderChangeEvent): void => {
+        const newPriceRange = e.value as [number, number];
+        setPriceRange(newPriceRange);
+        handleFilterChange('price', { gte: newPriceRange[0] * 100, lte: newPriceRange[1] * 100 });
+    };
 
-  const handleCategoryChange = (categoryId: string | string[]): void => {
-    const updatedCategories =
-      Array.isArray(categoryId) ? categoryId : selectedCategories.includes(categoryId)
-        ? selectedCategories.filter((id) => id !== categoryId)
-        : [...selectedCategories, categoryId];
+    const handleCategoryChange = (categoryId: string | string[]): void => {
+        const updatedCategories =
+            Array.isArray(categoryId) ? categoryId : selectedCategories.includes(categoryId)
+                ? selectedCategories.filter((id) => id !== categoryId)
+                : [...selectedCategories, categoryId];
 
-    setSelectedCategories(updatedCategories);
-    handleFilterChange('categoryId', { in: updatedCategories });
-  };
+        setSelectedCategories(updatedCategories);
+        handleFilterChange('categoryId', { in: updatedCategories });
+        setCurrentPage(1);
+    };
 
-  const updateFilters = (e: { value: boolean }): void => {
-    setSelectedOption(e.value);
-    handleFilterChange('discountId', e.value ? { not: null } : null);
-  };
+    const updateFilters = (e: { value: boolean }): void => {
+        setSelectedOption(e.value);
+        handleFilterChange('discountId', e.value ? { not: null } : null);
+        setCurrentPage(1);
+    };
 
-  const resetFilters = (): void => {
-    setSelectedCategories([]);
-    setPriceRange([0, 50]);
-    setSelectedOption(null);
-    setFilters({});
-  };
+    const resetFilters = (): void => {
+        setSelectedCategories([]);
+        setPriceRange([0, 50]);
+        setSelectedOption(null);
+        setFilters({});
+        setCurrentPage(1);
+    };
 
-  return (
-    <section className="w-full">
-      <Banner/>
-      <div className="flex flex-col gap-8 p-8 bg-gray-50 rounded-lg shadow-lg">
-        <FilterControls
-          categories={categories}
-          selectedCategories={selectedCategories}
-          setSelectedCategories={setSelectedCategories}
-          handleCategoryChange={handleCategoryChange}
-          selectedOption={selectedOption}
-          updateFilters={updateFilters}
-          isFilterOpen={isFilterOpen}
-          setIsFilterOpen={setIsFilterOpen}
-        />
-        <ProductFiltersAside
-          categories={categories}
-          handlePriceChange={handlePriceChange}
-          handleCategoryChange={handleCategoryChange}
-          isFilterOpen={isFilterOpen}
-          setIsFilterOpen={setIsFilterOpen}
-          priceRange={priceRange}
-          selectedCategories={selectedCategories}
-          onReset={resetFilters}
-          selectedOption={selectedOption}
-          updateFilters={updateFilters}
-          booleanOptions={booleanOptions}
-        />
-        <ProductGrid filteredProducts={filteredProducts}/>
-      </div>
-    </section>
-  );
+    return (
+        <section className="w-full">
+            <Banner />
+            <div className="flex flex-col gap-8 p-8 bg-gray-50 rounded-lg shadow-lg">
+                <FilterControls
+                    categories={categories}
+                    selectedCategories={selectedCategories}
+                    setSelectedCategories={setSelectedCategories}
+                    handleCategoryChange={handleCategoryChange}
+                    selectedOption={selectedOption}
+                    updateFilters={updateFilters}
+                    isFilterOpen={isFilterOpen}
+                    setIsFilterOpen={setIsFilterOpen}
+                />
+                <ProductFiltersAside
+                    categories={categories}
+                    handlePriceChange={handlePriceChange}
+                    handleCategoryChange={handleCategoryChange}
+                    isFilterOpen={isFilterOpen}
+                    setIsFilterOpen={setIsFilterOpen}
+                    priceRange={priceRange}
+                    selectedCategories={selectedCategories}
+                    onReset={resetFilters}
+                    selectedOption={selectedOption}
+                    updateFilters={updateFilters}
+                    booleanOptions={booleanOptions}
+                />
+                <ProductGrid filteredProducts={currentProducts} />
+                <Pagination
+                    itemsPerPage={itemsPerPage}
+                    totalItems={filteredProducts.length}
+                    currentPage={currentPage}
+                    onPageChange={handlePageChange}
+                />
+            </div>
+        </section>
+    );
 }
 
 const Banner = () => (
