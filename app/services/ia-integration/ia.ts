@@ -141,7 +141,7 @@ export async function generateRecipes(format: string, complement: string = "", p
         break;
       case "generate-recipes-from-cart":
         formattedIngredients = JSON.stringify(products)
-        prompt = "Je vais te fournir une liste d'ingrédients alimentaires. À partir de cette liste, tu devras créer un tableau de recettes (maximum 1 recette). Chaque recette sera cohérente, délicieuse et réalisable avec les ingrédients fournis. La cohérence entre les ingrédients est essentielle : chaque recette sera construite de manière logique avec des ingrédients qui se marient bien ensemble. J'utiliserai uniquement les ingrédients de la liste, ainsi que du sel et du poivre.";
+        prompt = "Je vais te fournir une liste d'ingrédients alimentaires. À partir de cette liste, tu devras créer un tableau de recettes. Une seule recette maximum. Chaque recette sera cohérente, délicieuse et réalisable avec les ingrédients fournis. La cohérence entre les ingrédients est essentielle : chaque recette sera construite de manière logique avec des ingrédients qui se marient bien ensemble. J'utiliserai uniquement les ingrédients de la liste, ainsi que du sel et du poivre.";
         break;
       case "generate-recipe-from-image-of-recipe":
         formattedIngredients = JSON.stringify(products)

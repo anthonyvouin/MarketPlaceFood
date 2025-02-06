@@ -1,32 +1,31 @@
-"use client"
+"use client";
 
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { ToastContext } from "../provider/toastProvider";
 import { Button } from "primereact/button";
-import { Card } from "primereact/card";
-import { Dialog } from "primereact/dialog";
-import { createRecipe, getAllRecipes, getRandomRecipes } from "../services/recipes";
-import { analysePicture, generateRecipes } from "../services/ia-integration/ia";
-// import Link from "next/link";
-import { getImageFromGoogle, getImageFromPixabay, getImageFromUnsplash, searchProduct } from "../services/products/product";
-import { ProgressSpinner } from 'primereact/progressspinner';
-import { createOrUpdateMissingIngredientReport } from "../services/missingIngredientReport";
+import { ProgressSpinner } from "primereact/progressspinner";
 import RecipeCard from "../components/recipe/RecipeCard";
 import IngredientsDialog from "../components/IngredientsDialog";
-import { useSideBarBasket } from "../provider/sideBar-cart-provider";
-import { CartDto } from "../interface/cart/cartDto";
-import { getClientCart } from "../services/cart/cart";
-import { formatPriceEuro } from "../pipe/formatPrice";
 import ImageUploadDialog from "../components/uploadImageDialog";
-import { uploadImage, uploadTemporaryImageToCloudinary } from "@/lib/uploadImage";
+import { useSideBarBasket } from "../provider/sideBar-cart-provider";
+import { createRecipe, getAllRecipes, getRandomRecipes, getUserFavoriteRecipes } from "../services/recipes";
+import { generateRecipes, analysePicture } from "../services/ia-integration/ia";
+import { getImageFromPixabay, searchProduct } from "../services/products/product";
+import { uploadTemporaryImageToCloudinary } from "@/lib/uploadImage";
+import { formatPriceEuro } from "../pipe/formatPrice";
+import { getClientCart } from "../services/cart/cart";
 import { RecipeDto } from "../interface/recipe/RecipeDto";
+import { CartDto } from "../interface/cart/cartDto";
+import { useRouter } from "next/navigation";
 
 export default function RecipesPage() {
     const { data: session } = useSession();
     const { show } = useContext(ToastContext);
-    const [recipes, setRecipes] = useState([]);
-    const [recipeName, setRecipeName] = useState<string | null>(null);
+    const [recipes, setRecipes] = useState<RecipeDto[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [imageUploadVisible, setImageUploadVisible] = useState(false);
+    const [selectedAction, setSelectedAction] = useState<"recipe" | "fridge" | null>(null);
     const [ingredients, setIngredients] = useState<{
         products_not_found: string[],
         products_found: any[],
@@ -36,27 +35,24 @@ export default function RecipesPage() {
         products_found: [],
         original_ingredients: [],
     });
-    const [loading, setLoading] = useState(false);
     const [ingredientsDialogVisible, setIngredientsDialogVisible] = useState(false);
+    const [recipeName, setRecipeName] = useState("");
     const [selectedFormat, setSelectedFormat] = useState("");
-    const [imageUploadVisible, setImageUploadVisible] = useState(false);
-    const [selectedAction, setSelectedAction] = useState<"analyse-recipe" | "fridge" | null>(null); // Pour différencier l'action (analyse ou frigo)
+    
+    const router = useRouter();
 
-    const handleImageUpload = async (formData) => {
+    async function handleImageUpload(formData) {
         try {
             const imagePath = await uploadTemporaryImageToCloudinary(formData);
-            if (selectedAction === "analyse-recipe") {
-                await analysePictureWithAI("recipe", imagePath);
-            } else if (selectedAction === "fridge") {
-                await analysePictureWithAI("fridge", imagePath);
+            if (selectedAction) {
+                await analysePictureWithAI(selectedAction, imagePath);
             }
-
             return imagePath;
         } catch (error) {
             console.error("Erreur lors de l'upload de l'image:", error);
             throw error;
         }
-    };
+    }
 
     async function analysePictureWithAI(format, imagePath) {
         try {
@@ -105,138 +101,142 @@ export default function RecipesPage() {
         }
     }
 
-    const { addProduct } = useSideBarBasket();
+    // async function randomizeRecipeFromBDD() {
+    //     try {
+    //         setLoading(true);
+    //         const recipes = await getRandomRecipes(9);
+    //         setRecipes(recipes);
+    //     } catch {
+    //         show("Erreur", "Erreur lors de la génération", "error");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }
 
-    async function randomizeRecipeFromBDD() {
-        try {
-            setLoading(true);
-            const recipes = await getRandomRecipes(9);
-            setRecipes(recipes);
-            // show("Succès", "Recette générée avec succès", "success");
-        } catch (error) {
-            show("Erreur", "Erreur lors de la génération de la recette", "error");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    async function generateRecipe(format) {
+    async function generateRecipe() {
         try {
             if (!session) {
-                show("Erreur", "Vous devez être connecté pour générer des recettes", "error");
+                show("Erreur", "Vous devez être connecté", "error");
                 return;
             }
             setLoading(true);
             const user = session.user.id;
-            let recipes = [];
-            const localStorageBasket: CartDto | null = await getClientCart(session.user.id);
-            if (localStorageBasket?.cartItems.length === 0) {
+            const cart: CartDto | null = await getClientCart(user);
+
+            if (!cart || cart.cartItems.length === 0) {
                 show("Erreur", "Votre panier est vide", "error");
+                setLoading(false);
                 return;
             }
-            let products = localStorageBasket?.cartItems;
-            if (!products || products.length === 0) {
-                show("Erreur", "Votre panier est vide", "error");
-                return;
-            }
-            products = products.map((product: any) => {
-                return {
-                    id: product.product.id,
-                    name: product.product.name,
-                    price: formatPriceEuro(product.product.price),
-                    quantity: product.quantity,
-                    product: product.product,
-                    totalPrice: product.totalPrice,
-                    productId: product.product.id,
-                }
-            });
 
-            recipes = await generateRecipes(format, "", products);
+            const products = cart.cartItems.map((item) => ({
+                id: item.product.id,
+                name: item.product.name,
+                price: formatPriceEuro(item.product.price),
+                quantity: item.quantity,
+            }));
 
-            const generatedRecipes: any[] = [];
-            for (const recipe of recipes as any) {
+            const recipes = await generateRecipes("generate-recipes-from-cart", "", products);
+            const userConnected = session?.user?.id;
+            for (const recipe of recipes) {
                 const generatedImageForRecipe = await getImageFromPixabay(recipe.englishName);
                 recipe.image = generatedImageForRecipe;
                 delete recipe.englishName;
-                const createdRecipe = await createRecipe(recipe, user);
-                generatedRecipes.push(createdRecipe);
-                getLastRecipes();
-            }
-
-            if (generatedRecipes.length > 0) {
-                show("Succès", "Recettes générées avec succès", "success");
-            } else {
-                show("Erreur", "Erreur lors de la génération des recettes", "error");
+                if (userConnected) {
+                    const createdRecipe = await createRecipe(recipe, userConnected) as { slug: string };
+                    router.push(`/recipes/${createdRecipe.slug}`);
+                } else {
+                    throw new Error("User is not connected");
+                }
             }
         } catch (error) {
-            show("Erreur", "Erreur lors de la génération des recettes", "error");
+            show("Erreur", "Erreur lors de la génération", "error");
+            console.error("Erreur lors de la génération:", error);
         } finally {
             setLoading(false);
         }
     }
 
-    useEffect(() => {
-        getLastRecipes();
-    }, []);
+    const { addProduct } = useSideBarBasket();
 
-    async function getLastRecipes() {
+      const fetchRecipesAndFavorites = useCallback(async (fetchRandom = false) => {
         setLoading(true);
-        const lastRecipes = await getAllRecipes(1, 12, {}, { createdAt: 'desc' });
-        setRecipes(lastRecipes.recipes);
-        setLoading(false);
-    }
+        try {
+            let fetchedRecipes: RecipeDto[] = [];
+            if (fetchRandom) {
+                fetchedRecipes = await getRandomRecipes(9);
+            } else {
+                fetchedRecipes = await getAllRecipes();
+                if (fetchedRecipes) {
+                    fetchedRecipes = (fetchedRecipes as unknown as { recipes: RecipeDto[] })?.recipes;
+                }
+            }
+            
+            let favoriteRecipesIds: string[] = [];
+            if (session?.user?.id) {
+                const favoriteRecipes = await getUserFavoriteRecipes(session.user.id);
+                favoriteRecipesIds = favoriteRecipes?.recipes.map(recipe => recipe.id) || [];
+            }
+            
+            console.log(fetchedRecipes);
+            setRecipes(fetchedRecipes.map(recipe => ({
+                ...recipe,
+                isFavorite: favoriteRecipesIds.includes(recipe.id),
+            })));
+        } catch (error) {
+            show("Erreur", "Erreur lors du chargement des recettes", "error");
+        } finally {
+            setLoading(false);
+        }
+    }, [session, show]);
+
+    useEffect(() => {
+        if (session) {
+            fetchRecipesAndFavorites();
+        }
+    }, [session, fetchRecipesAndFavorites]);
 
     return (
-        <div className="min-h-[85vh] flex flex-col items-center bg-primaryBackgroundColor p-4">
-            <Card className="w-full max-w-4xl shadow-2 mb-6" title="Recettes">
-                <p className="text-gray-700 mb-6">
-                    Découvrez nos délicieuses recettes et régalez-vous en famille ou entre amis.
+        <div className="min-h-screen flex flex-col items-center p-6 sm:p-10 bg-gray-100 mt-16">
+            <div className="w-full max-w-4xl text-center">
+                <h1 className="text-3xl sm:text-4xl font-bold text-primaryColor">🍽️ Recettes Gourmandes</h1>
+                <p className="text-gray-600 mt-2 text-sm sm:text-base">
+                    Découvrez, générez et savourez des recettes adaptées à vos envies !
                 </p>
-                <div className="flex gap-5">
-                    <Button
-                        label="Pas d'idées ?"
-                        icon="pi pi-refresh"
-                        className="p-button-success"
-                        onClick={() => randomizeRecipeFromBDD()}
-                        // onClick={() => generateRecipe("generate-recipes-from-bdd")}
-                        disabled={loading}
-                    />
-                    <Button
-                        label="Générer des recettes à partir de votre panier"
-                        icon="pi pi-refresh"
-                        className="p-button-success"
-                        onClick={() => generateRecipe("generate-recipes-from-cart")}
-                        disabled={loading}
-                    />
+            </div>
 
-                    <Button
-                        label="Analyser une recette"
-                        icon="pi pi-refresh"
-                        className="p-button-success"
-                        onClick={() => {
-                            setSelectedAction("analyse-recipe");
-                            setImageUploadVisible(true);
-                        }}
-                        disabled={loading}
-                    />
-                    <Button
-                        label="Générer des recettes depuis votre frigo"
-                        icon="pi pi-refresh"
-                        className="p-button-success"
-                        onClick={() => {
-                            setSelectedAction("fridge");
-                            setImageUploadVisible(true);
-                        }}
-                        disabled={loading}
-                    />
+            <div className="w-3/4 grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+                <Button label="🔄 Aléatoires" className="bg-pink-500 text-white shadow-lg h-16" onClick={() => fetchRecipesAndFavorites(true)} />
+                <Button label="🛒 Panier → Recette" className="bg-orange-500 text-white shadow-lg h-16" onClick={generateRecipe} />
+                <Button
+                    label="📷 Analyser une recette"
+                    className="bg-blue-500 text-white shadow-lg h-16"
+                    onClick={() => {
+                        setSelectedAction("recipe");
+                        setImageUploadVisible(true);
+                    }}
+                />
+                <Button
+                    label="🥦 Frigo"
+                    className="bg-purple-500 text-white shadow-lg h-16"
+                    onClick={() => {
+                        setSelectedAction("fridge");
+                        setImageUploadVisible(true);
+                    }}
+                />
+            </div>
+
+            {loading ? (
+                <ProgressSpinner className="mt-6" />
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-6 w-full max-w-6xl">
+                    {recipes.map((recipe) => (
+                        <RecipeCard key={recipe.id} recipe={recipe} favorite={recipe.isFavorite} />
+                    ))}
                 </div>
-            </Card>
+            )}
 
-            <ImageUploadDialog
-                visible={imageUploadVisible}
-                onHide={() => setImageUploadVisible(false)}
-                onUpload={handleImageUpload}
-            />
+            <ImageUploadDialog visible={imageUploadVisible} onHide={() => setImageUploadVisible(false)} onUpload={handleImageUpload} />
 
             <IngredientsDialog
                 visible={ingredientsDialogVisible}
@@ -246,21 +246,6 @@ export default function RecipesPage() {
                 addProduct={addProduct}
                 format={selectedFormat}
             />
-
-            {loading ? (
-                <ProgressSpinner />
-            ) : (
-                recipes && recipes.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-6xl">
-                        {recipes.map((recipe, index) => (
-                            <RecipeCard
-                                key={index}
-                                recipe={recipe}
-                            />
-                        ))}
-                    </div>
-                )
-            )}
         </div>
     );
 }

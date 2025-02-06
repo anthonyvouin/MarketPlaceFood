@@ -13,6 +13,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
 import ProductFiltersAside from '../components/ProductFiltersAside';
 import SelectCategories from '../components/SelectCategories';
+import Pagination from '../components/Pagination';
 
 const bgColors = ['bg-tertiaryColorPink', 'bg-tertiaryColorOrange', 'bg-tertiaryColorBlue', 'bg-tertiaryColorPurple'];
 const booleanOptions = [
@@ -28,6 +29,16 @@ export default function Products() {
     const [filters, setFilters] = useState<{ price?: { gte: number; lte: number }; categoryId?: { in: string[] }; discountId?: boolean }>({});
     const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<boolean | null>(null);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const itemsPerPage = 12;
+
+    const handlePageChange = (page: number): void => {
+        setCurrentPage(page);
+    };
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
 
     useEffect(() => {
         const fetchInitialData = async () => {
@@ -75,11 +86,13 @@ export default function Products() {
 
         setSelectedCategories(updatedCategories);
         handleFilterChange('categoryId', { in: updatedCategories });
+        setCurrentPage(1);
     };
 
     const updateFilters = (e: { value: boolean }): void => {
         setSelectedOption(e.value);
         handleFilterChange('discountId', e.value ? { not: null } : null);
+        setCurrentPage(1);
     };
 
     const resetFilters = (): void => {
@@ -87,6 +100,7 @@ export default function Products() {
         setPriceRange([0, 50]);
         setSelectedOption(null);
         setFilters({});
+        setCurrentPage(1);
     };
 
     return (
@@ -116,7 +130,13 @@ export default function Products() {
                     updateFilters={updateFilters}
                     booleanOptions={booleanOptions}
                 />
-                <ProductGrid filteredProducts={filteredProducts} />
+                <ProductGrid filteredProducts={currentProducts} />
+                <Pagination
+                    itemsPerPage={itemsPerPage}
+                    totalItems={filteredProducts.length}
+                    currentPage={currentPage}
+                    onPageChange={handlePageChange}
+                />
             </div>
         </section>
     );

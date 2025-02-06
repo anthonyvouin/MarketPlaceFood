@@ -41,6 +41,10 @@ const config: Config = {
         tertiaryColorOrange: '#F6C778',
         tertiaryColorBlue: '#61D4EC',
         tertiaryColorPurple: '#9682DA',
+        tertiaryColorPinkDark: '#F6948E',
+        tertiaryColorOrangeDark: '#E5B05A',
+        tertiaryColorBlueDark: '#4FB8D4',
+        tertiaryColorPurpleDark: '#7A68B2',
       },
       fontFamily: {
         manrope: ["Manrope", "sans-serif"],
