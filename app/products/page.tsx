@@ -72,6 +72,18 @@ export default function Products() {
     setFilters((prevFilters) => ({ ...prevFilters, [key]: value }));
   };
 
+    const handlePriceChange = (e: SliderChangeEvent): void => {
+        const newPriceRange = e.value as [number, number];
+        setPriceRange(newPriceRange);
+        handleFilterChange('price', { gte: newPriceRange[0] * 100, lte: newPriceRange[1] * 100 });
+    };
+
+    const handleCategoryChange = (categoryId: string | string[]): void => {
+        const updatedCategories =
+            Array.isArray(categoryId) ? categoryId : selectedCategories.includes(categoryId)
+                ? selectedCategories.filter((id) => id !== categoryId)
+                : [...selectedCategories, categoryId];
+
         setSelectedCategories(updatedCategories);
         handleFilterChange('categoryId', { in: updatedCategories });
         setCurrentPage(1);
