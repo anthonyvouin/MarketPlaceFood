@@ -178,7 +178,6 @@ export default function RecipesPage() {
                 favoriteRecipesIds = favoriteRecipes?.recipes.map(recipe => recipe.id) || [];
             }
             
-            console.log(fetchedRecipes);
             setRecipes(fetchedRecipes.map(recipe => ({
                 ...recipe,
                 isFavorite: favoriteRecipesIds.includes(recipe.id),
@@ -199,18 +198,31 @@ export default function RecipesPage() {
     return (
         <div className="min-h-screen flex flex-col items-center p-6 sm:p-10 bg-gray-100 mt-16">
             <div className="w-full max-w-4xl text-center">
-                <h1 className="text-3xl sm:text-4xl font-bold text-primaryColor">🍽️ Recettes Gourmandes</h1>
+                <h1 className="text-3xl sm:text-4xl font-bold text-primaryColor">
+                    <span role="img" aria-label="Recettes Gourmandes">🍽️</span> Recettes Gourmandes
+                </h1>
                 <p className="text-gray-600 mt-2 text-sm sm:text-base">
                     Découvrez, générez et savourez des recettes adaptées à vos envies !
                 </p>
             </div>
-
+    
             <div className="w-3/4 grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-                <Button label="🔄 Aléatoires" className="bg-pink-500 text-white shadow-lg h-16" onClick={() => fetchRecipesAndFavorites(true)} />
-                <Button label="🛒 Panier → Recette" className="bg-orange-500 text-white shadow-lg h-16" onClick={generateRecipe} />
+                <Button 
+                    label="🔄 Aléatoires" 
+                    className="bg-pink-600 text-white shadow-lg h-16 focus:ring-4 focus:ring-pink-300"
+                    aria-label="Générer des recettes aléatoires"
+                    onClick={() => fetchRecipesAndFavorites(true)}
+                />
+                <Button 
+                    label="🛒 Panier → Recette" 
+                    className="bg-orange-600 text-white shadow-lg h-16 focus:ring-4 focus:ring-orange-300"
+                    aria-label="Convertir panier en recette"
+                    onClick={generateRecipe} 
+                />
                 <Button
                     label="📷 Analyser une recette"
-                    className="bg-blue-500 text-white shadow-lg h-16"
+                    className="bg-blue-600 text-white shadow-lg h-16 focus:ring-4 focus:ring-blue-300"
+                    aria-label="Analyser une image de recette"
                     onClick={() => {
                         setSelectedAction("recipe");
                         setImageUploadVisible(true);
@@ -218,14 +230,15 @@ export default function RecipesPage() {
                 />
                 <Button
                     label="🥦 Frigo"
-                    className="bg-purple-500 text-white shadow-lg h-16"
+                    className="bg-purple-600 text-white shadow-lg h-16 focus:ring-4 focus:ring-purple-300"
+                    aria-label="Analyser le contenu du frigo"
                     onClick={() => {
                         setSelectedAction("fridge");
                         setImageUploadVisible(true);
                     }}
                 />
             </div>
-
+    
             {loading ? (
                 <ProgressSpinner className="mt-6" />
             ) : (
@@ -235,9 +248,13 @@ export default function RecipesPage() {
                     ))}
                 </div>
             )}
-
-            <ImageUploadDialog visible={imageUploadVisible} onHide={() => setImageUploadVisible(false)} onUpload={handleImageUpload} />
-
+    
+            <ImageUploadDialog 
+                visible={imageUploadVisible} 
+                onHide={() => setImageUploadVisible(false)} 
+                onUpload={handleImageUpload} 
+            />
+    
             <IngredientsDialog
                 visible={ingredientsDialogVisible}
                 ingredients={ingredients}
@@ -248,4 +265,4 @@ export default function RecipesPage() {
             />
         </div>
     );
-}
+}    

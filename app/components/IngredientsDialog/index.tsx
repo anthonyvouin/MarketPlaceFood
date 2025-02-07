@@ -32,7 +32,6 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
   
         for (const recipe of recipes) {
           recipe.image = await getImageFromPixabay(recipe.englishName);
-          console.log(recipe);
           delete recipe.englishName;
   
           if (userConnected) {
@@ -105,13 +104,14 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
 
   const foundIngredientsFooter = (
     <div className="flex justify-between w-full">
-      <Button label="Fermer" icon="pi pi-times" onClick={onHide} className="p-button-text" />
+      <Button label="Fermer" icon="pi pi-times" onClick={onHide} className="p-button-text" aria-label="Fermer" />
       {format === "fridge" && (
         <Button
           label="Générer une recette"
           icon={loading ? "pi pi-spin pi-spinner" : "pi pi-external-link"}
           disabled={loading}
           onClick={() => generateRecipe("generate-recipes-from-fridge")}
+          aria-label="Générer une recette"
         />
       )}
       {format === "recipe" && (
@@ -125,6 +125,7 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
                 onHide();
               }}
               className="p-button-success"
+              aria-label="Tout ajouter au panier"
             />
           )}
           <Button
@@ -132,6 +133,7 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
             icon={loading ? "pi pi-spin pi-spinner" : "pi pi-external-link"}
             disabled={loading}
             onClick={() => createAnalyzedRecipe(ingredients)}
+            aria-label="Générer une recette"
           />
         </>
       )}
@@ -145,10 +147,11 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
       style={{ width: "90vw", minHeight: "50vh" }}
       footer={foundIngredientsFooter}
       onHide={onHide}
+      aria-modal="true"
     >
       {loading ? (
         <div className="flex justify-center items-center py-10">
-          <ProgressSpinner />
+          <ProgressSpinner aria-label="Chargement" />
         </div>
       ) : (
         <>
@@ -162,44 +165,43 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
               ) : (
                 <>
                   <div className="mb-4">
-                    <h3 className="font-bold text-lg">Pour réaliser votre {recipeName} :</h3>
+                    <h3 className="font-bold text-lg" tabIndex={0}>Pour réaliser votre {recipeName} :</h3>
                     <ul className="list-disc pl-5">
                       {ingredients?.original_ingredients?.map((ingredient, index) => (
-                        <li key={index}>
+                        <li key={index} tabIndex={0}>
                           {ingredient.name} - {ingredient.quantity}
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  {/* Produits non trouvés */}
                   {ingredients.products_not_found.length > 0 && (
                     <div className="mb-4 p-4 border border-red-500 bg-red-100 rounded-md">
-                      <h3 className="text-red-600 font-bold text-lg">Produits non trouvés :</h3>
-                      <p>Une notification a été envoyée à nos vendeurs pour ces produits.</p>
+                      <h3 className="text-red-600 font-bold text-lg" tabIndex={0}>Produits non trouvés :</h3>
+                      <p tabIndex={0}>Une notification a été envoyée à nos vendeurs pour ces produits.</p>
                       <ul className="list-disc pl-5 text-red-500">
                         {ingredients.products_not_found.map((product, index) => (
-                          <li key={index}>{product}</li>
+                          <li key={index} tabIndex={0}>{product}</li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {/* Produits trouvés */}
                   {ingredients.products_found.length > 0 && (
                     <div className="p-4 border border-green-500 bg-green-100 rounded-md">
-                      <h3 className="text-green-600 font-bold text-lg">Produits trouvés :</h3>
+                      <h3 className="text-green-600 font-bold text-lg" tabIndex={0}>Produits trouvés :</h3>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
                         {ingredients.products_found.map((ingredient, index) => (
                           <div
                             key={index}
                             className="flex justify-between items-center p-3 border rounded bg-white shadow-sm"
                           >
-                            <span className="text-gray-800">{ingredient.name}</span>
+                            <span className="text-gray-800" tabIndex={0}>{ingredient.name}</span>
                             <Button
                               icon="pi pi-plus"
                               className="p-button-rounded p-button-success p-button-sm"
                               onClick={() => addProduct(ingredient, 1)}
+                              aria-label={`Ajouter ${ingredient.name} au panier`}
                             />
                           </div>
                         ))}
@@ -217,14 +219,23 @@ export default function IngredientsDialog({ visible, ingredients, recipeName, on
                 <div
                   key={index}
                   className={`flex justify-between items-center p-4 border rounded-lg shadow-sm hover:shadow-md cursor-pointer transition-all
-                    ${ingredient.mustBeUsed ? "bg-green-100 border-green-500" : "bg-red-100 border-red-500"}`}
-                  onClick={() => toggleIngredientUsage(index)}
-                >
+                  ${ingredient.mustBeUsed ? "bg-green-100 border-green-500" : "bg-red-100 border-red-500"}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleIngredientUsage(index);
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-pressed={ingredient.mustBeUsed}>
                   <span className="font-semibold text-gray-800">{ingredient.name}</span>
                   <Button
-                    icon={ingredient.mustBeUsed ? "pi pi-check" : "pi pi-times"}
-                    className={`p-button-rounded ${ingredient.mustBeUsed ? "p-button-success" : "p-button-danger"}`}
-                    onClick={() => toggleIngredientUsage(index)}
+                  icon={ingredient.mustBeUsed ? "pi pi-check" : "pi pi-times"}
+                  className={`p-button-rounded ${ingredient.mustBeUsed ? "p-button-success" : "p-button-danger"}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleIngredientUsage(index);
+                  }}
+                  aria-label={ingredient.mustBeUsed ? `Désactiver ${ingredient.name}` : `Activer ${ingredient.name}`}
                   />
                 </div>
               ))}

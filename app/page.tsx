@@ -9,6 +9,7 @@ import { Button } from 'primereact/button';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAppleWhole, faCarrot, faLemon, faPepperHot, faLeaf } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
 
 library.add(faAppleWhole, faCarrot, faLemon, faPepperHot, faLeaf);
 
@@ -75,19 +76,24 @@ export default function Home() {
     { left: '85%', top: '95%' }
   ];
 
-  const decorativeIcons = fixedPositions.map((position, index) => ({
-    icon: icons[index % icons.length],
-    className: `${colors[index % colors.length]} opacity-0 transition-all transform scale-50`,
-    readyClassName: `opacity-40 scale-100 animate-float`,
-    style: {
-      position: 'absolute',
-      left: position.left,
-      top: position.top,
-      transform: `rotate(${Math.random() * 360}deg)`,
-      fontSize: `${1 + Math.random()}rem`,
-      animationDelay: `${Math.random() * 2}s`
-    }
-  }));
+  const [decorativeIcons, setDecorativeIcons] = useState([]);
+
+  useEffect(() => {
+    const mappedIcons = fixedPositions.map((position, index) => ({
+      icon: icons[index % icons.length],
+      className: `${colors[index % colors.length]} opacity-0 transition-all transform scale-50`,
+      readyClassName: `opacity-40 scale-100 animate-float`,
+      style: {
+        position: 'absolute',
+        left: position.left,
+        top: position.top,
+        transform: `rotate(${Math.random() * 360}deg)`,
+        fontSize: `${1 + Math.random()}rem`,
+        animationDelay: `${Math.random() * 2}s`
+      }
+    }));
+    setDecorativeIcons(mappedIcons);
+  }, []);
 
   useEffect(() => {
     setIconsReady(true);
@@ -96,49 +102,54 @@ export default function Home() {
   return (
     <div className="w-full bg-primaryBackgroundColor min-h-screen h-screen">
       <section className="h-full relative overflow-hidden w-full">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-green-100/50"/>
+      <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-green-100/50" />
 
-        <div className="absolute w-full h-full">
-          {decorativeIcons.map((item, index) => (
-            <FontAwesomeIcon
-              key={index}
-              icon={item.icon}
-              className={`transition-all duration-500 ${item.className} ${iconsReady ? item.readyClassName : ''}`}
-              style={item.style as React.CSSProperties}
-            />
-          ))}
-        </div>
+      <div className="absolute w-full h-full pointer-events-none">
+        {decorativeIcons.map((item, index) => (
+        <FontAwesomeIcon
+          key={index}
+          icon={item.icon}
+          className={`transition-all duration-500 ${item.className} ${iconsReady ? item.readyClassName : ''}`}
+          style={item.style as React.CSSProperties}
+        />
+        ))}
+      </div>
 
-        <div className="relative h-full container mx-auto px-4">
-          <div className="h-full flex flex-col justify-center items-center gap-12">
-            <div className="md:w-[55rem] h-[27rem] items-center justify-center text-center flex flex-col gap-10 bg-white/50 backdrop-blur-sm p-8 rounded-lg shadow-lg">
-              <h1 className="font-manrope font-extrabold text-2xl md:text-3xl text-indigo-800 animate-fade-in">
-                Besoin de faire vos courses ? 🤖
-              </h1>
-              <div className="space-y-4">
-                <h2 className="font-manrope font-bold text-xl md:text-xl text-primaryColor">
-                  Grâce à Snap&Shop, votre frigo a enfin de bonnes idées.
-                </h2>
-                <p className="font-manrope text-lg text-primaryColor/80">
-                  Simplifiez vos courses, sublimez vos repas.
-                </p>
-              </div>
+      <div className="relative h-full container mx-auto px-4">
+        <div className="h-full flex flex-col justify-center items-center gap-12">
+        <div className="md:w-[55rem] h-[27rem] relative z-10 items-center justify-center text-center flex flex-col gap-10 bg-white/50 backdrop-blur-sm p-8 rounded-lg shadow-lg">
+          <h1 className="font-manrope font-extrabold text-2xl md:text-3xl text-indigo-800 animate-fade-in">
+          Besoin de faire vos courses ? 🤖
+          </h1>
+          <div className="space-y-4">
+          <h2 className="font-manrope font-bold text-xl md:text-xl text-primaryColor">
+            Grâce à Snap&Shop, votre frigo a enfin de bonnes idées.
+          </h2>
+          <p className="font-manrope text-lg text-primaryColor/80">
+            Simplifiez vos courses, sublimez vos repas.
+          </p>
+          </div>
 
-              <div className="flex flex-wrap gap-6 justify-center">
-                <Button
-                  icon="pi pi-shopping-cart"
-                  className="font-manrope bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white px-6 py-3 text-lg font-bold rounded-full shadow-lg transition-all hover:scale-105 hover:shadow-xl"
-                  label="Pas d'idées ? 🤔"
-                />
-                <Button
-                  icon="pi pi-eye"
-                  className="font-manrope bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white px-6 py-3 text-lg font-bold rounded-full shadow-lg transition-all hover:scale-105 hover:shadow-xl"
-                  label="Nos promotions ✨"
-                />
-              </div>
-            </div>
+          <div className="flex flex-wrap gap-6 justify-center">
+          <Link
+            href="/recipes"
+            className="z-[100] font-manrope bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white px-6 py-3 text-lg font-bold rounded-full shadow-lg transition-all hover:scale-105 hover:shadow-xl flex items-center gap-2"
+          >
+            <i className="pi pi-shopping-cart"></i>
+            Pas d'idées ? 🤔
+          </Link>
+
+          <Link
+            href="/products"
+            className="z-[100] font-manrope bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white px-6 py-3 text-lg font-bold rounded-full shadow-lg transition-all hover:scale-105 hover:shadow-xl flex items-center gap-2"
+          >
+            <i className="pi pi-eye"></i>
+            Nos produits ✨
+          </Link>
           </div>
         </div>
+        </div>
+      </div>
       </section>
 
       {productsHighlighting.length > 0 && (
@@ -147,7 +158,7 @@ export default function Home() {
             <h2 className="font-manrope font-bold text-3xl text-gray-900">
               Nos produits phare
             </h2>
-            <div className="h-1 w-24 bg-indigo-600 mt-4 rounded-full"/>
+            <div className="h-1 w-24 bg-indigo-600 mt-4 rounded-full" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -169,7 +180,7 @@ export default function Home() {
             <h2 className="font-manrope font-bold text-3xl text-gray-900">
               Nos produits en promotions
             </h2>
-            <div className="h-1 w-24 bg-orange-500 mt-4 rounded-full"/>
+            <div className="h-1 w-24 bg-orange-500 mt-4 rounded-full" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
