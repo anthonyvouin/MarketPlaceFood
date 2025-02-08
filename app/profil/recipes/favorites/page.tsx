@@ -26,7 +26,10 @@ export default function RecipesPage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col items-center bg-primaryBackgroundColor p-4">
+        <div className="min-h-screen flex flex-col items-center bg-primaryBackgroundColor p-14 mt-14">
+
+
+
 
             {loading ? (
                 <ProgressSpinner />
