@@ -10,6 +10,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAppleWhole, faCarrot, faLemon, faPepperHot, faLeaf } from '@fortawesome/free-solid-svg-icons';
 import Footer from './components/footer/footer';
+import { useSession } from 'next-auth/react';
 
 library.add(faAppleWhole, faCarrot, faLemon, faPepperHot, faLeaf);
 

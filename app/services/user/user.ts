@@ -1,161 +1,170 @@
 'use server';
-import {Prisma, PrismaClient} from "@prisma/client";
-import {UserDto} from "@/app/interface/user/userDto";
+import { Prisma, PrismaClient, User } from '@prisma/client';
+import { UserDto } from '@/app/interface/user/userDto';
 import bcrypt from 'bcrypt';
-import {UserRegisterDto} from "@/app/interface/user/useRegisterDto";
-import {verifyAuth} from "@/app/core/verifyAuth";
-import {sendWelcomeEmail} from "../mail/email";
-import {UpdatePasswordDto} from "@/app/interface/user/userPasswordDto";
-import {sendPasswordResetEmail} from "@/app/services/mail/email";
+import { UserRegisterDto } from '@/app/interface/user/useRegisterDto';
+import { verifyAuth } from '@/app/core/verifyAuth';
+import { sendWelcomeEmail } from '../mail/email';
+import { UpdatePasswordDto } from '@/app/interface/user/userPasswordDto';
+import { sendPasswordResetEmail } from '@/app/services/mail/email';
 import crypto from 'crypto';
-import { PasswordResetData } from "@/app/interface/user/passwordResetDataDto";
+import { PasswordResetData } from '@/app/interface/user/passwordResetDataDto';
 
 const prisma = new PrismaClient();
 export type UserWithAdress = Prisma.UserGetPayload<{
-    include: { addresses: true }
+  include: { addresses: true }
 }>;
 
-
 export async function getUserById(id: string): Promise<UserWithAdress | null> {
-   await verifyAuth(["USER", "ADMIN", "STOREKEEPER"]);
+  const verify = await verifyAuth(['USER', 'ADMIN', 'STOREKEEPER']);
 
-  
-  try {
+  if (verify && verify.user.id === id) {
+    try {
       return await prisma.user.findUnique({
-          where: { id },
-          include: {
-              addresses: true,
-          },
+        where: { id },
+        include: {
+          addresses: true,
+        },
       });
-  } catch (e: any) {
+    } catch (e: any) {
       console.error('Erreur lors de la récupération de l\'utilisateur:', e);
       throw new Error(`La récupération de l'utilisateur a échoué : ${e.message}`);
+    }
+  } else {
+    throw new Error(`userId and token user are differents`);
   }
 }
 
-
 export async function updateUser(user: UserDto): Promise<UserDto> {
-    if (!user.id) {
-        throw new Error(`L'ID de l'utilisateur est requis pour la mise à jour.`);
-    }
+  if (!user.id) {
+    throw new Error(`L'ID de l'utilisateur est requis pour la mise à jour.`);
+  }
 
+  const verify = await verifyAuth(['USER', 'ADMIN']);
+
+  if (verify && verify.user.id === user.id) {
     try {
-        const updatedUser: UserDto = await prisma.user.update({
-            where: {
-                id: user.id,
-            },
+      const updatedUser: UserDto = await prisma.user.update({
+        where: {
+          id: user.id,
+        },
 
-            data: {
-                name: user.name,
-            },
-            include: {
-                addresses: true,
-            },
-        });
+        data: {
+          name: user.name,
+        },
+        include: {
+          addresses: true,
+        },
+      });
 
-        return {
-            id: updatedUser.id || undefined,
-            name: updatedUser.name,
-            email: updatedUser.email,
-            emailVerified: updatedUser.emailVerified,
-            image: updatedUser.image,
-            addresses: updatedUser.addresses || [],
-            role: updatedUser.role,
-        };
+      return {
+        id: updatedUser.id || undefined,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        emailVerified: updatedUser.emailVerified,
+        image: updatedUser.image,
+        addresses: updatedUser.addresses || [],
+        role: updatedUser.role,
+      };
 
     } catch (e) {
-        throw new Error(`La mise à jour de l'utilisateur a échouée`);
+      throw new Error(`La mise à jour de l'utilisateur a échouée`);
     }
-
-
+  } else {
+    throw new Error(`userId and token user are differents`);
+  }
 }
 
 export async function createUser(email: string, name: string, password: string): Promise<UserRegisterDto> {
   try {
-      const hashedPassword: string = await bcrypt.hash(password, 10);
-      const token = crypto.randomBytes(32).toString('hex');
-      const tokenExpiration = new Date(Date.now() + 60 * 60 * 1000);
+    const hashedPassword: string = await bcrypt.hash(password, 10);
+    const token: string = crypto.randomBytes(32).toString('hex');
+    const tokenExpiration: Date = new Date(Date.now() + 60 * 60 * 1000);
 
-      const user = await prisma.user.create({
-          data: {
-              email,
-              name,
-              password: hashedPassword,
-              role: "USER",
-              verificationTokenEmail: token,
-              verificationTokenExpiresEmail: tokenExpiration 
-          },
-      });
+    const user = await prisma.user.create({
+      data: {
+        email,
+        name,
+        password: hashedPassword,
+        role: 'USER',
+        verificationTokenEmail: token,
+        verificationTokenExpiresEmail: tokenExpiration
+      },
+    });
 
-      await sendWelcomeEmail(user.email!, user.name!, token, false);
+    await sendWelcomeEmail(user.email!, user.name!, token, false);
 
-      return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          password: "", 
-          emailVerified: user.emailVerified,
-          image: user.image,
-          role: user.role,
-      };
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: '',
+      emailVerified: user.emailVerified,
+      image: user.image,
+      role: user.role,
+    };
   } catch (error: unknown) {
+
     if (error instanceof Error && (error as any).code === 'P2002' && (error as any).meta?.target?.includes('email')) {
-        throw new Error("Cet email est déjà utilisé.");
+      throw new Error('Cet email est déjà utilisé.');
+
     } else {
-        console.error("Erreur lors de la création de l'utilisateur : ", error);
-        throw new Error("Erreur lors de la création de l'utilisateur. Veuillez réessayer plus tard.");
+      console.error('Erreur lors de la création de l\'utilisateur : ', error);
+      throw new Error('Erreur lors de la création de l\'utilisateur. Veuillez réessayer plus tard.');
     }
-}
+  }
 }
 
-export async function updatePassword({userId, oldPassword, newPassword}: UpdatePasswordDto) {
+export async function updatePassword({ userId, oldPassword, newPassword }: UpdatePasswordDto) {
   try {
-    await verifyAuth(["USER", "ADMIN"]);
+    const verify = await verifyAuth(['USER', 'ADMIN']);
 
     if (!userId) {
-      throw new Error("L'ID utilisateur est requis pour mettre à jour le mot de passe.");
+      throw new Error('L\'ID utilisateur est requis pour mettre à jour le mot de passe.');
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { password: true },
-    });
+    if (verify && verify.user.id === userId) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { password: true },
+      });
 
-    if (!user) {
-      throw new Error("Utilisateur non trouvé.");
+      if (!user) {
+        throw new Error('Utilisateur non trouvé.');
+      }
+
+      if (!user.password) {
+        throw new Error('Ce compte est associé à Google. Veuillez gérer le mot de passe depuis votre compte Google.');
+      }
+
+      const isOldPasswordValid: boolean = await bcrypt.compare(oldPassword, user.password);
+      if (!isOldPasswordValid) {
+        throw new Error('L\'ancien mot de passe est incorrect.');
+      }
+
+      const isSameAsOldPassword: boolean = await bcrypt.compare(newPassword, user.password);
+      if (isSameAsOldPassword) {
+        throw new Error('Le nouveau mot de passe doit être différent de l\'ancien mot de passe.');
+      }
+
+      const hashedPassword: string = await bcrypt.hash(newPassword, 10);
+
+      await prisma.user.update({
+        where: { id: userId },
+        data: { password: hashedPassword },
+      });
+
+      return { message: 'Mot de passe mis à jour avec succès.' };
+    } else {
+      throw new Error(`userId and token user are differents`);
     }
-
-    if (!user.password) {
-      throw new Error("Ce compte est associé à Google. Veuillez gérer le mot de passe depuis votre compte Google.");
-    }
-
-    const isOldPasswordValid: boolean = await bcrypt.compare(oldPassword, user.password);
-    if (!isOldPasswordValid) {
-      throw new Error("L'ancien mot de passe est incorrect.");
-    }
-
-    const isSameAsOldPassword: boolean = await bcrypt.compare(newPassword, user.password);
-    if (isSameAsOldPassword) {
-      throw new Error("Le nouveau mot de passe doit être différent de l'ancien mot de passe.");
-    }
-
-    const hashedPassword: string = await bcrypt.hash(newPassword, 10);
-
-    await prisma.user.update({
-      where: { id: userId },
-      data: { password: hashedPassword },
-    });
-
-    return { message: "Mot de passe mis à jour avec succès." };
-
   } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-    throw new Error("Une erreur est survenue lors de la mise à jour du mot de passe.");
+    throw new Error('Une erreur est survenue lors de la mise à jour du mot de passe.');
   }
 }
-
 
 export async function requestPasswordReset(email: string): Promise<void> {
   try {
@@ -165,11 +174,11 @@ export async function requestPasswordReset(email: string): Promise<void> {
     });
 
     if (!user) {
-      throw new Error("Utilisateur non trouvé.");
+      throw new Error('Utilisateur non trouvé.');
     }
 
     if (!user.password) {
-      throw new Error("Ce compte est associé à Google. Veuillez gérer le mot de passe depuis votre compte Google.");
+      throw new Error('Ce compte est associé à Google. Veuillez gérer le mot de passe depuis votre compte Google.');
     }
 
     const token: string = crypto.randomBytes(32).toString('hex');
@@ -181,7 +190,7 @@ export async function requestPasswordReset(email: string): Promise<void> {
     };
 
     if (!resetData.resetToken || !resetData.resetTokenExpires) {
-      throw new Error("Token ou expiration manquants.");
+      throw new Error('Token ou expiration manquants.');
     }
 
     await prisma.user.update({
@@ -195,47 +204,45 @@ export async function requestPasswordReset(email: string): Promise<void> {
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-    throw new Error("Une erreur est survenue lors de la demande de réinitialisation.");
+    throw new Error('Une erreur est survenue lors de la demande de réinitialisation.');
   }
 }
 
-
 export async function resetPassword(token: string, newPassword: string): Promise<void> {
   try {
-    const user = await prisma.user.findFirst({
+    const user: User | null = await prisma.user.findFirst({
       where: {
-        resetToken: token, 
-        resetTokenExpires: { gte: new Date() },  
+        resetToken: token,
+        resetTokenExpires: { gte: new Date() },
       },
     });
 
-
     if (!user) {
-      throw new Error("Token invalide ou expiré.");
+      throw new Error('Token invalide ou expiré.');
     }
 
-    console.log("Hachage du nouveau mot de passe...");
+    console.log('Hachage du nouveau mot de passe...');
     const hashedPassword: string = await bcrypt.hash(newPassword, 10);
+    console.log('Mise à jour du mot de passe...');
 
-    console.log("Mise à jour du mot de passe...");
     await prisma.user.update({
       where: { id: user.id },
       data: {
         password: hashedPassword,
-        resetToken: null,  
-        resetTokenExpires: null, 
+        resetToken: null,
+        resetTokenExpires: null,
       },
     });
 
-    console.log("Mot de passe réinitialisé avec succès.");
+    console.log('Mot de passe réinitialisé avec succès.');
 
   } catch (error) {
-    console.error("Erreur dans la réinitialisation du mot de passe:", error);
+    console.error('Erreur dans la réinitialisation du mot de passe:', error);
 
     if (error instanceof Error) {
-      throw new Error(error.message);  
+      throw new Error(error.message);
     }
-    throw new Error("Une erreur est survenue lors de la réinitialisation du mot de passe. Veuillez réessayer.");
+    throw new Error('Une erreur est survenue lors de la réinitialisation du mot de passe. Veuillez réessayer.');
   }
 }
 

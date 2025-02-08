@@ -3,12 +3,14 @@
 import OpenAI from "openai";
 import { getAllProducts } from "../products/product";
 import { ResponseFormatJSONSchema } from "openai/resources/shared.mjs";
+import { verifyAuth } from '@/app/core/verifyAuth';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || ""
 });
 
 export async function analysePicture(format: string = 'recipe', imageUrl: string) {
+  await verifyAuth(['ADMIN', 'USER']);
   try {
     const data = {
       recipe: {
@@ -126,6 +128,7 @@ export async function analysePicture(format: string = 'recipe', imageUrl: string
 }
 
 export async function generateRecipes(format: string, complement: string = "", products?: any, recipeName?: string) {
+  await verifyAuth(['ADMIN', 'USER']);
   try {
     let formattedIngredients: string | null = null
 

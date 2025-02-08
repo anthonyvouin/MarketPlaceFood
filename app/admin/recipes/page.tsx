@@ -61,7 +61,7 @@ export default function RecipesAdminPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10">
+        <div className="min-h-screen bg-primaryBackgroundColor flex flex-col items-center py-10">
             <div className="p-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Gestion des Recettes</h1>
 
