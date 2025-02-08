@@ -56,9 +56,10 @@ const PasswordUpdatePage: React.FC = () => {
     };
 
     return (
-        <div className="h-[85vh] flex items-center justify-center bg-primaryBackgroundColor overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-primaryBackgroundColor overflow-hidden">
             <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg max-w-4xl mx-4 p-6 md:p-10 space-y-6 md:space-y-0 md:space-x-10">
                 <div className="md:w-1/2 flex flex-col justify-center">
+
                     <h1 className="text-2xl font-semibold text-darkActionColor mb-4">Mise à jour du mot de passe</h1>
                     <p className="text-gray-600 mb-6">
                         Pour des raisons de sécurité, nous vous recommandons de changer régulièrement votre mot de passe.

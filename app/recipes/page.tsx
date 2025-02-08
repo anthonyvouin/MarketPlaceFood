@@ -38,7 +38,7 @@ export default function RecipesPage() {
     const [ingredientsDialogVisible, setIngredientsDialogVisible] = useState(false);
     const [recipeName, setRecipeName] = useState("");
     const [selectedFormat, setSelectedFormat] = useState("");
-    
+
     const router = useRouter();
 
     async function handleImageUpload(formData) {
@@ -171,13 +171,13 @@ export default function RecipesPage() {
                     fetchedRecipes = (fetchedRecipes as unknown as { recipes: RecipeDto[] })?.recipes;
                 }
             }
-            
+
             let favoriteRecipesIds: string[] = [];
             if (session?.user?.id) {
                 const favoriteRecipes = await getUserFavoriteRecipes(session.user.id);
                 favoriteRecipesIds = favoriteRecipes?.recipes.map(recipe => recipe.id) || [];
             }
-            
+
             console.log(fetchedRecipes);
             setRecipes(fetchedRecipes.map(recipe => ({
                 ...recipe,

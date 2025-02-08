@@ -41,8 +41,8 @@ export default function HeaderClient(): JSX.Element {
                     aria-label="Ouvrir le menu"
                 />
                 <Link href="/" className="flex items-center gap-2 cursor-pointer">
-                    <Image src="/images/logo.svg" width={35} height={35} alt="Snap&Shop Logo" />
-                    <h2 className="text-lg font-extrabold text-actionColor tracking-wide uppercase font-manrope">Snap&Shop</h2>
+                    <Image src="/images/snap&shop.png" width={35} height={35} alt="Snap&Shop Logo" />
+                  <h2 className="text-lg font-extrabold text-actionColor tracking-wide uppercase font-manrope">Snap&Shop</h2>
                 </Link>
 
                 {pathname.startsWith("/profil")
@@ -103,8 +103,9 @@ export default function HeaderClient(): JSX.Element {
                 ) : (
                     <Link
                         href="/login"
-                        className="flex items-center gap-2 text-actionColor font-semibold border-2 border-actionColor hover:text-white hover:bg-actionColor transition-all duration-300 transform hover:scale-105 px-4 py-2 rounded-md"
-                        aria-label="Se connecter"
+                        className="flex items-center gap-2 text-actionColor font-semibold border-2 border-actionColor flex-row
+                            hover:text-white hover:bg-actionColor transition-all duration-300 transform hover:scale-105 px-4 py-2 rounded-md"
+                        aria-label="Connexion"
                         role="button"
                     >
                         <span className='text-sm md:text-lg'>Connexion</span>
@@ -167,5 +168,5 @@ export default function HeaderClient(): JSX.Element {
                 </div>
             )}
         </header>
-    );
+    )
 }
