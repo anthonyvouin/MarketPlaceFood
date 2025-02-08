@@ -1,6 +1,7 @@
 "use server"
 
 import {Prisma, PrismaClient, Product, MissingIngredientReport} from '@prisma/client';
+import { verifyAuth } from '@/app/core/verifyAuth';
 
 export interface MissingIngredientReportDto extends MissingIngredientReport {
     product: Product;
@@ -9,6 +10,7 @@ export interface MissingIngredientReportDto extends MissingIngredientReport {
 const prisma = new PrismaClient();
 
 export async function getMissingIngredientReports(): Promise<any[]> {
+    await verifyAuth(['ADMIN']);
     try {
         return await prisma.missingIngredientReport.findMany();
     } catch (error) {
@@ -18,6 +20,7 @@ export async function getMissingIngredientReports(): Promise<any[]> {
 }
 
 export async function getMissingIngredientReportById(id: string): Promise<any> {
+    await verifyAuth(['ADMIN']);
     try {
         return await prisma.missingIngredientReport.findUnique({
             where: {id},
@@ -29,6 +32,7 @@ export async function getMissingIngredientReportById(id: string): Promise<any> {
 }
 
 export async function createOrUpdateMissingIngredientReport(data: Prisma.MissingIngredientReportCreateInput): Promise<any> {
+    await verifyAuth(['ADMIN', 'USER']);
     try {
         const existingReport = await prisma.missingIngredientReport.findFirst({
             where: {

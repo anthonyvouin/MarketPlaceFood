@@ -50,7 +50,6 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
         const {updateProductList} = useCart();
         const [visibility, setVisibility] = useState<boolean>(false);
         const [clientCart, setClientCart] = useState<CartDto | null>(defaultClientCart);
-
         const renderCount = useRef(0);
         const router: AppRouterInstance = useRouter();
 
@@ -60,11 +59,15 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
             if (session) {
 
                 const fetchCart = async () => {
-                    const clientCart: CartDto | null = await getClientCart(session.user.id);
-                    if (clientCart) {
-                        setClientCart(clientCart)
-                    }
-
+                   await getClientCart(session.user.id).then((response: CartDto| null)=>{
+                      if (response) {
+                        setClientCart(response)
+                      }
+                    }, (e)=> {
+                      if(e.message.includes("STOREKEEPER") && (window.location.pathname === '/' ||window.location.pathname === '/products' || window.location.pathname === '/recipes' )){
+                          router.push('/admin/product')
+                      }
+                    });
                 };
                 fetchCart()
             }
@@ -115,7 +118,8 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
         }
 
         const handleChangeQuantityProduct = async (changeItem: CartItemDto, action: 'add' | 'remove' | 'deleteProduct' = "add"): Promise<void> => {
-            if (clientCart && clientCart.id) {
+
+          if (clientCart && clientCart.id) {
                 let updateCart: CartDto;
                 if (action === 'add') {
                     updateCart = await addQuantityToProductInCart(changeItem)
