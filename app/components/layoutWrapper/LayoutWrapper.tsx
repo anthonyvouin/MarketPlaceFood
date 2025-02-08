@@ -33,7 +33,6 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                                     <div className="bg-primaryBackgroundColor">
                                         {children}
                                     </div>
-                                    <Footer/>
                                 </div>
                             </div>
                         </SideBarBasketProvider>
@@ -55,7 +54,7 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                                 <div className=" bg-primaryBackgroundColor">
                                     {children}
                                 </div>
-                                <Footer/>
+                                    <Footer/>
                             </div>
                         </div>
                     </SideBarBasketProvider>
