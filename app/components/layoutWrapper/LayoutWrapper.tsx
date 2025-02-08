@@ -54,7 +54,7 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                                 <div className=" bg-primaryBackgroundColor">
                                     {children}
                                 </div>
-                                    <Footer/>
+                                {pathname !== "/" && <Footer/>}
                             </div>
                         </div>
                     </SideBarBasketProvider>
