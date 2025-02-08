@@ -93,14 +93,14 @@ export default function ShippingPage() {
 
     if (loading) {
         return (
-            <div className="h-[84vh] flex items-center justify-center bg-primaryBackgroundColor">
+            <div className="min-h-screen  flex items-center justify-center bg-primaryBackgroundColor">
                 <p className="text-lg font-semibold text-gray-700">Chargement des adresses...</p>
             </div>
         );
     }
 
     return (
-        <div className="h-full flex items-center justify-center pt-20">
+        <div className="min-h-screen bg-primaryBackgroundColor flex items-center justify-center pt-20">
             <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 md:p-10">
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold text-darkActionColor">Adresse de livraison</h1>
