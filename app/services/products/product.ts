@@ -5,6 +5,7 @@ import { Prisma, PrismaClient, Product } from '@prisma/client';
 import { ProductDto } from '@/app/interface/product/productDto';
 import { CategoryDto } from '@/app/interface/category/categoryDto';
 import { DiscountDto } from '@/app/interface/discount/discountDto';
+import { uploadImageToCloudinary } from '@/lib/uploadImage';
 
 const prisma = new PrismaClient();
 
@@ -275,7 +276,8 @@ export async function getImageFromPixabay(name: string): Promise<string> {
 
     for (const hit of data.hits) {
       if (hit.webformatURL && hit.webformatURL.match(/^https?:\/\/.+/)) {
-        return hit.webformatURL;
+        const cloudinaryUrl = await uploadImageToCloudinary(hit.webformatURL);
+        return cloudinaryUrl;
       }
     }
 

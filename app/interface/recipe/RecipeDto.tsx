@@ -1,6 +1,7 @@
 import { RecipeStepDto } from "./RecipeStepDto";
 
 export interface RecipeDto {
+    isFavorite: boolean | undefined;
     englishName?: string;
     id: string;
     slug: any;

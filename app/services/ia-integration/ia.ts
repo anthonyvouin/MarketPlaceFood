@@ -10,7 +10,6 @@ const openai = new OpenAI({
 
 export async function analysePicture(format: string = 'recipe', imageUrl: string) {
   try {
-    // Définir les prompts en fonction du format
     const data = {
       recipe: {
         prompt: "Je vais te fournir l'image d'un plat cuisiné. Analyse l'image et donne moi le nom du plat et ensuite décris le plat en identifiant les ingrédients principaux. Pour chaque ingrédient, indique la quantité nécessaire afin de pouvoir refaire le plat pour une personne. La description doit être précise et détaillée, en mentionnant les éléments visibles",
@@ -90,14 +89,26 @@ export async function analysePicture(format: string = 'recipe', imageUrl: string
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        {
-          role: "user",
-          content: prompt
-        },
-        {
-          role: "user",
-          content: imageUrl
-        }
+      {
+        role: "system",
+        content: "Tu es un assistant culinaire expert en analyse d'images et en génération de recettes. Ton objectif est de fournir des recettes précises et détaillées basées sur l'analyse d'images de plats cuisinés ou de réfrigérateurs."
+      },
+      {
+        role: "user",
+        content: prompt
+      },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: "Image de la recette à analyser" },
+          {
+              type: "image_url",
+              image_url: {
+                  "url": imageUrl,
+              },
+          }
+      ],
+      }
       ],
       response_format: data[format].response_format as ResponseFormatJSONSchema
     });
@@ -130,7 +141,7 @@ export async function generateRecipes(format: string, complement: string = "", p
         break;
       case "generate-recipes-from-cart":
         formattedIngredients = JSON.stringify(products)
-        prompt = "Je vais te fournir une liste d'ingrédients alimentaires. À partir de cette liste, tu devras créer un tableau de recettes (maximum 1 recette). Chaque recette sera cohérente, délicieuse et réalisable avec les ingrédients fournis. La cohérence entre les ingrédients est essentielle : chaque recette sera construite de manière logique avec des ingrédients qui se marient bien ensemble. J'utiliserai uniquement les ingrédients de la liste, ainsi que du sel et du poivre.";
+        prompt = "Je vais te fournir une liste d'ingrédients alimentaires. À partir de cette liste, tu devras créer un tableau de recettes. Une seule recette maximum. Chaque recette sera cohérente, délicieuse et réalisable avec les ingrédients fournis. La cohérence entre les ingrédients est essentielle : chaque recette sera construite de manière logique avec des ingrédients qui se marient bien ensemble. J'utiliserai uniquement les ingrédients de la liste, ainsi que du sel et du poivre.";
         break;
       case "generate-recipe-from-image-of-recipe":
         formattedIngredients = JSON.stringify(products)
