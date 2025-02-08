@@ -15,6 +15,7 @@ function AdminSidebarNav() {
   const { data: session } = useSession();
 
   const adminLinks: SidebarLinks[] = [
+    { name: 'Accueil', href: '/', icon: 'pi pi-home', roles: ['ADMIN', 'STOREKEEPER'] },
     { name: 'Dashboard', href: '/admin/', icon: 'pi pi-chart-bar', roles: ['ADMIN'] },
     { name: 'Categories', href: '/admin/category', icon: 'pi pi-tags', roles: ['ADMIN'] },
     { name: 'Remises', href: '/admin/discount', icon: 'pi pi-percentage', roles: ['ADMIN'] },

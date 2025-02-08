@@ -130,14 +130,17 @@ export default function RevenueChart() {
     return (
         <div className="p-6 bg-primaryBackgroundColor h-full flex justify-center items-center">
             <div className="w-full" style={{ height: '600px' }}>
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-center items-center mb-6">
                     <h1 className="text-3xl font-bold text-gray-800 text-center">
                         Revenus en temps réel
                     </h1>
-                    <div className="flex items-center">
+                    <div className="flex items-center ml-12">
                         <span className={`h-3 w-3 rounded-full mr-2 ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></span>
                         <span className="text-sm text-gray-600">
                             {isConnected ? 'Connecté en temps réel' : 'Déconnecté'}
+
+
+
                         </span>
                     </div>
                 </div>
