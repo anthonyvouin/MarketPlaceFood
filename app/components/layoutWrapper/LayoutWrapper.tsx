@@ -8,6 +8,9 @@ import React from "react";
 import {CartProvider} from "@/app/provider/cart-provider";
 import {SideBarBasketProvider} from "@/app/provider/sideBar-cart-provider";
 import {ToastProvider} from "@/app/provider/toastProvider";
+import Footer from "@/app/components/footer/footer";
+
+
 
 export default function LayoutWrapper({children}: { children: React.ReactNode }) {
     const pathname: string = usePathname();
@@ -30,9 +33,11 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                                     <div className="bg-primaryBackgroundColor">
                                         {children}
                                     </div>
+                                    <Footer/>
                                 </div>
                             </div>
                         </SideBarBasketProvider>
+
                     </CartProvider>
                 </ToastProvider>
             </>
@@ -50,6 +55,7 @@ export default function LayoutWrapper({children}: { children: React.ReactNode })
                                 <div className=" bg-primaryBackgroundColor">
                                     {children}
                                 </div>
+                                <Footer/>
                             </div>
                         </div>
                     </SideBarBasketProvider>

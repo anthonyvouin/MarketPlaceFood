@@ -38,7 +38,7 @@ export default function HeaderClient(): JSX.Element {
                     onClick={toggleSidebar}
                 />
                 <Link href="/" className="items-center gap-2 cursor-pointer hidden md:flex">
-                    <Image src="/images/logo.svg" width={40} height={40} alt="Snap&Shop Logo" />
+                    <Image src="/images/snap&shop.png" width={40} height={40} alt="Snap&Shop Logo" />
                     <h2 className="text-sm md:text-xl font-extrabold text-actionColor tracking-wide uppercase font-manrope">Snap&Shop</h2>
                 </Link>
                 { pathname.startsWith("/profil") ? 
