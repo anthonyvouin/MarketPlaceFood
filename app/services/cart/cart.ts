@@ -31,7 +31,7 @@ export async function getTotalLengthItemsCart(userId: string): Promise<number> {
 
 export async function getClientCart(userId: string): Promise<CartDto | null> {
   const verify = await verifyAuth(['ADMIN', 'USER']);
-
+  console.log('ouvre le cart');
 
   if (verify && verify.user.id === userId) {
 
@@ -50,13 +50,20 @@ export async function getClientCart(userId: string): Promise<CartDto | null> {
             },
             cart: false,
           },
+          orderBy: {
+            product: {
+              name: 'asc'
+            }
+          }
         },
         user: true
       },
-
     });
 
     if (cart && cart.id) {
+      if (cart) {
+        cart.cartItems.sort((a, b) => a.product.name.localeCompare(b.product.name));
+      }
       const isSameTotalPrice: boolean = await checkIfTotalCartEqualTotalProductPrice(cart);
       console.log(isSameTotalPrice);
       if (!isSameTotalPrice) {
@@ -90,7 +97,7 @@ async function updatePriceItemCartAndCart(cart: CartDto): Promise<CartDto | null
                 discount: true
               }
             }
-          }
+          },
         });
       }
     }
@@ -161,6 +168,9 @@ export async function updateItemCart(cartItemId: string | undefined, quantity: n
           discount: true
         }
       }
+    },
+    orderBy: {
+      product: { name: 'asc' }
     }
   });
 
@@ -270,6 +280,9 @@ export async function updateTotalCartPrice(cartId: string, cartItems: CartItemDt
           }
         }
       },
+      orderBy: {
+        product: { name: 'asc' }
+      }
     });
   }
 
@@ -289,7 +302,7 @@ export async function updateTotalCartPrice(cartId: string, cartItems: CartItemDt
   const verify = await verifyAuth(['ADMIN', 'USER']);
 
   if (verify && verify.user.id === cart.userId) {
-    return prisma.cart.update({
+    const newCart: CartDto = await prisma.cart.update({
       where: { id: cartId },
       data: {
         totalPrice,
@@ -308,6 +321,13 @@ export async function updateTotalCartPrice(cartId: string, cartItems: CartItemDt
         }
       }
     });
+
+    if (newCart) {
+      newCart.cartItems.sort((a, b) => a.product.name.localeCompare(b.product.name));
+    }
+
+    return newCart;
+
   } else {
     throw new Error('User Id and owner cart are differents');
   }
