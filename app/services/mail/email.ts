@@ -188,12 +188,9 @@ export const sendEmailSendOrder = async (email: string, orderDetails: {
                 ${orderDetails.products.map((product: PrepOrderItemsDto) => {
       return `
                       <div style="display: flex; align-items: center; flex-wrap: wrap;">
-                        <img src=${product.product.image} alt="image du produit" style="width: 50px; height: 50px; object-fit: contain; margin-right: 10px">
-                        <div>
                           <p><strong>Nom du produit :</strong> ${product.product.name}</p>
                           <p><strong>Quantité :</strong> ${product.quantity}</p>
                           <p><strong>Prix :</strong> ${(product.unitPrice / 100).toFixed(2)}€</p>
-                        </div>
                       </div>
                     `;
     })
