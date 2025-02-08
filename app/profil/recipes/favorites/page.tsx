@@ -25,6 +25,10 @@ export default function RecipesPage() {
         setLoading(false);
     }
 
+    const handleUnfavorite = (recipeId) => {
+        setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe.id !== recipeId));
+    };
+
     return (
         <div className="min-h-[85vh] flex flex-col items-center bg-primaryBackgroundColor p-4">
 
@@ -37,6 +41,8 @@ export default function RecipesPage() {
                             <RecipeCard
                                 key={index}
                                 recipe={recipe}
+                                favorite={true}
+                                onUnfavorite={() => handleUnfavorite(recipe.id)}
                             />
                         ))}
                     </div>

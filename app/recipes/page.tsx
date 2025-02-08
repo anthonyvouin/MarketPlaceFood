@@ -178,7 +178,6 @@ export default function RecipesPage() {
                 favoriteRecipesIds = favoriteRecipes?.recipes.map(recipe => recipe.id) || [];
             }
             
-            console.log(fetchedRecipes);
             setRecipes(fetchedRecipes.map(recipe => ({
                 ...recipe,
                 isFavorite: favoriteRecipesIds.includes(recipe.id),

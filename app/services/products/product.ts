@@ -5,7 +5,7 @@ import { Prisma, PrismaClient, Product } from '@prisma/client';
 import { ProductDto } from '@/app/interface/product/productDto';
 import { CategoryDto } from '@/app/interface/category/categoryDto';
 import { DiscountDto } from '@/app/interface/discount/discountDto';
-import { uploadImageToCloudinary } from '@/lib/uploadImage';
+import { uploadImageToCloudinary } from '../../../lib/uploadImage';
 
 const prisma = new PrismaClient();
 

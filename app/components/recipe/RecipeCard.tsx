@@ -7,7 +7,7 @@ import { getUserFavoriteRecipes, toggleRecipeFavorite } from "@/app/services/rec
 import { useContext, useEffect, useState } from "react";
 import { ToastContext } from "@/app/provider/toastProvider";
 
-const RecipeCard = ({ recipe, favorite = false }: { recipe: RecipeDto, favorite?: boolean }) => {
+const RecipeCard = ({ recipe, favorite = false, onUnfavorite }: { recipe: RecipeDto, favorite?: boolean, onUnfavorite?: () => void }) => {
     const [isRecipeFavorite, setIsRecipeFavorite] = useState(favorite);
     const { data: sessionData } = useSession();
     const { show } = useContext(ToastContext);
@@ -21,6 +21,9 @@ const RecipeCard = ({ recipe, favorite = false }: { recipe: RecipeDto, favorite?
         try {
             const response = await toggleRecipeFavorite(recipe.id, sessionData.user.id);
             setIsRecipeFavorite(response.isFavorited);
+            if (response.isFavorited === false && onUnfavorite) {
+                onUnfavorite();
+            }
             show(response.isFavorited ? "Recette ajoutée aux favoris" : "Recette retirée des favoris", "", "success");
         } catch (error) {
             console.error("Erreur lors de l'ajout aux favoris:", error);
