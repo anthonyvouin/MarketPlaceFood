@@ -56,7 +56,7 @@ export default function Products() {
       params.set('page', currentPage.toString());
     }
 
-    router.push(`/products?${params.toString()}`);
+    router.replace(`/products?${params.toString()}`, { scroll: false });
   };
 
   const loadFiltersFromURL = () => {
