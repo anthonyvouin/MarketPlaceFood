@@ -5,10 +5,11 @@ import { useSession } from "next-auth/react";
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { getUserFavoriteRecipes } from "@/app/services/recipes";
 import RecipeCard from "@components/recipe/RecipeCard";
+import { RecipeDto } from "@/app/interface/recipe/RecipeDto";
 
 export default function RecipesPage() {
     const { data: session } = useSession();
-    const [recipes, setRecipes] = useState([]);
+    const [recipes, setRecipes] = useState<RecipeDto[]>([]);
 
     const [loading, setLoading] = useState(false);
 
