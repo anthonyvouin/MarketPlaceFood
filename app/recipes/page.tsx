@@ -187,7 +187,7 @@ export default function RecipesPage() {
     }
 
     return (
-        <div className="min-h-[85vh] flex flex-col items-center bg-primaryBackgroundColor p-4">
+        <div className="min-h-screen flex flex-col items-center bg-primaryBackgroundColor p-4">
             <Card className="w-full max-w-4xl shadow-2 mb-6" title="Recettes">
                 <p className="text-gray-700 mb-6">
                     Découvrez nos délicieuses recettes et régalez-vous en famille ou entre amis.
