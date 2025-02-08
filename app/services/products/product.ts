@@ -6,6 +6,7 @@ import { ProductDto } from '@/app/interface/product/productDto';
 import { CategoryDto } from '@/app/interface/category/categoryDto';
 import { DiscountDto } from '@/app/interface/discount/discountDto';
 import { uploadImageToCloudinary } from '@/lib/uploadImage';
+import { verifyAuth } from '@/app/core/verifyAuth';
 
 const prisma = new PrismaClient();
 
@@ -22,7 +23,7 @@ const fuseOptions = {
 };
 
 export async function createProduct(product: ProductDto): Promise<ProductDto> {
-
+  await verifyAuth(['ADMIN', 'STOREKEEPER']);
   if (!product.image) {
     product.image = '/images/default-image.png';
   }
@@ -310,18 +311,6 @@ export async function searchProduct(name: string, minScore: number = 0.36): Prom
   }
 }
 
-export async function getProductById(id: string): Promise<ProductDto | null> {
-  try {
-    return await prisma.product.findUnique({
-      where: { id },
-      include: { category: true, discount: true },
-    });
-  } catch (error) {
-    console.error('Erreur lors de la récupération du produit :', error);
-    throw new Error('La récupération du produit a échoué.');
-  }
-}
-
 export async function getProductBySlug(slug: string): Promise<ProductDto | null> {
   try {
     return await prisma.product.findUnique({
@@ -377,6 +366,7 @@ export async function filterProduct(filters: {
 }
 
 export async function changeDiscount(product: ProductDto | null, discount: DiscountDto | null): Promise<ProductDto> {
+  await verifyAuth(['ADMIN', 'STOREKEEPER']);
   if (!product) {
     throw Error('produit non définit');
   }
@@ -410,6 +400,8 @@ export async function changeDiscount(product: ProductDto | null, discount: Disco
 }
 
 export async function toggleProductVisibility(productId: string, visible: boolean): Promise<void> {
+  await verifyAuth(['ADMIN', 'STOREKEEPER']);
+
   try {
 
 
@@ -429,6 +421,7 @@ export async function toggleProductVisibility(productId: string, visible: boolea
 }
 
 export async function toggleProductHighlighting(productId: string): Promise<ProductDto> {
+  await verifyAuth(['ADMIN', 'STOREKEEPER']);
   const product: Product | null = await prisma.product.findUnique({ where: { id: productId } });
 
   if (!product) {
@@ -441,6 +434,8 @@ export async function toggleProductHighlighting(productId: string): Promise<Prod
 }
 
 export async function updateStock(productId: string, stock: number, action: 'add' | 'delete') {
+  await verifyAuth(['ADMIN', 'STOREKEEPER']);
+
   if (action === 'add') {
     return prisma.product.update({
       where: { id: productId },

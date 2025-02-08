@@ -2,10 +2,12 @@
 
 import { formatPriceEuro } from '@/app/pipe/formatPrice';
 import { PrismaClient } from '@prisma/client';
+import { verifyAuth } from '@/app/core/verifyAuth';
 
 const prisma = new PrismaClient();
 
 export async function getTotalOrderCount(): Promise<number> {
+    await verifyAuth(['ADMIN']);
     try {
         const totalOrderCount: number = await prisma.order.count();
 
@@ -18,6 +20,7 @@ export async function getTotalOrderCount(): Promise<number> {
 
 
 export async function getTotalUserCount(): Promise<number> {
+    await verifyAuth(['ADMIN']);
     try {
         const totalUserCount: number = await prisma.user.count(); 
         return totalUserCount;
