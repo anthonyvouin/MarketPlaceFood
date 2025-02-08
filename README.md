@@ -37,7 +37,7 @@ Vous pouvez accéder au projet en ligne à l'adresse suivante : [Snap&Shop](http
 - **Interface réactive** : Conçue pour être utilisée sur tous les appareils.
 - **Intelligence artificielle** :
     - Génération de recettes en fonction des articles présents dans le panier de l'utilisateur.
-     - Ajout d'une fonctionnalité permettant à l'utilisateur de mettre une photo de sonfrigo. L'IA analysera l'image pour identifier les aliments disponibles et proposera des recettes adaptées en fonction des ingrédients détectés.
+     - Ajout d'une fonctionnalité permettant à l'utilisateur de mettre une photo de son frigo. L'IA analysera l'image pour identifier les aliments disponibles et proposera des recettes adaptées en fonction des ingrédients détectés.
 
 
 ## Rôles et Permissions
