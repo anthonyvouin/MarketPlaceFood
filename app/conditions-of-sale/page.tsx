@@ -2,10 +2,11 @@ import React from 'react';
 
 const ConditionsOfSale = () => {
   return (
-    <div className=" bg-primaryBackgroundColor flex justify-center py-10">
+    <div className=" bg-primaryBackgroundColor flex justify-center py-10 mt-14">
       <div className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-lg">
         <h1 className="text-center text-2xl font-bold mb-8">Conditions Générales de Vente (CGV)</h1>
         
+
         <section className="mb-6">
           <h2 className="text-xl font-semibold mb-3">1. Objet</h2>
           <p className="mb-1">Les présentes Conditions Générales de Vente (CGV) régissent les modalités de vente des produits et services proposés sur le site Snap&Shop dans le cadre de ce projet scolaire.</p>

@@ -2,7 +2,7 @@ import React from 'react';
 
 const PrivacyPolicy = () => {
   return (
-    <div className="bg-primaryBackgroundColor flex justify-center py-10">
+    <div className="bg-primaryBackgroundColor flex justify-center py-10 mt-14">
       <div className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-lg">
         <h1 className="text-center text-2xl font-bold mb-8">Politique de Confidentialité & Protection des Données (RGPD)</h1>
         

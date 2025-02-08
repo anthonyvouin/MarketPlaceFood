@@ -2,10 +2,11 @@ import React from 'react';
 
 const LegalNotices = () => {
   return (
-    <div className="bg-primaryBackgroundColor flex justify-center py-10">
+    <div className="bg-primaryBackgroundColor flex justify-center py-10 mt-14">
       <div className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-lg">
         <h1 className="text-center text-3xl font-bold mb-8">Mentions Légales</h1>
         
+
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">1. Identification de l'entreprise</h2>
           <p className="mb-2"><strong>Nom de l'entreprise :</strong> Snap&Shop</p>
