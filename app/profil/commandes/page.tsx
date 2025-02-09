@@ -165,7 +165,7 @@ const Commandes = () => {
               <div className="flex flex-col md:flex-row  items-start md:items-center">
                 <p className="font-bold text-lg mr-5">Commande #{order.id}</p>
                 <Tag value={statusInFrench(order.status)}
-                     className={`${statusInFrench(order.status) === 'Paiement réussi' ? 'bg-actionColor' : 'bg-primaryColor'} mb-8 md:mb-0`}></Tag>
+                     className={`${order.status === 'PAYMENT_SUCCEDED' || order.status === 'SEND' ? 'bg-actionColor' : order.status === 'PAYMENT_FAILED' ? 'bg-primaryColor' : 'bg-info'} mb-8 md:mb-0`}></Tag>
               </div>
 
               <p>Total : {(order.totalAmount / 100).toFixed(2)} €</p>

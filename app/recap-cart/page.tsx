@@ -119,6 +119,7 @@ export default function RecapCart() {
                                         alt={item.product.name}
                                         width={40} height={40}
                                         className="w-16 h-16 object-contain rounded-md"
+                                        unoptimized
                                     />
                                 </Link>
 

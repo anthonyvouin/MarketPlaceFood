@@ -227,7 +227,6 @@ export async function getRecipeById(id: string): Promise<any> {
 }
 
 export async function getRandomRecipes(limit): Promise<any> {
-    await verifyAuth(['ADMIN', 'USER']);
     try {
         const recipes = await prisma.recipe.findMany({
             orderBy: {
@@ -261,7 +260,6 @@ export async function getRandomRecipes(limit): Promise<any> {
 
 // Récupérer toutes les recettes
 export async function getAllRecipes(page = 1, limit = 10, filter = {}, orderBy = {}): Promise<any> {
-    await verifyAuth(['ADMIN', 'USER']);
     try {
         const skip = (page - 1) * limit;
         const [recipes, total] = await Promise.all([

@@ -55,7 +55,7 @@ const PaymentForm: React.FC<PaymentFormPropsDto> = ({ clientSecret, userId, ship
         setSucceeded(true);
         setSideBarCart(null);
         updateProductList(null);
-        router.push('/profil/commandes')
+        router.push('/')
       }
 
     } catch (paymentError) {

@@ -15,6 +15,7 @@ import {formatPriceEuro} from "@/app/pipe/formatPrice";
 import {useRouter} from "next/navigation";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {addQuantityToProductInCart, removeQuantityToProductInCart} from "@/app/services/cart/functions-front";
+import { ToastContext } from '@provider/toastProvider';
 
 
 export const SideBarBasketContext: Context<SideBarBasketContextType> = createContext<SideBarBasketContextType>({
@@ -52,7 +53,7 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
         const [clientCart, setClientCart] = useState<CartDto | null>(defaultClientCart);
         const renderCount = useRef(0);
         const router: AppRouterInstance = useRouter();
-
+        const {show} = useContext(ToastContext)
 
         useEffect(() => {
             renderCount.current += 1;
@@ -174,6 +175,8 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
                         }
                     }
                 }
+            }else{
+              show('Erreur', 'Vous devez être connecté pour ajouter ce produit au panier', 'error')
             }
         }
 
@@ -191,7 +194,7 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
                          blockScroll={true}
                          className="relative bg-primaryBackgroundColor"
                 >
-                    <header className='sticky top-2.5 right-0 w-full h-20 border-b-actionColor border-b text-center bg-primaryBackgroundColor'>
+                    <header className='sticky top-0 right-0 w-full h-20 border-b-actionColor border-b text-center bg-primaryBackgroundColor'>
                       <div className='flex justify-center'>
                         <RoundedButton
                           onClickAction={goToDetailPanier}

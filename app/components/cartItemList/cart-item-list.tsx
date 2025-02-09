@@ -15,6 +15,7 @@ const CartItemList = ({product, updateProduct}: CartItemProps) => {
                         width={50}
                         height={50}
                         className="object-contain max-w-[50px] max-h-[50px] mr-2.5"
+                        unoptimized
                     />
                 </Link>
                 <div className="flex flex-col w-full">
