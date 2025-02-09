@@ -187,10 +187,10 @@ export const sendEmailSendOrder = async (email: string, orderDetails: {
                           
                 ${orderDetails.products.map((product: PrepOrderItemsDto) => {
       return `
-                      <div style="display: flex; align-items: center; flex-wrap: wrap;">
+                      <div style="display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
                           <p><strong>Nom du produit :</strong> ${product.product.name}</p>
-                          <p><strong>Quantité :</strong> ${product.quantity}</p>
-                          <p><strong>Prix :</strong> ${(product.unitPrice / 100).toFixed(2)}€</p>
+                          <p style="margin-left: 10px;"><strong>Quantité :</strong> ${product.quantity}</p>
+                          <p style="margin-left: 10px;"><strong>Prix :</strong> ${(product.unitPrice / 100).toFixed(2)}€</p>
                       </div>
                     `;
     })
