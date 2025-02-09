@@ -56,6 +56,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({ onSelect, onClose }) 
                     width={500}
                     height={500}
                     className="object-cover w-full h-full"
+                    unoptimized
                   />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-800 group-hover:text-primaryColor">

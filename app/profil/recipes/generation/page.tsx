@@ -26,22 +26,18 @@ export default function RecipesPage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col items-center bg-primaryBackgroundColor p-14 mt-14">
-
-            {loading ? (
-                <ProgressSpinner />
-            ) : (
-                recipes && recipes.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-6xl">
-                        {recipes.map((recipe, index) => (
-                            <RecipeCard
-                                key={index}
-                                recipe={recipe}
-                            />
-                        ))}
-                    </div>
-                )
-            )}
-        </div>
+      <div className="min-h-screen flex flex-col items-center bg-primaryBackgroundColor p-14 mt-14">
+          {loading ? (
+            <ProgressSpinner />
+          ) : recipes && recipes.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-6xl">
+                {recipes.map((recipe, index) => (
+                  <RecipeCard key={index} recipe={recipe} />
+                ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-lg mt-6">Aucune recette trouvée.</p>
+          )}
+      </div>
     );
 }
