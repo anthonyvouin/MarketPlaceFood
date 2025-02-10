@@ -43,10 +43,11 @@ const VerifyEmailPage = ({ searchParams }) => {
     }, [token]);
 
     return (
-        <div className="h-[85vh] flex items-center justify-center bg-primaryBackgroundColor overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-primaryBackgroundColor overflow-hidden">
             <div className="bg-white shadow-lg rounded-lg max-w-md mx-4 p-6">
                 <h1 className="text-3xl font-semibold text-darkActionColor mb-6 text-center">
                     Vérification de votre email
+
                 </h1>
 
                 <div className="mb-6">

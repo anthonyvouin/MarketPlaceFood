@@ -6,7 +6,7 @@ import {DefaultArgs} from "@prisma/client/runtime/binary";
 const prisma: PrismaClient<PrismaClientOptions, never, DefaultArgs> = new PrismaClient();
 
 async function fetchOpenFoodFactsProducts(): Promise<any> {
-    const url: string = "https://world.openfoodfacts.org/api/v2/search?fields=code,product_name_fr,generic_name_fr,categories_tags_fr,stores_tags,prices_tags,image_url&page_size=100&filter&page=20";
+    const url: string = "https://world.openfoodfacts.org/api/v2/search?fields=code,product_name_fr,generic_name_fr,categories_tags_fr,stores_tags,prices_tags,image_url&page_size=100&categories_tags=fruits,vegetables&page=1";
     try {
         const response: Response = await fetch(url);
         const data = await response.json();

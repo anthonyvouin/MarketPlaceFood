@@ -20,6 +20,7 @@ export async function getAllOrders() {
         },
         user: true,
       },
+      orderBy:{createdAt:'desc'}
     });
 
     return orders;

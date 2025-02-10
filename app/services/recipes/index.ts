@@ -4,6 +4,7 @@ import { PrismaClient, Prisma, RecipeType, Recipe } from '@prisma/client';
 import { searchProduct } from '../products/product';
 import { createOrUpdateMissingIngredientReport } from '../missingIngredientReport';
 import slugify from 'slugify';
+import { verifyAuth } from '@/app/core/verifyAuth';
 
 const prisma = new PrismaClient();
 
@@ -40,6 +41,7 @@ type UpdateRecipeInput = Partial<Omit<CreateRecipeInput, 'userId'>>;
 
 // Créer une recette
 export async function createRecipe(data: CreateRecipeInput, userId: string): Promise<unknown | null> {
+    await verifyAuth(['ADMIN', 'USER']);
     try {
 
         const { ingredients, steps, ...recipeData } = data;
@@ -163,6 +165,7 @@ export async function createRecipe(data: CreateRecipeInput, userId: string): Pro
 
 // Récupérer une recette par ID
 export async function getRecipeBySlug(slug: string): Promise<any> {
+    await verifyAuth(['ADMIN', 'USER']);
     try {
         const recipe = await prisma.recipe.findUnique({
             where: { slug: slug },
@@ -193,6 +196,7 @@ export async function getRecipeBySlug(slug: string): Promise<any> {
 }
 
 export async function getRecipeById(id: string): Promise<any> {
+    await verifyAuth(['ADMIN', 'USER']);
     try {
         const recipe = await prisma.recipe.findUnique({
             where: { id },
@@ -301,6 +305,7 @@ export async function getAllRecipes(page = 1, limit = 10, filter = {}, orderBy =
 
 // Mettre à jour une recette
 export async function updateRecipe(id: string, data: UpdateRecipeInput): Promise<any> {
+    await verifyAuth(['ADMIN', 'USER']);
     try {
         const { ingredients, steps, ...recipeData } = data;
 
@@ -351,6 +356,7 @@ export async function updateRecipe(id: string, data: UpdateRecipeInput): Promise
 
 // Supprimer une recette
 export async function deleteRecipe(id: string): Promise<any> {
+    await verifyAuth(['ADMIN']);
     try {
         await prisma.recipeIngredient.deleteMany({
             where: { recipeId: id }
@@ -377,6 +383,7 @@ export async function deleteRecipe(id: string): Promise<any> {
 
 // Basculer les favoris
 export async function toggleRecipeFavorite(recipeId: string, userId: string): Promise<any> {
+    await verifyAuth(['ADMIN', 'USER']);
     try {
         const recipe = await prisma.recipe.findUnique({
             where: { id: recipeId },
@@ -441,6 +448,7 @@ export async function getRecipesByType(type: RecipeType, page = 1, limit = 10): 
 
 // Récupérer les recettes favorites d'un utilisateur
 export async function getUserFavoriteRecipes(userId: string, page = 1, limit = 10): Promise<any> {
+    await verifyAuth(['ADMIN', 'USER']);
     try {
         return getAllRecipes(page, limit, { favoritedBy: { some: { id: userId } } });
     } catch (error) {
@@ -451,6 +459,7 @@ export async function getUserFavoriteRecipes(userId: string, page = 1, limit = 1
 
 // Récupérer les recettes créées par un utilisateur
 export async function getUserCreatedRecipes(userId: string, page = 1, limit = 10): Promise<any> {
+    await verifyAuth(['ADMIN', 'USER']);
     try {
         return getAllRecipes(page, limit, {
             createdBy: { id: userId }

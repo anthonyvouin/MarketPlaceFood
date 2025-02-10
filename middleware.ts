@@ -29,7 +29,7 @@ export async function middleware(req: NextRequest) {
             return NextResponse.redirect(new URL('/', req.url));
         }
 
-        if (!isStorekeeperPage && userRole === 'storekeeper'){
+        if ((!isStorekeeperPage || req.url === '/') && userRole === 'storekeeper'){
             return NextResponse.redirect(new URL('/admin/product', req.url));
         }
 

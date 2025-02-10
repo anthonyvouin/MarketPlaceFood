@@ -15,6 +15,7 @@ import {formatPriceEuro} from "@/app/pipe/formatPrice";
 import {useRouter} from "next/navigation";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {addQuantityToProductInCart, removeQuantityToProductInCart} from "@/app/services/cart/functions-front";
+import { ToastContext } from '@provider/toastProvider';
 
 
 export const SideBarBasketContext: Context<SideBarBasketContextType> = createContext<SideBarBasketContextType>({
@@ -50,21 +51,24 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
         const {updateProductList} = useCart();
         const [visibility, setVisibility] = useState<boolean>(false);
         const [clientCart, setClientCart] = useState<CartDto | null>(defaultClientCart);
-
         const renderCount = useRef(0);
         const router: AppRouterInstance = useRouter();
-
+        const {show} = useContext(ToastContext)
 
         useEffect(() => {
             renderCount.current += 1;
             if (session) {
 
                 const fetchCart = async () => {
-                    const clientCart: CartDto | null = await getClientCart(session.user.id);
-                    if (clientCart) {
-                        setClientCart(clientCart)
-                    }
-
+                   await getClientCart(session.user.id).then((response: CartDto| null)=>{
+                      if (response) {
+                        setClientCart(response)
+                      }
+                    }, (e)=> {
+                      if(e.message.includes("STOREKEEPER") && (window.location.pathname === '/' ||window.location.pathname === '/products' || window.location.pathname === '/recipes' )){
+                          router.push('/admin/product')
+                      }
+                    });
                 };
                 fetchCart()
             }
@@ -115,7 +119,8 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
         }
 
         const handleChangeQuantityProduct = async (changeItem: CartItemDto, action: 'add' | 'remove' | 'deleteProduct' = "add"): Promise<void> => {
-            if (clientCart && clientCart.id) {
+
+          if (clientCart && clientCart.id) {
                 let updateCart: CartDto;
                 if (action === 'add') {
                     updateCart = await addQuantityToProductInCart(changeItem)
@@ -170,6 +175,8 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
                         }
                     }
                 }
+            }else{
+              show('Erreur', 'Vous devez être connecté pour ajouter ce produit au panier', 'error')
             }
         }
 
@@ -187,7 +194,7 @@ export const SideBarBasketProvider = ({children}: { children: ReactNode }) => {
                          blockScroll={true}
                          className="relative bg-primaryBackgroundColor"
                 >
-                    <header className='sticky top-2.5 right-0 w-full h-20 border-b-actionColor border-b text-center bg-primaryBackgroundColor'>
+                    <header className='sticky top-0 right-0 w-full h-20 border-b-actionColor border-b text-center bg-primaryBackgroundColor'>
                       <div className='flex justify-center'>
                         <RoundedButton
                           onClickAction={goToDetailPanier}

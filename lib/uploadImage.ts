@@ -1,14 +1,14 @@
 "use server"
 
 import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
-import cloudinary from 'cloudinary'; 
+import * as path from 'path';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; 
 const ALLOWED_FILE_TYPES = ['image/png', 'image/webp', 'image/jpeg'];
 
 
-cloudinary.v2.config({
+cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
@@ -20,8 +20,8 @@ export async function uploadTemporaryImageToCloudinary(formData: FormData): Prom
         throw new Error('Aucun fichier n\'a été téléchargé');
     }
     const buffer = Buffer.from(await file.arrayBuffer());
-    const result = await new Promise<cloudinary.UploadApiResponse>((resolve, reject) => {
-      const uploadStream = cloudinary.v2.uploader.upload_stream({
+    const result = await new Promise<UploadApiResponse>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream({
         folder: 'temp',
         resource_type: 'image',
         type: 'upload',
@@ -58,8 +58,8 @@ export async function uploadImageToCloudinary(input: FormData | string): Promise
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const result = await new Promise<cloudinary.UploadApiResponse>((resolve, reject) => {
-    const uploadStream = cloudinary.v2.uploader.upload_stream({
+  const result = await new Promise<UploadApiResponse>((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream({
     folder: 'uploads',
     resource_type: 'image',
     type: 'upload',

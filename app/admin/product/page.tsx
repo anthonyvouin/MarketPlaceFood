@@ -176,7 +176,8 @@ export default function ProductPage() {
   };
 
   return (
-    <div className="p-6 bg-primaryBackgroundColor h-full">
+    <div className="p-6 bg-primaryBackgroundColor min-h-screen">
+
 
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Produits</h1>
 

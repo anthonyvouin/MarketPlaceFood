@@ -81,7 +81,9 @@ export default function PrepOrderById() {
                          alt="photo du produit"
                          width={50}
                          height={50}
-                         className="mr-8 object-contain !h-[50px]"/>
+                         className="mr-8 object-contain !h-[50px]"
+                         unoptimized
+                  />
                   <div className="w-[80%]">
                     <p>Nom : {article.product.name}</p>
                     <p>Quantité : {article.quantity}</p>

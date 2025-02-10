@@ -62,9 +62,9 @@ export default function RecipesAdminPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10 px-6">
-            <div className="w-full max-w-6xl">
-                <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Gestion des Recettes</h1>
+        <div className="min-h-screen bg-primaryBackgroundColor flex flex-col items-center py-10">
+            <div className="p-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Gestion des Recettes</h1>
 
                 {loading && recipes.length === 0 ? (
                     <div className="flex justify-center py-20">
