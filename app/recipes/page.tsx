@@ -156,7 +156,9 @@ export default function RecipesPage() {
       if (fetchRandom) {
         fetchedRecipes = await getRandomRecipes(9);
       } else {
-        const result = await getAllRecipes(1, 12);
+        const result = await getAllRecipes(1, 12, {}, {
+          createdAt: 'desc',
+        });
         fetchedRecipes = result?.recipes || [];
       }
 
