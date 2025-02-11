@@ -251,7 +251,6 @@ export async function getImageFromPixabay(name: string): Promise<string> {
   }
 
   const apiKey = process.env.PIXABAY_API_KEY;
-  console.log(apiKey);
 
   if (!apiKey) {
     throw new Error('La clé API Pixabay (PIXABAY_API_KEY) est requise');

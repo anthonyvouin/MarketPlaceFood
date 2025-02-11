@@ -14,8 +14,10 @@ export default function RecipesPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getFavoritedRecipes();
-  }, []);
+    if (session) {
+      getFavoritedRecipes();
+    }
+  }, [session]);
 
   async function getFavoritedRecipes() {
     setLoading(true);

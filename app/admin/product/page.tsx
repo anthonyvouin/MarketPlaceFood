@@ -38,10 +38,6 @@ export default function ProductPage() {
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    console.log(products);
-  }, [products]);
-
   const onVisibilityToggle = async (productId: string, newValue: boolean) => {
     try {
       await toggleProductVisibility(productId, newValue);

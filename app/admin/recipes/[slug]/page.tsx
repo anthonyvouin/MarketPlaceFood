@@ -317,7 +317,6 @@ const RecipeAdminDetailPage = () => {
       setSteps(updatedSteps);
       setRecipeDetails({ ...recipeDetails, steps: updatedSteps as RecipeStepDto[] });
 
-      console.log("Updated steps", updatedSteps);
       try {
         await updateRecipe(recipeDetails.id, { steps: updatedSteps });
         showSuccessToast("Ordre des étapes mis à jour avec succès");

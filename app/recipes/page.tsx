@@ -20,7 +20,8 @@ import { CartDto } from '../interface/cart/cartDto';
 import { useRouter } from 'next/navigation';
 
 export default function RecipesPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const [favoriteRecipesIds, setFavoriteRecipesIds] = useState<string[]>([]);
   const { show } = useContext(ToastContext);
   const [recipes, setRecipes] = useState<RecipeDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -76,7 +77,7 @@ export default function RecipesPage() {
 
       for (const ingredient of recipe.ingredients) {
         const ingredientInBdd = await searchProduct(ingredient?.name);
-        const isIngredientExist = ingredientInBdd ? true : false;
+        const isIngredientExist = Boolean(ingredientInBdd);
         if (ingredient) {
           originalIngredients.push(ingredient);
           if (!isIngredientExist) {
@@ -100,18 +101,6 @@ export default function RecipesPage() {
       setLoading(false);
     }
   }
-
-  // async function randomizeRecipeFromBDD() {
-  //     try {
-  //         setLoading(true);
-  //         const recipes = await getRandomRecipes(9);
-  //         setRecipes(recipes);
-  //     } catch {
-  //         show("Erreur", "Erreur lors de la génération", "error");
-  //     } finally {
-  //         setLoading(false);
-  //     }
-  // }
 
   async function generateRecipe() {
     try {
@@ -163,25 +152,28 @@ export default function RecipesPage() {
     setLoading(true);
     try {
       let fetchedRecipes: RecipeDto[] = [];
+
       if (fetchRandom) {
         fetchedRecipes = await getRandomRecipes(9);
       } else {
-        fetchedRecipes = await getAllRecipes();
-        if (fetchedRecipes) {
-          fetchedRecipes = (fetchedRecipes as unknown as { recipes: RecipeDto[] })?.recipes;
-        }
+        const result = await getAllRecipes(1, 12, {}, {
+          createdAt: 'desc',
+        });
+        fetchedRecipes = result?.recipes || [];
       }
 
-      let favoriteRecipesIds: string[] = [];
+      setRecipes(fetchedRecipes);
+
       if (session?.user?.id) {
         const favoriteRecipes = await getUserFavoriteRecipes(session.user.id);
-        favoriteRecipesIds = favoriteRecipes?.recipes.map(recipe => recipe.id) || [];
+        const favIds = Array.isArray(favoriteRecipes)
+          ? favoriteRecipes.map(recipe => recipe.id)
+          : (favoriteRecipes?.recipes?.map(recipe => recipe.id) || []);
+        setFavoriteRecipesIds(favIds);
+      } else {
+        setFavoriteRecipesIds([]);
       }
 
-      setRecipes(fetchedRecipes.map(recipe => ({
-        ...recipe,
-        isFavorite: favoriteRecipesIds.includes(recipe.id),
-      })));
     } catch (error) {
       show('Erreur', 'Erreur lors du chargement des recettes', 'error');
     } finally {
@@ -189,54 +181,78 @@ export default function RecipesPage() {
     }
   }, [session, show]);
 
-  const changeAction = (action: 'recipe'| 'fridge', uploadImageVisible: boolean) =>{
+  const changeAction = (action: 'recipe' | 'fridge', uploadImageVisible: boolean) => {
     if (!session) {
       show('Erreur', 'Vous devez être connecté', 'error');
-    }else{
+    } else {
       setSelectedAction(action);
       setImageUploadVisible(uploadImageVisible);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchRecipesAndFavorites();
-  }, []);
+    if (status !== 'loading') {
+      fetchRecipesAndFavorites();
+    }
+  }, [fetchRecipesAndFavorites, status]);
 
   return (
     <div className="min-h-screen flex flex-col items-center p-6 sm:p-10 bg-gray-100 mt-16">
       <div className="w-full max-w-4xl text-center">
-        <h1 className="text-3xl sm:text-4xl font-bold text-primaryColor">🍽️ Recettes Gourmandes</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold text-primaryColor">
+          <span role="img" aria-label="Recettes Gourmandes">🍽️</span> Recettes Gourmandes
+        </h1>
         <p className="text-gray-600 mt-2 text-sm sm:text-base">
           Découvrez, générez et savourez des recettes adaptées à vos envies !
         </p>
       </div>
 
       <div className="w-3/4 grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-        <Button label="🔄 Aléatoires" className="bg-pink-500 text-white shadow-lg h-16" onClick={() => fetchRecipesAndFavorites(true)}/>
-        <Button label="🛒 Panier → Recette" className="bg-orange-500 text-white shadow-lg h-16" onClick={generateRecipe}/>
+        <Button
+          label="🔄 Aléatoires"
+          className="bg-pink-600 text-white shadow-lg h-16 focus:ring-4 focus:ring-pink-300"
+          aria-label="Générer des recettes aléatoires"
+          onClick={() => fetchRecipesAndFavorites(true)}
+        />
+        <Button
+          label="🛒 Panier → Recette"
+          className="bg-orange-600 text-white shadow-lg h-16 focus:ring-4 focus:ring-orange-300"
+          aria-label="Convertir panier en recette"
+          onClick={generateRecipe}
+        />
         <Button
           label="📷 Analyser une recette"
           className="bg-blue-500 text-white shadow-lg h-16"
+          aria-label="Analyser une image de recette"
           onClick={() => changeAction('recipe', true)}
         />
         <Button
           label="🥦 Frigo"
           className="bg-purple-500 text-white shadow-lg h-16"
+          aria-label="Analyser le contenu du frigo"
           onClick={() => changeAction('fridge', true)}
         />
       </div>
 
       {loading ? (
-        <ProgressSpinner className="mt-6"/>
+        <ProgressSpinner className="mt-6" />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-6 w-full max-w-6xl">
           {recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} favorite={recipe.isFavorite}/>
+            <RecipeCard
+              key={recipe.id}
+              recipe={{ ...recipe, isFavorite: favoriteRecipesIds.includes(recipe.id) }}
+              favorite={favoriteRecipesIds.includes(recipe.id)}
+            />
           ))}
         </div>
       )}
 
-      <ImageUploadDialog visible={imageUploadVisible} onHide={() => setImageUploadVisible(false)} onUpload={handleImageUpload}/>
+      <ImageUploadDialog
+        visible={imageUploadVisible}
+        onHide={() => setImageUploadVisible(false)}
+        onUpload={handleImageUpload}
+      />
 
       <IngredientsDialog
         visible={ingredientsDialogVisible}
