@@ -276,7 +276,11 @@ export async function getImageFromPixabay(name: string): Promise<string> {
 
     for (const hit of data.hits) {
       if (hit.webformatURL && hit.webformatURL.match(/^https?:\/\/.+/)) {
-        const cloudinaryUrl = await uploadImageToCloudinary(hit.webformatURL);
+        const response = await fetch(hit.webformatURL);
+        const blob = await response.blob();
+        const formData = new FormData();
+        formData.append('file', blob, 'image.jpg');
+        const cloudinaryUrl = await uploadImageToCloudinary(formData);
         return cloudinaryUrl;
       }
     }
