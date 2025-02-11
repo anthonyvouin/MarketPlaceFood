@@ -6,7 +6,7 @@ import { getPageName } from '@/app/utils/utils';
 import { getAllProductDiscount, getAllProductHighlighting } from './services/products/product';
 import ProductCard from './components/ProductCard/ProductCard';
 import { Button } from 'primereact/button';
-import { library } from '@fortawesome/fontawesome-svg-core';
+import { IconDefinition, library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAppleWhole, faCarrot, faLemon, faPepperHot, faLeaf } from '@fortawesome/free-solid-svg-icons';
 import Footer from './components/footer/footer';
@@ -78,7 +78,7 @@ export default function Home() {
     { left: '85%', top: '95%' }
   ];
 
-  const [decorativeIcons, setDecorativeIcons] = useState([]);
+  const [decorativeIcons, setDecorativeIcons] = useState<{ icon: IconDefinition; className: string; readyClassName: string; style: React.CSSProperties; }[]>([]);
 
   useEffect(() => {
     const mappedIcons = fixedPositions.map((position, index) => ({
@@ -86,13 +86,13 @@ export default function Home() {
       className: `${colors[index % colors.length]} opacity-0 transition-all transform scale-50`,
       readyClassName: `opacity-40 scale-100 animate-float`,
       style: {
-        position: 'absolute',
+        position: 'absolute' as React.CSSProperties['position'],
         left: position.left,
         top: position.top,
         transform: `rotate(${Math.random() * 360}deg)`,
         fontSize: `${1 + Math.random()}rem`,
         animationDelay: `${Math.random() * 2}s`
-      }
+      } as React.CSSProperties
     }));
     setDecorativeIcons(mappedIcons);
   }, []);
