@@ -42,16 +42,8 @@ export async function uploadTemporaryImageToCloudinary(formData: FormData): Prom
     return result.secure_url;
 }
 
-export async function uploadImageToCloudinary(input: FormData | string): Promise<string> {
-  let file: File;
-
-  if (typeof input === 'string') {
-    const response = await fetch(input);
-    const blob = await response.blob();
-    file = new File([blob], 'image', { type: blob.type });
-  } else {
-    file = input.get('file') as File;
-  }
+export async function uploadImageToCloudinary(input: FormData): Promise<string> {
+  const file: File = input.get('file') as File;
 
   if (!file) {
     throw new Error('Aucun fichier n\'a été téléchargé');
