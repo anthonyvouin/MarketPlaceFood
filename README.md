@@ -12,9 +12,9 @@ Vous pouvez accéder au projet en ligne à l'adresse suivante : [Snap&Shop](http
 
 ## Contributions
 
-- **Anthony Vouin** : Développeur Full Stack 
-- **Charline Royer** : Développeur Full Stack
-- **Matthias Faucon** : Développeur Full Stack 
+- **Anthony Vouin - github : anthonyvouin** : Développeur Full Stack 
+- **Charline Royer - github : akia-web** : Développeur Full Stack
+- **Matthias Faucon - github : matthiasfaucon** Développeur Full Stack 
 
 
 ## Technologies Utilisées
@@ -31,14 +31,28 @@ Vous pouvez accéder au projet en ligne à l'adresse suivante : [Snap&Shop](http
  
 ## Fonctionnalités
 
-- **Parcourir les produits** : Les utilisateurs peuvent explorer une variété de produits alimentaires.
-- **Système de paiement intégré** : Utilisation de Stripe pour des transactions sécurisées.
-- **Gestion des utilisateurs** : Inscription, connexion et gestion des profils utilisateurs.
-- **Interface réactive** : Conçue pour être utilisée sur tous les appareils.
-- **Intelligence artificielle** :
-    - Génération de recettes en fonction des articles présents dans le panier de l'utilisateur.
-     - Ajout d'une fonctionnalité permettant à l'utilisateur de mettre une photo de son frigo. L'IA analysera l'image pour identifier les aliments disponibles et proposera des recettes adaptées en fonction des ingrédients détectés.
+## Fonctionnalités
 
+- **Parcourir les produits** : Les utilisateurs peuvent explorer une variété de produits alimentaires. (Matthias)
+- **SSE** : L'administrateur peut voir en temps réel les revenus généré par le site sous forme d'un graphique (Anthony)
+- **Mise en avant** : L'administrateur peut choisir les produits à mettre en avant sur le page d'accueil (Charline)
+- **Promotions** : L'administrateur peut créer des promotions et les appliquer sur les produits qu'il souhaite. Les produits en promotions sont mise en avant automatique sur la page d'accueil.(Charline)
+- **PDF** : L'utilisateur peut télécharger ses factures sous forme de pdf. (Anthony)
+- **Mise en place des tests** : Utilisation de jest pour la mise en place des tests.(Anthony)
+- **Préparation des commandes** : L'administrateur et le magasinier peuvent préparer les commandes dont le paiement a été validé par Stripe. (Charline)
+- **Réalisation des pages pour les RGPD** : Mise en place des pages mentions légales, condition générale des ventes, RGPD, politique des cookies (Anthony)
+- **Filtrer les produits** : Les utilisateurs peuvent trier les produits avec différents filtres (Prix, catégories, promotions) (Matthias)
+- **Système de paiement intégré** : Utilisation de Stripe pour des transactions sécurisées (avec webhook). (Anthony et Charline)
+- **Gestion des utilisateurs** : Inscription, connexion et gestion des profils utilisateurs. (Anthony)
+- **Panier d'achat** :  Ajout, modification et suppression des produits avant l'achat. (Charline)
+- **Interface réactive** : Conçue pour être utilisée sur tous les appareils. (Anthony, Charline et Matthias)
+- **Expérience mobile** : Réalisation d'une pwa. (Anthony)
+- **Service de mail** :  Envoi d’e-mails de création de compte, validation d'adresse mail, confirmation de commande  et envoi de commande. (Anthony)
+- **Tableau de bord administrateur** : Gestion des comandes, des produits, des stocks et des produits, etc... (Anthony, Charline et Matthias)
+- **Notification de produits manquant** : L'administrateur est notifié si un produit est manquant lors de la génération d'une recette. L'administrateur pourra alors choisir de créer ce dernier ou non.
+- **Intelligence artificielle** :
+    - Génération de recettes en fonction des articles présents dans le panier de l'utilisateur. (Matthias)
+     - Ajout d'une fonctionnalité permettant à l'utilisateur de mettre une photo de son frigo ou d'un plat. L'IA analysera l'image pour identifier les aliments disponibles et proposera des recettes adaptées en fonction des ingrédients détectés. (Matthias)
 
 ## Rôles et Permissions
 
