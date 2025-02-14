@@ -12,9 +12,9 @@ Vous pouvez accéder au projet en ligne à l'adresse suivante : [Snap&Shop](http
 
 ## Contributions
 
-- **Anthony Vouin** : Développeur Full Stack 
-- **Charline Royer** : Développeur Full Stack
-- **Matthias Faucon** : Développeur Full Stack 
+- **Anthony Vouin - github : anthonyvouin** : Développeur Full Stack 
+- **Charline Royer - github : akia-web** : Développeur Full Stack
+- **Matthias Faucon - github : matthiasfaucon** Développeur Full Stack 
 
 
 ## Technologies Utilisées
