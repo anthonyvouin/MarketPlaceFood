@@ -28,8 +28,6 @@ Vous pouvez accéder au projet en ligne à l'adresse suivante : [Snap&Shop](http
 - **Tailwind CSS** : Framework CSS pour le design.
 - **NextAuth** : Authentification pour Next.js.
 
- 
-## Fonctionnalités
 
 ## Fonctionnalités
 
@@ -49,7 +47,9 @@ Vous pouvez accéder au projet en ligne à l'adresse suivante : [Snap&Shop](http
 - **Expérience mobile** : Réalisation d'une pwa. (Anthony)
 - **Service de mail** :  Envoi d’e-mails de création de compte, validation d'adresse mail, confirmation de commande  et envoi de commande. (Anthony)
 - **Tableau de bord administrateur** : Gestion des comandes, des produits, des stocks et des produits, etc... (Anthony, Charline et Matthias)
-- **Notification de produits manquant** : L'administrateur est notifié si un produit est manquant lors de la génération d'une recette. L'administrateur pourra alors choisir de créer ce dernier ou non.
+- **Notification de produits manquant** : L'administrateur est notifié si un produit est manquant lors de la génération d'une recette. L'administrateur pourra alors choisir de créer ce dernier ou non.(Matthias)
+- **Mise en place d'une CI** : Mise en place d'une ci test + build. (Matthias)
+- **Mise en place d'une CD** : Mise en place d'une CD, déploiement et installation du site avec ansible en production. (Matthias)
 - **Intelligence artificielle** :
     - Génération de recettes en fonction des articles présents dans le panier de l'utilisateur. (Matthias)
      - Ajout d'une fonctionnalité permettant à l'utilisateur de mettre une photo de son frigo ou d'un plat. L'IA analysera l'image pour identifier les aliments disponibles et proposera des recettes adaptées en fonction des ingrédients détectés. (Matthias)
